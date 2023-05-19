@@ -403,11 +403,6 @@
               <FileType>4</FileType>
               <FilePath>.\TiDriver\usblib.lib</FilePath>
             </File>
-            <File>
-              <FileName>system_TM4C123.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\TiDriver\src\system_TM4C123.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -479,9 +474,14 @@
               <FilePath>.\Driver\SenserDriver\Drv_spl06.c</FilePath>
             </File>
             <File>
-              <FileName>Drv_gps.c</FileName>
+              <FileName>Drv_heating.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Driver\SenserDriver\Drv_gps.c</FilePath>
+              <FilePath>.\Driver\SenserDriver\Drv_heating.c</FilePath>
+            </File>
+            <File>
+              <FileName>Drv_laser.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Driver\SenserDriver\Drv_laser.c</FilePath>
             </File>
             <File>
               <FileName>Ano_OF.c</FileName>
@@ -489,19 +489,9 @@
               <FilePath>.\Driver\SenserDriver\Ano_OF.c</FilePath>
             </File>
             <File>
-              <FileName>Drv_heating.c</FileName>
+              <FileName>Ano_UWB.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Driver\SenserDriver\Drv_heating.c</FilePath>
-            </File>
-            <File>
-              <FileName>Drv_UP_Flow.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Driver\SenserDriver\Drv_UP_Flow.c</FilePath>
-            </File>
-            <File>
-              <FileName>Drv_laser.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Driver\SenserDriver\Drv_laser.c</FilePath>
+              <FilePath>.\Driver\SenserDriver\Ano_UWB.c</FilePath>
             </File>
             <File>
               <FileName>nlink_linktrack_tagframe0.c</FileName>
@@ -514,9 +504,9 @@
               <FilePath>.\Driver\SenserDriver\UWB\nlink_utils.c</FilePath>
             </File>
             <File>
-              <FileName>Ano_UWB.c</FileName>
+              <FileName>Drv_UP_Flow.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Driver\SenserDriver\Ano_UWB.c</FilePath>
+              <FilePath>.\Driver\SenserDriver\Drv_UP_Flow.c</FilePath>
             </File>
           </Files>
         </Group>

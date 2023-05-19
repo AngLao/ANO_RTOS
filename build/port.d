@@ -1,0 +1,13 @@
+.\build\port.o: FreeRTOS\portable\RVDS\ARM_CM4F\port.c
+.\build\port.o: .\FreeRTOS\include\FreeRTOS.h
+.\build\port.o: D:\Work\Keil5\ARM\ARMCC\Bin\..\include\stddef.h
+.\build\port.o: D:\Work\Keil5\ARM\ARMCC\Bin\..\include\stdint.h
+.\build\port.o: .\FreeRTOS\include\FreeRTOSConfig.h
+.\build\port.o: D:\Work\Keil5\ARM\ARMCC\Bin\..\include\stdio.h
+.\build\port.o: .\FreeRTOS\include\projdefs.h
+.\build\port.o: .\FreeRTOS\include\portable.h
+.\build\port.o: .\FreeRTOS\include\deprecated_definitions.h
+.\build\port.o: .\FreeRTOS\portable\RVDS\ARM_CM4F\portmacro.h
+.\build\port.o: .\FreeRTOS\include\mpu_wrappers.h
+.\build\port.o: .\FreeRTOS\include\task.h
+.\build\port.o: .\FreeRTOS\include\list.h

@@ -12,7 +12,6 @@
 #include "Ano_FlightDataCal.h"
 #include "Ano_Sensor_Basic.h"
 
-#include "Drv_gps.h"
 #include "Ano_DT.h"
 #include "Ano_RC.h"
 #include "Ano_Parameter.h"
@@ -30,51 +29,14 @@
 #include "Ano_OF.h"
 #include "Drv_heating.h"
 #include "Ano_FlyCtrl.h"
-#include "Ano_UWB.h"
-#include "Drv_OpenMV.h"
-#include "Ano_OPMV_CBTracking_Ctrl.h"
-#include "Ano_OPMV_LineTracking_Ctrl.h"
-#include "Ano_OPMV_Ctrl.h"
+#include "Ano_UWB.h" 
 #include "Ano_OF_DecoFusion.h"
 #include "Drv_laser.h"
 #include "Drv_Uart.h"
 
 #include "Ano_Sensor_Basic.h"
+  
  
-static unsigned long long CPU_ADD=0;//CPU占用率统计变量
-static unsigned long Free_Heap_Size; 	//操作系统内存剩余量
-
-
-/* CPU 空闲时间统计进程 执行频率不固定 优先级0*/
-static void CPU_Occupancy_Rate(void *pvParameters)
-{
-    while (1)
-    {
-        CPU_ADD+=1ULL;
-        vTaskDelay(1);
-    }
-}
-/* CPU 占用率计算进程 该任务为精准进行的任务 执行频率精准5Hz 优先级全局最高*/
-static void CPU_Occupancy_Rate_Updata(void *pvParameters)
-{
-    TickType_t xLastWakeTime;         //用于精准定时的变量
-	
-    while (1)
-    {
-        xLastWakeTime = xTaskGetTickCount(); //获取当前Tick次数,以赋给延时函数初值
-			 
-				static float Occupancy_Rate;        	//CPU占用率(取值范围:0.0f-100.0f)
-        Occupancy_Rate=100.0f-((float)CPU_ADD/(float)(configTICK_RATE_HZ/5)*100.0f); //CPU占用率计算
-        Free_Heap_Size=xPortGetFreeHeapSize();
-        CPU_ADD=0;
-				
-				printf("Occupancy_Rate:%.2f\r\n",Occupancy_Rate);  
-			  
-        /* 5Hz的频率 */ 
-        vTaskDelayUntil(&xLastWakeTime,configTICK_RATE_HZ/5);
-    }
-} 
-
 /* 基本传感器数据准备进程 该任务为精准进行的任务 执行频率精准1000Hz 优先级全局最高*/
 void basic_data_read(void *pvParameters)
 {
@@ -96,8 +58,7 @@ void basic_data_read(void *pvParameters)
 					IMU_Update_Task(1); 
 					
 					/*获取WC_Z加速度*/
-					WCZ_Acc_Get_Task();
-					WCXY_Acc_Get_Task();
+					WCZ_Acc_Get_Task(); 
 					
 					/*飞行状态任务*/
 					Flight_State_Task(1,CH_N);
@@ -156,7 +117,7 @@ void outer_loop(void *pvParameters)
     }
 } 
 
-/* 高度环控制进程 该任务为精准进行的任务 执行频率精准100Hz 优先级第三*/
+/* 高度环控制进程 该任务为精准进行的任务 执行频率精准100Hz 优先级第三 */
 void height_loop(void *pvParameters)
 {
     TickType_t xLastWakeTime;         //用于精准定时的变量
@@ -182,7 +143,7 @@ void height_loop(void *pvParameters)
 				Alt_2level_Ctrl(10e-3f);
 				
 				/*--*/	
-				AnoOF_DataAnl_Task(10);
+				AnoOF_Check(10);
 
 				/*灯光控制*/	
 				LED_Task2(10);
@@ -211,13 +172,13 @@ void position_loop(void *pvParameters)
 					 onekey.val = UWBTest_Task(20);
 				}
 				
-				ANO_OFDF_Task(20);
+				AnoOF_Check(20);
 				
 				/*位置速度环控制*/
 				Loc_1level_Ctrl(20,CH_N); 
 				
 				//解析UWB数据
-				UWB_Get_Data_Task(50);
+				UWB_Get_Data_Task();
 				 
         vTaskDelayUntil(&xLastWakeTime,configTICK_RATE_HZ/50);
     }
@@ -235,11 +196,13 @@ void temperature_loop(void *pvParameters)
 
 				/*电压相关任务*/
 				Power_UpdateTask(50);
+			
 				//恒温控制（不能直接注释掉，否则开机过不了校准）
 				Thermostatic_Ctrl_Task(50);
+			
 				/*延时存储任务*/
 				Ano_Parame_Write_task(50); 
-				 
+				  
         vTaskDelayUntil(&xLastWakeTime,configTICK_RATE_HZ/20);
     } 
 } 
@@ -250,28 +213,28 @@ int main(void)
 
 	Drv_BspInit();
 	
-	flag.start_ok = 1; 
+	flag.start_ok = 1;  
 	
-	/* CPU空闲时间统计进程(优先级0) */
-	xTaskCreate(CPU_Occupancy_Rate,"CPU_Occupancy_Rate",80,NULL,0,NULL);
-	/* CPU占用率计算进程(最高优先级) */
-	xTaskCreate(CPU_Occupancy_Rate_Updata,"CPU_Occupancy_Rate_Updata",112,NULL,4,NULL);
-	  
 	/* 基本传感器数据准备进程 1000Hz*/
 	xTaskCreate(basic_data_read,"basic_data_read",152,NULL,4,NULL);
+	
 	/* 姿态角速度环控制进程 500Hz*/
 	xTaskCreate(inner_loop,"inner_loop",104,NULL,3,NULL);
+	
 	/* 姿态角度环控制进程 200Hz*/
 	xTaskCreate(outer_loop,"outer_loop",104,NULL,3,NULL);
+	
 	/* 高度环控制进程 100Hz*/
 	xTaskCreate(height_loop,"height_loop",248,NULL,3,NULL);
+	
 	/* 位置环控制进程 50Hz*/
 	xTaskCreate(position_loop,"position_loop",184,NULL,2,NULL);
+	
 	/* 恒温控制进程 20Hz*/
 	xTaskCreate(temperature_loop,"temperature_loop",128,NULL,2,NULL);
 	
-	Free_Heap_Size=xPortGetFreeHeapSize();  
-	printf("Free_Heap_Size:%ld\r\n",Free_Heap_Size);
+	
+	printf("Free_Heap_Size:%d\r\n",xPortGetFreeHeapSize());
 	
 	//启用任务调度器
 	vTaskStartScheduler();

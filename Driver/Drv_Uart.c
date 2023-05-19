@@ -12,8 +12,7 @@
 //TM4C的串口5对应底板串口3
 //TM4C的串口7对应底板串口4
 //这里都以底板的串口标号为准，比如Drv_Uart1Init，为底板串口1的初始化，即TM4C的串口0
-/////////////////////////////////////////////////////////////////////////////////////////////////
-#include "Drv_gps.h"
+
 u8 U1TxDataTemp[256];
 u8 U1TxInCnt = 0;
 u8 U1TxOutCnt = 0;
@@ -215,12 +214,7 @@ void UART4_IRQHandler(void)
 		if(of_init_type!=2)
 		{
 			AnoOF_GetOneByte(com_data);
-		}
-		//优像光流解析
-		if(of_init_type!=1)
-		{
-			OFGetByte(com_data);
-		}
+		} 
 	}
 	if(flag & UART_INT_TX)
 	{

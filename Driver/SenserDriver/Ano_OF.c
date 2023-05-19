@@ -35,18 +35,7 @@ void AnoOF_DataAnl(uint8_t *data_buf,uint8_t num);
 static uint8_t _datatemp[50];
 static u8 _data_cnt = 0;
 static u8 anoof_data_ok;
-
-void AnoOF_DataAnl_Task(u8 dT_ms)
-{
-//	if(anoof_data_ok)
-//	{
-//		anoof_data_ok = 0;
-//		AnoOF_DataAnl(_datatemp,_data_cnt+5);
-//	}
-	
-	AnoOF_Check(dT_ms);
-}
-
+ 
 
 //AnoOF_GetOneByte是初级数据解析函数，串口每接收到一字节光流数据，调用本函数一次，函数参数就是串口收到的数据
 //当本函数多次被调用，最终接收到完整的一帧数据后，会自动调用数据解析函数AnoOF_DataAnl

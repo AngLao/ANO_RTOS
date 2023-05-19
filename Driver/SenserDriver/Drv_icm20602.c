@@ -11,37 +11,13 @@
 #include "hw_ints.h"
 //
 #include "Ano_Scheduler.h"
-
-void Drv_Icm20602IrqHandler(void)
-{
-	//清除中断标记
-	GPIOIntClear(ICM20602_READY_PORT, ICM20602_READY_PIN);
-	//执行中断函数
-	//Drv_Icm20602_Read();
-	//利用icm的1ms中断做1ms任务
-//	INT_1ms_Task();
-}
+ 
 void Drv_Icm20602CSPinInit(void)
 {
 	ROM_SysCtlPeripheralEnable(ICM_CSPIN_SYSCTL);
 	ROM_GPIOPinTypeGPIOOutput(ICM20602_CS_PORT,ICM20602_CS_PIN);
 	ROM_GPIOPinWrite(ICM20602_CS_PORT, ICM20602_CS_PIN,ICM20602_CS_PIN);
-}
-void Drv_Icm20602ReadyPinInit(void)
-{
-	ROM_SysCtlPeripheralEnable(ICM_READYPIN_SYSCTL);
-	ROM_GPIODirModeSet(ICM20602_READY_PORT, ICM20602_READY_PIN, GPIO_DIR_MODE_IN);
-	ROM_GPIOPinTypeGPIOInput(ICM20602_READY_PORT, ICM20602_READY_PIN);
-	ROM_GPIOPadConfigSet(ICM20602_READY_PORT,ICM20602_READY_PIN,GPIO_STRENGTH_2MA,GPIO_PIN_TYPE_STD_WPD);
-	ROM_GPIOIntTypeSet(ICM20602_READY_PORT, ICM20602_READY_PIN , GPIO_RISING_EDGE);
-	//GPIO注册中断
-	GPIOIntRegister(ICM20602_READY_PORT, Drv_Icm20602IrqHandler);
-	//使能中断
-	GPIOIntEnable(ICM20602_READY_PORT, ICM20602_READY_PIN);
-	//设置中断优先级
-	ROM_IntPrioritySet(ICM20602_READY_INT_PORT, USER_INT7);
-}
-
+} 
 static void icm20602_enable(u8 ena)
 {
 	if(ena)

@@ -17,16 +17,14 @@
 #include "Drv_Uart.h"
 #include "ano_usb.h"
 #include "Ano_RC.h"
-#include "Ano_Sensor_Basic.h"
-#include "Drv_gps.h"
+#include "Ano_Sensor_Basic.h" 
 #include "Ano_Parameter.h"
 #include "ANO_IMU.h"
 #include "Drv_icm20602.h"
 #include "Ano_MagProcess.h"
 #include "Ano_MotorCtrl.h"
 #include "Ano_Power.h"
-#include "Ano_FlightCtrl.h"
-#include "Drv_OpenMV.h"
+#include "Ano_FlightCtrl.h" 
 #include "Ano_MotionCal.h"
 #include "Ano_FlightDataCal.h"
 #include "Ano_OF_DecoFusion.h"
@@ -81,10 +79,8 @@ void ANO_DT_Data_Exchange(void)
 	static u16 motopwm_cnt	= 20;
 	static u16 power_cnt	= 50;
 	static u16 speed_cnt   	= 50;
-	static u16 sensorsta_cnt = 500;
-	static u16 omv_cnt = 100;
-	static u16 location_cnt = 500;
-	static u8	flag_send_omv = 0;
+	static u16 sensorsta_cnt = 500; 
+	static u16 location_cnt = 500; 
 
 		
 	if((cnt % senser_cnt) == (senser_cnt-1))
@@ -115,12 +111,7 @@ void ANO_DT_Data_Exchange(void)
 	{
 		f.send_sensorsta = 1;		
 	}	
-	
-	if((cnt % omv_cnt) == (omv_cnt-2))
-	{
-		flag_send_omv = 1;		
-	}	
-	
+	 
 	if((cnt % location_cnt) == (location_cnt-3))
 	{
 		f.send_location = 1;		
@@ -212,25 +203,14 @@ void ANO_DT_Data_Exchange(void)
 		f.send_sensorsta = 0;
 //		switchs.of_tof_on = 1;
 		ANO_DT_SendSensorSta(switchs.of_flow_on ,switchs.gps_on,switchs.opmv_on,switchs.uwb_on,switchs.of_tof_on);
-	}
-	else if(f.send_location)
-	{
-		f.send_location = 0;
-		ANO_DT_Send_Location(switchs.gps_on,Gps_information.satellite_num,(s32)Gps_information.longitude,(s32)Gps_information.latitude,123,456);
-		
-	}
+	} 
 	else if(f.send_vef)
 	{
 		ANO_DT_Send_VER();
 		f.send_vef = 0;
-	}
-/////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////
-	ANO_DT_Data_Receive_Anl_Task();
-/////////////////////////////////////////////////////////////////////////////////////
-//	Usb_Hid_Send();					
-/////////////////////////////////////////////////////////////////////////////////////
+	} 
+	
+	ANO_DT_Data_Receive_Anl_Task(); 
 }
 
 
@@ -1139,9 +1119,7 @@ void ANO_DT_SendOmvLt(u8 sta, s16 angle, s16 offset, u8 pflag, s16 x, s16 y, u8 
 
 
 //用户自定义数据发送
-#include "Ano_MotionCal.h"
-#include "Ano_OPMV_CBTracking_Ctrl.h"
-#include "Drv_OpenMV.h"
+#include "Ano_MotionCal.h" 
 #include "Ano_OF_DecoFusion.h"
 void ANO_DT_Send_User()
 {

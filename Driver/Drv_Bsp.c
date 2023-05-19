@@ -13,8 +13,7 @@
 #include "Ano_FcData.h"
 #include "Ano_Sensor_Basic.h"
 #include "Ano_RC.h"
-#include "Ano_FlightCtrl.h"
-#include "Drv_gps.h"
+#include "Ano_FlightCtrl.h" 
 #include "ano_usb.h"
 #include "Drv_UP_Flow.h"
 #include "Drv_laser.h"
@@ -101,9 +100,7 @@ void Drv_BspInit(void)
 	
 	Drv_Uart2Init(115200);	
 	
-	Drv_Uart3Init(115200);   //接数传
-	
-	Drv_Uart4Init(19200);	//接优像光流
+	Drv_Uart3Init(115200);   //接数传 
 	 
 	Drv_Uart4Init(921600);	//接匿名光流
 		

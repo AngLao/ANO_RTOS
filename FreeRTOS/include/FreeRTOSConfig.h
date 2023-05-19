@@ -74,10 +74,7 @@
 	
 //针对不同的编译器调用不同的stdint.h文件
 #if defined(__ICCARM__) || defined(__CC_ARM) || defined(__GNUC__)
-    #include <stdint.h>
-    #include "rom.h" 
-		//TM4库函数 调用ROM_SysCtlClockGet()读取当前时钟频率
-    extern uint32_t SystemCoreClock; 
+    #include <stdint.h> 
 #endif
 
 #include <stdio.h> 
@@ -95,7 +92,7 @@
                                                                         //MCU没有这些硬件指令的话此宏应该设置为0！
 #define configUSE_TICKLESS_IDLE							0                       //1启用低功耗tickless模式
 #define configUSE_QUEUE_SETS								1                       //为1时启用队列
-#define configCPU_CLOCK_HZ									(SystemCoreClock)       //CPU频率
+#define configCPU_CLOCK_HZ									(80*1000*1000)       				//CPU频率
 #define configTICK_RATE_HZ									(1000)                  //时钟节拍频率，这里设置为1000，周期就是1ms
 #define configMAX_PRIORITIES								(5)                    	//可使用的最大优先级
 #define configMINIMAL_STACK_SIZE						((unsigned short)128)   //空闲任务使用的堆栈大小

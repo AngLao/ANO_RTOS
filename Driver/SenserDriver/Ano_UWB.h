@@ -22,15 +22,10 @@ typedef struct
 
 }_uwb_data_st;
 
+ 
 
-//==数据声明
-extern _uwb_data_st uwb_data;
-
-
-//==函数声明
-
-void UWB_Get_Data_Task(u8 dT_ms);
-void Ano_UWB_Data_Calcu_Task(u8 dT_ms);
+ 
+void UWB_Get_Data_Task(void); 
 
 
 

@@ -13,13 +13,11 @@
 #include "Drv_laser.h"
 #include "Ano_OF.h"
 #include "Ano_OF_DecoFusion.h"
-#include "Ano_FlyCtrl.h"
-#include "Ano_UWB.h"
+#include "Ano_FlyCtrl.h" 
 #include "Ano_Sensor_Basic.h"
 #include "Ano_DT.h"
 #include "Ano_LED.h"
-#include "Ano_ProgramCtrl_User.h"
-#include "Drv_OpenMV.h"
+#include "Ano_ProgramCtrl_User.h" 
 
 
 /*============================================================================
@@ -462,17 +460,7 @@ void Swtich_State_Task(u8 dT_ms)
 	{
 		switchs.tof_on = 0;
 	}
-	
-	
-	//UWB
-	if(uwb_data.online && flag.flight_mode == LOC_HOLD)
-	{
-		switchs.uwb_on = 1;
-	}
-	else
-	{
-		switchs.uwb_on = 0;
-	}
+	 
 	
 }
  
