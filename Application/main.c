@@ -241,35 +241,38 @@ void temperature_loop(void *pvParameters)
 				Ano_Parame_Write_task(50); 
 				 
         vTaskDelayUntil(&xLastWakeTime,configTICK_RATE_HZ/20);
-    }
+    } 
 } 
 
+ 
 int main(void)
 {
+
 	Drv_BspInit();
 	
 	flag.start_ok = 1; 
 	
 	/* CPU空闲时间统计进程(优先级0) */
-	xTaskCreate(CPU_Occupancy_Rate,"CPU_Occupancy_Rate",88,NULL,0,NULL);
+	xTaskCreate(CPU_Occupancy_Rate,"CPU_Occupancy_Rate",80,NULL,0,NULL);
 	/* CPU占用率计算进程(最高优先级) */
-	xTaskCreate(CPU_Occupancy_Rate_Updata,"CPU_Occupancy_Rate_Updata",96,NULL,4,NULL);
+	xTaskCreate(CPU_Occupancy_Rate_Updata,"CPU_Occupancy_Rate_Updata",112,NULL,4,NULL);
 	  
 	/* 基本传感器数据准备进程 1000Hz*/
-	xTaskCreate(basic_data_read,"basic_data_read",512,NULL,4,NULL);
+	xTaskCreate(basic_data_read,"basic_data_read",152,NULL,4,NULL);
 	/* 姿态角速度环控制进程 500Hz*/
-	xTaskCreate(inner_loop,"inner_loop",640,NULL,3,NULL);
+	xTaskCreate(inner_loop,"inner_loop",104,NULL,3,NULL);
 	/* 姿态角度环控制进程 200Hz*/
-	xTaskCreate(outer_loop,"outer_loop",512,NULL,3,NULL);
+	xTaskCreate(outer_loop,"outer_loop",104,NULL,3,NULL);
 	/* 高度环控制进程 100Hz*/
-	xTaskCreate(height_loop,"height_loop",512,NULL,3,NULL);
+	xTaskCreate(height_loop,"height_loop",248,NULL,3,NULL);
 	/* 位置环控制进程 50Hz*/
-	xTaskCreate(position_loop,"position_loop",640,NULL,2,NULL);
+	xTaskCreate(position_loop,"position_loop",184,NULL,2,NULL);
 	/* 恒温控制进程 20Hz*/
-	xTaskCreate(temperature_loop,"temperature_loop",640,NULL,2,NULL);
+	xTaskCreate(temperature_loop,"temperature_loop",128,NULL,2,NULL);
 	
 	Free_Heap_Size=xPortGetFreeHeapSize();  
 	printf("Free_Heap_Size:%ld\r\n",Free_Heap_Size);
+	
 	//启用任务调度器
 	vTaskStartScheduler();
 	

@@ -75,8 +75,7 @@
 //针对不同的编译器调用不同的stdint.h文件
 #if defined(__ICCARM__) || defined(__CC_ARM) || defined(__GNUC__)
     #include <stdint.h>
-    #include "rom.h"
-		#include "Drv_Timer.h" 
+    #include "rom.h" 
 		//TM4库函数 调用ROM_SysCtlClockGet()读取当前时钟频率
     extern uint32_t SystemCoreClock; 
 #endif
@@ -132,9 +131,9 @@
 /***************************************************************************************************************/
 /*                                FreeRTOS与运行时间和任务状态收集有关的配置选项                                 */
 /***************************************************************************************************************/
-#define configGENERATE_RUN_TIME_STATS	        1                       //为1时启用运行时间统计功能
-#define configUSE_TRACE_FACILITY							0                       //为1启用可视化跟踪调试
-#define configUSE_STATS_FORMATTING_FUNCTIONS	0                       //与宏configUSE_TRACE_FACILITY同时为1时会编译下面3个函数
+#define configGENERATE_RUN_TIME_STATS	        0	                      //为1时启用运行时间统计功能
+#define configUSE_TRACE_FACILITY							1                       //为1启用可视化跟踪调试
+#define configUSE_STATS_FORMATTING_FUNCTIONS	1                       //与宏configUSE_TRACE_FACILITY同时为1时会编译下面3个函数
                                                                         //prvWriteNameToBuffer(),vTaskList(),
                                                                         //vTaskGetRunTimeStats()
                                                                         
