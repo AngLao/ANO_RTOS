@@ -503,11 +503,6 @@
               <FileType>1</FileType>
               <FilePath>.\Driver\SenserDriver\UWB\nlink_utils.c</FilePath>
             </File>
-            <File>
-              <FileName>Drv_UP_Flow.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Driver\SenserDriver\Drv_UP_Flow.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>

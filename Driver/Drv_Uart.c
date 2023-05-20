@@ -205,8 +205,7 @@ void Drv_Uart3TxCheck(void)
 		U3TxOutCnt++;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////
-#include "Ano_OF.h"
-#include "Drv_UP_Flow.h"
+#include "Ano_OF.h" 
 u8 U4TxDataTemp[256];
 u8 U4TxInCnt = 0;
 u8 U4TxOutCnt = 0;

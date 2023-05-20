@@ -39,10 +39,19 @@
 //数据接口定义：
 //=========mapping===============
 //需要引用的文件：
-#include "Drv_UP_Flow.h"
 #include "Ano_Sensor_Basic.h"
 #include "Drv_laser.h"
 
+
+#define delay_ms MyDelayMs
+ 
+#define CIRCLE_P(n,a,b) ((a) + ((n)-(a))%((b)-(a)))
+#define OF_BUFFER_NUM 14
+
+uint8_t of_init_cnt;
+uint8_t of_buf_update_cnt;
+uint8_t OF_DATA[OF_BUFFER_NUM];
+ 
 //需要调用引用的外部变量：
 #define LASER_ONLINE              (1)//LASER_LINKOK
 #define BUF_UPDATE_CNT            (of_buf_update_cnt)
