@@ -204,7 +204,7 @@ void temperature_loop(void *pvParameters)
 
     /*—” ±¥Ê¥¢»ŒŒÒ*/
     Ano_Parame_Write_task(50);
-
+	
     vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 20);
   }
 }

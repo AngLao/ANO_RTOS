@@ -211,8 +211,8 @@ void ANO_DT_Init(void)
 //===========================================================
 void ANO_DT_Send_Data(u8 *dataToSend, u8 length)
 {
-  Drv_Uart3SendBuf(dataToSend, length);
-//		AnoUsbCdcSend(dataToSend, length);
+//		Drv_Uart3SendBuf(dataToSend, length);
+		AnoUsbCdcSend(dataToSend, length);
 
 }
 //===========================================================

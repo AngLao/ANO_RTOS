@@ -112,7 +112,7 @@ unsigned char UWBTest_Task(unsigned char dT_ms)
 
       static unsigned int over_time = 0;
 
-      static unsigned char allow_error = 50;  //x,y所允许的误差单位为 (mm)
+      static unsigned char allow_error = 30;  //x,y所允许的误差单位为 (mm)
 
       //在误差运行范围内() 到达了指定地点
       if(abs(error_pos_x) < allow_error && abs(error_pos_y) < allow_error) {
@@ -121,7 +121,7 @@ unsigned char UWBTest_Task(unsigned char dT_ms)
         Program_Ctrl_User_Set_HXYcmps(0, 0);
 
         //在指定位置悬停了多少时间 单位(mm)
-        if( over_time == 300 ) {
+        if( over_time == 180. ) {
 
           //所有位置都已走完结束飞行
           if(targe_index == targe_len - 1) {

@@ -283,7 +283,7 @@ void UART5_IRQHandler(void)
   while(ROM_UARTCharsAvail(UART2_BASE)) {
     com_data = ROM_UARTCharGet(UART2_BASE);
     openMV_res = com_data;
-    Drv_Uart3SendBuf( &com_data, 1 );
+//    Drv_Uart3SendBuf( &com_data, 1 );
 //		//ANO_DT_Data_Receive_Prepare(com_data);
 //		#if defined(USE_LASER)
 //		Drv_Laser_GetOneByte(com_data);

@@ -33,7 +33,7 @@
 //2000kv以上 0.3f-0.2f
 //==
 #define GYR_ACC_FILTER 0.22f //陀螺仪加速度计滤波系数
-#define FINAL_P 			 0.30f  //电机输出量比例系数
+#define FINAL_P 			 0.35f  //电机输出量比例系数
 
 #define MOTOR_ESC_TYPE 1  //2：无刷电机带刹车的电调，1：无刷电机不带刹车的电调，
 #define MOTORSNUM 4
@@ -68,7 +68,7 @@
 #define X_PROPORTION_X_Y 1.0f //proportion
 #define ROLL_ANGLE_KP 10.0f   //翻滚角度kp
 
-#define MAX_THR_SET    92  //最大油门百分比 %
+#define MAX_THR_SET    100  //最大油门百分比 %
 #define THR_INTE_LIM_SET   70  //油门积分百分比 % 
 
 //#define MAX_THR       MAX_THR_SET/FINAL_P

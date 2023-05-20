@@ -102,6 +102,7 @@ void Drv_BspInit(void)
 
   Drv_Uart4Init(921600);	//接匿名光流
 
+  Drv_Uart5Init(921600);	//openmv
   //====fc
   //飞控传感器计算初始化
   Sensor_Basic_Init();

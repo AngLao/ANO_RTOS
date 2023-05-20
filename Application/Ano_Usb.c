@@ -278,16 +278,6 @@ void AnoUsbCdcSend( const uint8_t* data, uint16_t length )
     USBBufferWrite( &g_sTxBuffer, data, length );
 }
 
-/* USER CODE BEGIN 1 */
-#include <stdio.h>
-
-int fputc(int ch, FILE *stream)
-{
-  Drv_Uart3SendBuf( (uint8_t*)&ch, 1 );
-//	  AnoUsbCdcSend( (uint8_t*)&ch , 1 );
-  return ch;
-}
-/* USER CODE END 1 */
 uint16_t AnoUsbCdcRead( uint8_t* data, uint16_t length )
 {
   if(g_bUSBConfigured)
