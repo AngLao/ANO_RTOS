@@ -95,7 +95,6 @@ void UART2_IRQHandler(void)
 	while(ROM_UARTCharsAvail(UART4_BASE))		
 	{			
 		com_data=ROM_UARTCharGet(UART4_BASE);
-		ANO_DT_Data_Receive_Prepare(com_data);
 	}
 	if(flag & UART_INT_TX)
 	{
@@ -141,8 +140,13 @@ void Drv_Uart2TxCheck(void)
 u8 U3TxDataTemp[256];
 u8 U3TxInCnt = 0;
 u8 U3TxOutCnt = 0;
+
+//串口收发环形缓冲区定义
+RINGBUFF_T U3rxring;
+volatile unsigned char UART3Buffer[128];
 void UART3_IRQHandler(void)
 {
+	
 	uint8_t com_data;
 	/*获取中断标志 原始中断状态 不屏蔽中断标志*/		
 	uint32_t flag = ROM_UARTIntStatus(UART5_BASE,1);
@@ -152,6 +156,11 @@ void UART3_IRQHandler(void)
 	while(ROM_UARTCharsAvail(UART5_BASE))		
 	{			
 		com_data=ROM_UARTCharGet(UART5_BASE); 
+		
+		if(RingBuffer_GetFree(&U3rxring)>1)
+		{
+		  RingBuffer_Insert(&U3rxring, &com_data);
+		}
 	}
 	if(flag & UART_INT_TX)
 	{
@@ -160,6 +169,8 @@ void UART3_IRQHandler(void)
 }
 void Drv_Uart3Init(uint32_t baudrate)
 {
+	//环形缓冲区初始化
+	RingBuffer_Init(&U3rxring, (unsigned char*)UART3Buffer, 1, 128*5);
 	ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_UART5);
 	ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
 	

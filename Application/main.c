@@ -74,6 +74,8 @@ void basic_data_read(void *pvParameters)
 				
 				//灯光驱动
 				LED_1ms_DRV();
+				
+				
         vTaskDelayUntil(&xLastWakeTime,configTICK_RATE_HZ/1000);
     }
 } 
@@ -94,6 +96,7 @@ void inner_loop(void *pvParameters)
 				/*电机输出控制*/
 				Motor_Ctrl_Task(2);	
 				 
+			
         vTaskDelayUntil(&xLastWakeTime,configTICK_RATE_HZ/500);
     }
 } 
@@ -113,6 +116,13 @@ void outer_loop(void *pvParameters)
 				/*姿态角度环控制*/
 				Att_2level_Ctrl(5e-3f,CH_N);
 				 
+				//数传响应
+				int len = RingBuffer_GetCount(&U3rxring);
+				u8 data =0;
+				for(; len!= 0 ; len--){
+					RingBuffer_Pop(&U3rxring, &data);
+					AnoDTRxOneByte( data);
+				}
         vTaskDelayUntil(&xLastWakeTime,configTICK_RATE_HZ/200);
     }
 } 
@@ -148,9 +158,10 @@ void height_loop(void *pvParameters)
 				/*灯光控制*/	
 				LED_Task2(10);
 				
+				
 				/*数传数据交换*/
-				ANO_DT_Data_Exchange();	
-				 
+				ANO_DT_Task1Ms(); 
+				
         vTaskDelayUntil(&xLastWakeTime,configTICK_RATE_HZ/100);
     }
 } 
@@ -202,7 +213,7 @@ void temperature_loop(void *pvParameters)
 			
 				/*延时存储任务*/
 				Ano_Parame_Write_task(50); 
-				  
+				   
         vTaskDelayUntil(&xLastWakeTime,configTICK_RATE_HZ/20);
     } 
 } 
@@ -212,7 +223,6 @@ int main(void)
 {
 
 	Drv_BspInit();
-	
 	flag.start_ok = 1;  
 	
 	/* 基本传感器数据准备进程 1000Hz*/

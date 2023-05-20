@@ -53,8 +53,8 @@ void Thermostatic_Ctrl_Task(u8 dT_ms)
 				//
 				sensor.acc_z_auto_CALIBRATE = 1; //重新对准Z轴
 				sensor.gyr_CALIBRATE = 2;//重新校准陀螺仪
-				//
-				ANO_DT_SendString("Thermostatic ON......");	
+				
+				AnoDTSendStr( 0xA0, 1,"Thermostatic ON......");
 			}
 		}
 		else
@@ -64,7 +64,8 @@ void Thermostatic_Ctrl_Task(u8 dT_ms)
 				//
 				thermostatic_en = 0;
 				//
-				ANO_DT_SendString("Thermostatic OFF,Please Restart ANO_Pioneer_pro!");	
+				
+				AnoDTSendStr(0xA0, 1,"Thermostatic OFF,Please Restart ANO_Pioneer_pro!"); 
 			}
 		}
 	}
@@ -113,8 +114,8 @@ void Thermostatic_Ctrl_Task(u8 dT_ms)
 
 						//
 						flag.mems_temperature_ok = 1;
-						//
-						ANO_DT_SendString("Thermostatic OK!");	
+					
+						AnoDTSendStr(0xA0, 1,"Thermostatic OK!"); 
 					
 				}
 			}

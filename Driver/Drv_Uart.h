@@ -5,6 +5,7 @@
 
 
 extern RINGBUFF_T U1rxring;//外部环形缓冲区声明 
+extern RINGBUFF_T U3rxring;
 extern u8 openMV_res ;
 void Drv_Uart1Init(uint32_t baudrate);
 void Drv_Uart1SendBuf(u8 *data, u8 len);

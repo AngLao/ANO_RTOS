@@ -319,7 +319,7 @@ void Flight_State_Task(u8 dT_ms,s16 *CH_N)
 		{
 			flag.sensor_imu_ok = 1;
 			LED_STA.rst_imu = 0;
-			ANO_DT_SendString("IMU OK!");
+			ANO_DT_SendString("IMU OK!"); 
 		}
 	}
 	

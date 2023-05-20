@@ -89,6 +89,8 @@ void Drv_BspInit(void)
 	//标记罗盘OK，否则罗盘不参与解算（注：此处没有做罗盘是否正常的检测程序）
 	sens_hd_check.mag_ok = 0;       
 	
+	//上位机通讯设置初始化
+	ANO_DT_Init();
 	
 	//ADC初始化
 	Drv_AdcInit();
