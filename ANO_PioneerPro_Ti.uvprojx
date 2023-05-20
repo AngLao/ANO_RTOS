@@ -608,11 +608,6 @@
               <FileType>1</FileType>
               <FilePath>.\SRC\fc_general\Ano_MotionCal.c</FilePath>
             </File>
-            <File>
-              <FileName>Ano_Navigate.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\SRC\fc_general\Ano_Navigate.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>

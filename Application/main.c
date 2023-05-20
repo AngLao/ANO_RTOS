@@ -116,13 +116,7 @@ void outer_loop(void *pvParameters)
 				/*姿态角度环控制*/
 				Att_2level_Ctrl(5e-3f,CH_N);
 				 
-				//数传响应
-				int len = RingBuffer_GetCount(&U3rxring);
-				u8 data =0;
-				for(; len!= 0 ; len--){
-					RingBuffer_Pop(&U3rxring, &data);
-					AnoDTRxOneByte( data);
-				}
+
         vTaskDelayUntil(&xLastWakeTime,configTICK_RATE_HZ/200);
     }
 } 
@@ -159,8 +153,13 @@ void height_loop(void *pvParameters)
 				LED_Task2(10);
 				
 				
-				/*数传数据交换*/
-				ANO_DT_Task1Ms(); 
+				//数传响应
+				int len = RingBuffer_GetCount(&U3rxring);
+				u8 data =0;
+				for(; len!= 0 ; len--){
+					RingBuffer_Pop(&U3rxring, &data);
+					AnoDTRxOneByte( data);
+				}
 				
         vTaskDelayUntil(&xLastWakeTime,configTICK_RATE_HZ/100);
     }
@@ -190,6 +189,11 @@ void position_loop(void *pvParameters)
 				
 				//解析UWB数据
 				UWB_Get_Data_Task();
+				
+				
+				
+				/*数传数据交换*/
+				ANO_DT_Task1Ms(); 
 				 
         vTaskDelayUntil(&xLastWakeTime,configTICK_RATE_HZ/50);
     }

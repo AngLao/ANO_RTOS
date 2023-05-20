@@ -7,8 +7,7 @@
 #include "Drv_PwmOut.h"
 
 #include "Ano_MotionCal.h"
-#include "Ano_Filter.h"
-#include "Ano_Navigate.h"
+#include "Ano_Filter.h" 
 #include "Ano_RC.h"
 
 /*

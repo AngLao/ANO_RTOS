@@ -14,10 +14,9 @@
 #include "Ano_Sensor_Basic.h"
 #include "Ano_RC.h"
 #include "Ano_FlightCtrl.h" 
-#include "ano_usb.h"
-#include "Drv_UP_Flow.h"
-#include "Drv_laser.h"
-
+#include "ano_usb.h" 
+#include "Drv_laser.h" 
+#include "Ano_DT.h"
 
 #include "FreeRTOS.h"
 #include "task.h" 
@@ -98,9 +97,7 @@ void Drv_BspInit(void)
 	SysTick_Init();	
 	//串口初始化
 	
-	Drv_Uart1Init(3000000);	//接UWB
-	
-	Drv_Uart2Init(115200);	
+	Drv_Uart1Init(3000000);	//接UWB 
 	
 	Drv_Uart3Init(115200);   //接数传 
 	 

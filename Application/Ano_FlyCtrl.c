@@ -58,11 +58,11 @@ unsigned char UWBTest_Task(unsigned char dT_ms){
 				//执行任务点顺序
 				static unsigned char targe_buf[] = {
 																						21 , 28 , 27 , 20 , 19  , 26 ,
-//																						25 , 18 , 14 , 10 ,  8  ,  4 ,
-//																						 3 ,  7 ,  9 , 13 , 17  , 24 ,  
-//																						23 , 16 , 12 ,  6 ,  2  ,
-//																						22 , 15 , 11 ,  5 ,  1  ,
-//																						0
+																						25 , 18 , 14 , 10 ,  8  ,  4 ,
+																						 3 ,  7 ,  9 , 13 , 17  , 24 ,  
+																						23 , 16 , 12 ,  6 ,  2  ,
+																						22 , 15 , 11 ,  5 ,  1  ,
+																						0
 				}; 
 				//执行任务点个数
 				static int targe_len =	sizeof(targe_buf)/sizeof(targe_buf[0]);
@@ -115,7 +115,7 @@ unsigned char UWBTest_Task(unsigned char dT_ms){
 							//依靠光流悬停
 							Program_Ctrl_User_Set_HXYcmps(0,0);
 							//在指定位置悬停了多少时间 单位(mm)
-							if( over_time == 800 ){
+							if( over_time == 300 ){
 								
 								//所有位置都已走完结束飞行
 								if(targe_index == targe_len-1){
