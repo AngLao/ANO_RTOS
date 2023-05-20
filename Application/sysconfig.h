@@ -22,12 +22,12 @@ typedef	int8_t 		s8;
 //#define ANO_DT_USE_USART2
 //#define ANO_DT_USE_USART3
 #define ANO_DT_USE_USB
-//======  
- 
+//======
+
 #define HW_ALL		 0xFF
 #define HW_TYPE		 05
 #define SWJ_ADDR 	 0xAF
-#define SOFT_VER 	 17 
+#define SOFT_VER 	 17
 #define HW_VER		 666666
 #define SW_VER  	 666666
 #define BL_VER		 666666
@@ -66,7 +66,7 @@ typedef	int8_t 		s8;
 //#define M0TO_PWM3_FUNCTION	GPIO_PB4_M0PWM2
 //#define M0TO_PWM4_FUNCTION	GPIO_PB5_M0PWM3
 /*油门行程为[0:1000]*/
-//#define MINTHROTTLE	    	0				//最小油门值           
+//#define MINTHROTTLE	    	0				//最小油门值
 //#define MAXTHROTTLE 		1000            //最大油门值
 //#define PWM_PERIOD_MAX		3125			//周期为2.5ms(400hz)
 /**********spi引脚配置*************/

@@ -8,18 +8,17 @@
 //#define USE_US100
 //#define USE_LASER
 
-typedef struct
-{
-	//s32 height;//cm
-	
-	//float relative_height;	
-	//float h_delta;
-	
-	float h_dt;
-	
-	u8 measure_ok;
-	u8 measure_ot_cnt;
-}_height_st;
+typedef struct {
+  //s32 height;//cm
+
+  //float relative_height;
+  //float h_delta;
+
+  float h_dt;
+
+  u8 measure_ok;
+  u8 measure_ot_cnt;
+} _height_st;
 
 extern _height_st ultra;
 

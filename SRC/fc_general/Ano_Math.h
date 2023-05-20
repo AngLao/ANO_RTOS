@@ -41,8 +41,8 @@ float my_sqrt_reciprocal(float number);
 double mx_sin(double rad);
 double my_sin(double rad);
 float my_cos(double rad);
-float my_deadzone(float x,float ,float zoom);
-float my_deadzone_2(float x,float ,float zoom);
+float my_deadzone(float x,float,float zoom);
+float my_deadzone_2(float x,float,float zoom);
 
 float my_deadzone_p(float x,float zone);
 float my_deadzone_n(float x,float zone);

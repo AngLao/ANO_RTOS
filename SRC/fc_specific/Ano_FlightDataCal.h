@@ -15,7 +15,7 @@ extern u16 ref_tof_height;
 void Fc_Sensor_Get(void);
 
 void IMU_Update_Task(u8 dT_ms);
-	
+
 void Mag_Update_Task(u8 dT_ms);
 
 void WCZ_Acc_Get_Task(void);
@@ -24,7 +24,7 @@ void WCZ_Fus_Task(u8 dT_ms);
 
 
 
-//rtos 
+//rtos
 
 
 void Icm20602_read(void *pvParameters);

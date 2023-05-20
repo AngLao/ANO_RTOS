@@ -8,20 +8,19 @@
 #include "Ano_Pid.h"
 /* Exported types ------------------------------------------------------------*/
 
-typedef struct
-{
-	float exp[VEC_XYZ];
-	float fb[VEC_XYZ];
+typedef struct {
+  float exp[VEC_XYZ];
+  float fb[VEC_XYZ];
 
-	
-	float out[VEC_XYZ];
-}_loc_ctrl_st;// loc_ctrl;
+
+  float out[VEC_XYZ];
+} _loc_ctrl_st; // loc_ctrl;
 extern _loc_ctrl_st loc_ctrl_1;
 extern _loc_ctrl_st loc_ctrl_2;
 /* Exported constants --------------------------------------------------------*/
 
-extern _PID_arg_st loc_arg_1[] ; 
-extern _PID_val_st loc_val_1[] ; 
+extern _PID_arg_st loc_arg_1[] ;
+extern _PID_val_st loc_val_1[] ;
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
 

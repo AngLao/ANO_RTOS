@@ -15,13 +15,13 @@ _pc_user_st pc_user;
 *参    数: X速度（厘米每秒，正为前进，负为后退，Y速度（厘米每秒，正为左移，负为右移）
 *返 回 值: 无
 **********************************************************************************************************/
-void Program_Ctrl_User_Set_HXYcmps(float hx_vel_cmps,float hy_vel_cmps)
+void Program_Ctrl_User_Set_HXYcmps(float hx_vel_cmps, float hy_vel_cmps)
 {
-	//
-	pc_user.vel_cmps_set_h[0] = hx_vel_cmps;
-	pc_user.vel_cmps_set_h[1] = hy_vel_cmps;
-	//限制XY速度模长
-	length_limit(&pc_user.vel_cmps_set_h[0],&pc_user.vel_cmps_set_h[1],MAX_PC_XYVEL_CMPS,pc_user.vel_cmps_set_h);
+  //
+  pc_user.vel_cmps_set_h[0] = hx_vel_cmps;
+  pc_user.vel_cmps_set_h[1] = hy_vel_cmps;
+  //限制XY速度模长
+  length_limit(&pc_user.vel_cmps_set_h[0], &pc_user.vel_cmps_set_h[1], MAX_PC_XYVEL_CMPS, pc_user.vel_cmps_set_h);
 }
 
 
@@ -39,10 +39,10 @@ void Program_Ctrl_User_Set_HXYcmps(float hx_vel_cmps,float hy_vel_cmps)
 **********************************************************************************************************/
 void Program_Ctrl_User_Set_Zcmps(float z_vel_cmps)
 {
-	//
-	pc_user.vel_cmps_set_z = z_vel_cmps;
-	//限幅
-	pc_user.vel_cmps_set_z = LIMIT(pc_user.vel_cmps_set_z,-MAX_PC_ZVEL_CMPS,MAX_PC_ZVEL_CMPS);
+  //
+  pc_user.vel_cmps_set_z = z_vel_cmps;
+  //限幅
+  pc_user.vel_cmps_set_z = LIMIT(pc_user.vel_cmps_set_z, -MAX_PC_ZVEL_CMPS, MAX_PC_ZVEL_CMPS);
 }
 /**********************************************************************************************************
 *函 数 名: Program_Ctrl_User_Set_YAWdps
@@ -52,10 +52,10 @@ void Program_Ctrl_User_Set_Zcmps(float z_vel_cmps)
 **********************************************************************************************************/
 void Program_Ctrl_User_Set_YAWdps(float yaw_pal_dps)
 {
-	//
-	pc_user.pal_dps_set = yaw_pal_dps;
-	//限幅
-	pc_user.pal_dps_set = LIMIT(pc_user.pal_dps_set,-MAX_PC_PAL_DPS,MAX_PC_PAL_DPS);
+  //
+  pc_user.pal_dps_set = yaw_pal_dps;
+  //限幅
+  pc_user.pal_dps_set = LIMIT(pc_user.pal_dps_set, -MAX_PC_PAL_DPS, MAX_PC_PAL_DPS);
 }
 
 

@@ -8,12 +8,11 @@
 #include "Ano_Pid.h"
 /* Exported types ------------------------------------------------------------*/
 
-typedef struct
-{
-	s32 ct_val_rol;
-	s32 ct_val_pit;
-	s32 ct_val_yaw; 
-	s32 ct_val_thr;
+typedef struct {
+  s32 ct_val_rol;
+  s32 ct_val_pit;
+  s32 ct_val_yaw;
+  s32 ct_val_thr;
 } _mc_st;
 extern _mc_st mc;
 

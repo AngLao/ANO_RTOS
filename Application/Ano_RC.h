@@ -2,28 +2,26 @@
 #define	_RC_H_
 #include "Ano_FcData.h"
 
-typedef struct//波动次数结构体
-{
-	u16 s_cnt;
-	u8 s_now_times;
-	u8 s_state;
-}_stick_f_c_st;
+typedef struct { //波动次数结构体
+  u16 s_cnt;
+  u8 s_now_times;
+  u8 s_state;
+} _stick_f_c_st;
 
 #define _stick_f_lp_st u16 //长按
 
-enum
-{
-	CH1 = 0,
-	CH2,
-	CH3,
-	CH4,
-	CH5,
-	CH6,
-	CH7,
-	CH8
+enum {
+  CH1 = 0,
+  CH2,
+  CH3,
+  CH4,
+  CH5,
+  CH6,
+  CH7,
+  CH8
 };
-	
-	
+
+
 
 
 
@@ -36,7 +34,7 @@ void fail_safe_check(u8 dT_ms);
 
 void stick_function(u8 dT_ms);
 
-void stick_function_check_longpress(u8 dT_ms,u16 *time_cnt,u16 longpress_time_ms,u8 en,u8 trig_val,u8 *trig);
+void stick_function_check_longpress(u8 dT_ms, u16 *time_cnt, u16 longpress_time_ms, u8 en, u8 trig_val, u8 *trig);
 
 void ch_watch_dog(u8 dT_ms);
 

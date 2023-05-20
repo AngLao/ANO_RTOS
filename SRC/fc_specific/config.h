@@ -13,7 +13,7 @@
 /***************换算******************/
 #define ANGLE_TO_RADIAN 0.01745329f //*0.01745 = /57.3	角度转弧度
 /***********************************************/
- 
+
 
 
 #define SP_EST_DRAG 1.0f
@@ -64,15 +64,15 @@
 
 #define CTRL_1_INTE_LIM 250 //角速度环积分限幅 ：输出
 
-#define ANGULAR_VELOCITY_PID_INTE_D_LIM 300/FINAL_P  
+#define ANGULAR_VELOCITY_PID_INTE_D_LIM 300/FINAL_P
 #define X_PROPORTION_X_Y 1.0f //proportion
 #define ROLL_ANGLE_KP 10.0f   //翻滚角度kp
 
 #define MAX_THR_SET    92  //最大油门百分比 %
 #define THR_INTE_LIM_SET   70  //油门积分百分比 % 
 
-//#define MAX_THR       MAX_THR_SET/FINAL_P   
-#define THR_INTE_LIM   THR_INTE_LIM_SET/FINAL_P  
+//#define MAX_THR       MAX_THR_SET/FINAL_P
+#define THR_INTE_LIM   THR_INTE_LIM_SET/FINAL_P
 
 #define THR_START      35  //油门起调量百分比 %
 

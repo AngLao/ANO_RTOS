@@ -9,12 +9,11 @@
 
 #include "usb_serial_structs.h"
 
-static tLineCoding usb_linecoding = 
-{
-	500000 ,
-	USB_CDC_STOP_BITS_1 ,
-	USB_CDC_PARITY_EVEN ,
-	8 ,
+static tLineCoding usb_linecoding = {
+  500000,
+  USB_CDC_STOP_BITS_1,
+  USB_CDC_PARITY_EVEN,
+  8,
 };
 
 //*****************************************************************************
@@ -56,73 +55,74 @@ ControlHandler(void *pvCBData, uint32_t ui32Event,
                uint32_t ui32MsgValue, void *pvMsgData)
 {
 
-    switch(ui32Event)
-    {
-        case USB_EVENT_CONNECTED:
-            g_bUSBConfigured = true;
-            USBBufferFlush(&g_sTxBuffer);
-            USBBufferFlush(&g_sRxBuffer);
-            break;
-        case USB_EVENT_DISCONNECTED:
-            g_bUSBConfigured = false;
-            break;
+  switch(ui32Event) {
+  case USB_EVENT_CONNECTED:
+    g_bUSBConfigured = true;
+    USBBufferFlush(&g_sTxBuffer);
+    USBBufferFlush(&g_sRxBuffer);
+    break;
 
-        //
-        // Return the current serial communication parameters.
-        //
-        case USBD_CDC_EVENT_GET_LINE_CODING:
-            *( (tLineCoding*)pvMsgData ) = usb_linecoding;
-            break;
+  case USB_EVENT_DISCONNECTED:
+    g_bUSBConfigured = false;
+    break;
 
-        //
-        // Set the current serial communication parameters.
-        //
-        case USBD_CDC_EVENT_SET_LINE_CODING:
-            usb_linecoding = *( (tLineCoding*)pvMsgData );
-            break;
+  //
+  // Return the current serial communication parameters.
+  //
+  case USBD_CDC_EVENT_GET_LINE_CODING:
+    *( (tLineCoding*)pvMsgData ) = usb_linecoding;
+    break;
 
-        //
-        // Set the current serial communication parameters.
-        //
-        case USBD_CDC_EVENT_SET_CONTROL_LINE_STATE:
-            //SetControlLineState((uint16_t)ui32MsgValue);
-            break;
+  //
+  // Set the current serial communication parameters.
+  //
+  case USBD_CDC_EVENT_SET_LINE_CODING:
+    usb_linecoding = *( (tLineCoding*)pvMsgData );
+    break;
 
-        //
-        // Send a break condition on the serial line.
-        //
-        case USBD_CDC_EVENT_SEND_BREAK:
-            //SendBreak(true);
-            break;
+  //
+  // Set the current serial communication parameters.
+  //
+  case USBD_CDC_EVENT_SET_CONTROL_LINE_STATE:
+    //SetControlLineState((uint16_t)ui32MsgValue);
+    break;
 
-        //
-        // Clear the break condition on the serial line.
-        //
-        case USBD_CDC_EVENT_CLEAR_BREAK:
-            //SendBreak(false);
-            break;
+  //
+  // Send a break condition on the serial line.
+  //
+  case USBD_CDC_EVENT_SEND_BREAK:
+    //SendBreak(true);
+    break;
 
-        //
-        // Ignore SUSPEND and RESUME for now.
-        //
-        case USB_EVENT_SUSPEND:
-        case USB_EVENT_RESUME:
-            break;
+  //
+  // Clear the break condition on the serial line.
+  //
+  case USBD_CDC_EVENT_CLEAR_BREAK:
+    //SendBreak(false);
+    break;
 
-        //
-        // We don't expect to receive any other events.  Ignore any that show
-        // up in a release build or hang in a debug build.
-        //
-        default:
+  //
+  // Ignore SUSPEND and RESUME for now.
+  //
+  case USB_EVENT_SUSPEND:
+  case USB_EVENT_RESUME:
+    break;
+
+  //
+  // We don't expect to receive any other events.  Ignore any that show
+  // up in a release build or hang in a debug build.
+  //
+  default:
 #ifdef DEBUG
-            while(1);
+    while(1);
+
 #else
-            break;
+    break;
 #endif
 
-    }
+  }
 
-    return(0);
+  return(0);
 }
 
 
@@ -147,31 +147,32 @@ uint32_t
 TxHandler(void *pvCBData, uint32_t ui32Event, uint32_t ui32MsgValue,
           void *pvMsgData)
 {
+  //
+  // Which event have we been sent?
+  //
+  switch(ui32Event) {
+  case USB_EVENT_TX_COMPLETE:
     //
-    // Which event have we been sent?
+    // Since we are using the USBBuffer, we don't need to do anything
+    // here.
     //
-    switch(ui32Event)
-    {
-        case USB_EVENT_TX_COMPLETE:
-            //
-            // Since we are using the USBBuffer, we don't need to do anything
-            // here.
-            //
-            break;
+    break;
 
-        //
-        // We don't expect to receive any other events.  Ignore any that show
-        // up in a release build or hang in a debug build.
-        //
-        default:
+  //
+  // We don't expect to receive any other events.  Ignore any that show
+  // up in a release build or hang in a debug build.
+  //
+  default:
 #ifdef DEBUG
-            while(1);
+    while(1);
+
 #else
-            break;
+    break;
 #endif
 
-    }
-    return(0);
+  }
+
+  return(0);
 }
 
 //*****************************************************************************
@@ -195,110 +196,107 @@ uint32_t
 RxHandler(void *pvCBData, uint32_t ui32Event, uint32_t ui32MsgValue,
           void *pvMsgData)
 {
-    uint32_t ui32Count;
+  uint32_t ui32Count;
 
+  //
+  // Which event are we being sent?
+  //
+  switch(ui32Event) {
+  //
+  // A new packet has been received.
+  //
+  case USB_EVENT_RX_AVAILABLE: {
     //
-    // Which event are we being sent?
+    // Feed some characters into the UART TX FIFO and enable the
+    // interrupt so we are told when there is more space.
     //
-    switch(ui32Event)
-    {
-        //
-        // A new packet has been received.
-        //
-        case USB_EVENT_RX_AVAILABLE:
-        {
-            //
-            // Feed some characters into the UART TX FIFO and enable the
-            // interrupt so we are told when there is more space.
-            //
-            //USBUARTPrimeTransmit(USB_UART_BASE);
-            //ROM_UARTIntEnable(USB_UART_BASE, UART_INT_TX);
-            break;
-        }
+    //USBUARTPrimeTransmit(USB_UART_BASE);
+    //ROM_UARTIntEnable(USB_UART_BASE, UART_INT_TX);
+    break;
+  }
 
-        //
-        // We are being asked how much unprocessed data we have still to
-        // process. We return 0 if the UART is currently idle or 1 if it is
-        // in the process of transmitting something. The actual number of
-        // bytes in the UART FIFO is not important here, merely whether or
-        // not everything previously sent to us has been transmitted.
-        //
-        case USB_EVENT_DATA_REMAINING:
-        {
-            //
-            // Get the number of bytes in the buffer and add 1 if some data
-            // still has to clear the transmitter.
-            //
-            //ui32Count = ROM_UARTBusy(USB_UART_BASE) ? 1 : 0;
-            return(ui32Count);
-        }
+  //
+  // We are being asked how much unprocessed data we have still to
+  // process. We return 0 if the UART is currently idle or 1 if it is
+  // in the process of transmitting something. The actual number of
+  // bytes in the UART FIFO is not important here, merely whether or
+  // not everything previously sent to us has been transmitted.
+  //
+  case USB_EVENT_DATA_REMAINING: {
+    //
+    // Get the number of bytes in the buffer and add 1 if some data
+    // still has to clear the transmitter.
+    //
+    //ui32Count = ROM_UARTBusy(USB_UART_BASE) ? 1 : 0;
+    return(ui32Count);
+  }
 
-        //
-        // We are being asked to provide a buffer into which the next packet
-        // can be read. We do not support this mode of receiving data so let
-        // the driver know by returning 0. The CDC driver should not be sending
-        // this message but this is included just for illustration and
-        // completeness.
-        //
-        case USB_EVENT_REQUEST_BUFFER:
-        {
-            return(0);
-        }
-
-        //
-        // We don't expect to receive any other events.  Ignore any that show
-        // up in a release build or hang in a debug build.
-        //
-        default:
-#ifdef DEBUG
-            while(1);
-#else
-            break;
-#endif
-    }
-
+  //
+  // We are being asked to provide a buffer into which the next packet
+  // can be read. We do not support this mode of receiving data so let
+  // the driver know by returning 0. The CDC driver should not be sending
+  // this message but this is included just for illustration and
+  // completeness.
+  //
+  case USB_EVENT_REQUEST_BUFFER: {
     return(0);
+  }
+
+  //
+  // We don't expect to receive any other events.  Ignore any that show
+  // up in a release build or hang in a debug build.
+  //
+  default:
+#ifdef DEBUG
+    while(1);
+
+#else
+    break;
+#endif
+  }
+
+  return(0);
 }
 
 void AnoUsbCdcInit(void)
 {
-	ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
-	ROM_GPIOPinTypeUSBAnalog( GPIOD_BASE , GPIO_PIN_4 );	//PD4 USB DM
-	ROM_GPIOPinTypeUSBAnalog( GPIOD_BASE , GPIO_PIN_5 );	//PD5 USB DP
-	//初始化发送接收缓冲区
-	USBBufferInit(&g_sTxBuffer);
-	USBBufferInit(&g_sRxBuffer);
-	USBStackModeSet(0, eUSBModeForceDevice, 0);	
-	void* usbd_instance = USBDCDCInit(0, &g_sCDCDevice);	
-	USBIntRegister( INT_USB0 , USB0DeviceIntHandler );
-	ROM_IntPrioritySet( INT_USB0 , USER_INT7 );
+  ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
+  ROM_GPIOPinTypeUSBAnalog( GPIOD_BASE, GPIO_PIN_4 );	//PD4 USB DM
+  ROM_GPIOPinTypeUSBAnalog( GPIOD_BASE, GPIO_PIN_5 );	//PD5 USB DP
+  //初始化发送接收缓冲区
+  USBBufferInit(&g_sTxBuffer);
+  USBBufferInit(&g_sRxBuffer);
+  USBStackModeSet(0, eUSBModeForceDevice, 0);
+  void* usbd_instance = USBDCDCInit(0, &g_sCDCDevice);
+  USBIntRegister( INT_USB0, USB0DeviceIntHandler );
+  ROM_IntPrioritySet( INT_USB0, USER_INT7 );
 }
 
-void AnoUsbCdcSend( const uint8_t* data , uint16_t length )
+void AnoUsbCdcSend( const uint8_t* data, uint16_t length )
 {
-	if(g_bUSBConfigured)
-		USBBufferWrite( &g_sTxBuffer , data , length );
+  if(g_bUSBConfigured)
+    USBBufferWrite( &g_sTxBuffer, data, length );
 }
 
-/* USER CODE BEGIN 1 */ 
+/* USER CODE BEGIN 1 */
 #include <stdio.h>
 
 int fputc(int ch, FILE *stream)
-{ 
-		Drv_Uart3SendBuf( (uint8_t*)&ch , 1 );
-//	  AnoUsbCdcSend( (uint8_t*)&ch , 1 );
-    return ch;
-}  
-/* USER CODE END 1 */ 
-uint16_t AnoUsbCdcRead( uint8_t* data , uint16_t length )
 {
-	if(g_bUSBConfigured)
-		return USBBufferRead( &g_sRxBuffer , data , length );
-	else
-		return 0;
+  Drv_Uart3SendBuf( (uint8_t*)&ch, 1 );
+//	  AnoUsbCdcSend( (uint8_t*)&ch , 1 );
+  return ch;
+}
+/* USER CODE END 1 */
+uint16_t AnoUsbCdcRead( uint8_t* data, uint16_t length )
+{
+  if(g_bUSBConfigured)
+    return USBBufferRead( &g_sRxBuffer, data, length );
+  else
+    return 0;
 }
 uint16_t AnoUsbCdcDataAvailable()
 {
-	return USBBufferDataAvailable(&g_sRxBuffer);
+  return USBBufferDataAvailable(&g_sRxBuffer);
 }
 

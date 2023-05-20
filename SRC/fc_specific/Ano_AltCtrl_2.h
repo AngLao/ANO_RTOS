@@ -6,30 +6,29 @@
 #include "Ano_FcData.h"
 
 //==定义
-typedef struct
-{
-	//
-	float target_vel_fixup_cmps;
-	float target_acc_fixup_cmpss;
-	//
-	float expect_hei;
-	float expect_vel;
-	float expect_acc;
-	//
-	float feedback_hei;
-	float feedback_vel;
-	float feedback_acc;
-	//
-	float e_hei;
-	float e_vel;
-	float e_acc;
-	float ei_acc;
-	//
-	float adj_b;
-	float obs_twr;
-	float out_u;
+typedef struct {
+  //
+  float target_vel_fixup_cmps;
+  float target_acc_fixup_cmpss;
+  //
+  float expect_hei;
+  float expect_vel;
+  float expect_acc;
+  //
+  float feedback_hei;
+  float feedback_vel;
+  float feedback_acc;
+  //
+  float e_hei;
+  float e_vel;
+  float e_acc;
+  float ei_acc;
+  //
+  float adj_b;
+  float obs_twr;
+  float out_u;
 
-}_ano_alt_ctrl_st;
+} _ano_alt_ctrl_st;
 
 //==数据声明
 _ano_alt_ctrl_st alt_ctrl;

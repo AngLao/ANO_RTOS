@@ -21,57 +21,57 @@ extern "C"
 #define NLINK_PROTOCOL_LENGTH(X) ((size_t)(X[2] | X[3] << 8))
 
 #define NLINK_TRANSFORM_ARRAY(DEST, SRC, MULTIPLY)                             \
-  for (size_t _CNT = 0; _CNT < sizeof(SRC) / sizeof(SRC[0]); ++_CNT)           \
-  {                                                                            \
-    DEST[_CNT] = SRC[_CNT] / MULTIPLY;                                         \
-  }
+    for (size_t _CNT = 0; _CNT < sizeof(SRC) / sizeof(SRC[0]); ++_CNT)           \
+        {                                                                            \
+            DEST[_CNT] = SRC[_CNT] / MULTIPLY;                                         \
+        }
 
 #define NLINK_TRANSFORM_ARRAY_INT24(DEST, SRC, MULTIPLY)                       \
-  for (size_t _CNT = 0; _CNT < sizeof(SRC) / sizeof(SRC[0]); ++_CNT)           \
-  {                                                                            \
-    DEST[_CNT] = NLINK_ParseInt24(SRC[_CNT]) / MULTIPLY;                       \
-  }
+    for (size_t _CNT = 0; _CNT < sizeof(SRC) / sizeof(SRC[0]); ++_CNT)           \
+        {                                                                            \
+            DEST[_CNT] = NLINK_ParseInt24(SRC[_CNT]) / MULTIPLY;                       \
+        }
 
 #define TRY_MALLOC_NEW_NODE(NODE_POINTER, NODE_TYPE)                           \
-  if (!NODE_POINTER)                                                           \
-  {                                                                            \
-    void *p = malloc(sizeof(NODE_TYPE));                                       \
-    if (p != NULL)                                                             \
-    {                                                                          \
-      NODE_POINTER = (NODE_TYPE *)p;                                           \
-      memset(p,0,sizeof(NODE_TYPE));                                           \
-    }                                                                          \
-    else                                                                       \
-    {                                                                          \
-      printf("Memory allocation failed, please increase heap size to support " \
-             "protocol unpack.\r\n");                                          \
-      return 0;                                                                \
-    }                                                                          \
-  }
+    if (!NODE_POINTER)                                                           \
+        {                                                                            \
+            void *p = malloc(sizeof(NODE_TYPE));                                       \
+            if (p != NULL)                                                             \
+                {                                                                          \
+                    NODE_POINTER = (NODE_TYPE *)p;                                           \
+                    memset(p,0,sizeof(NODE_TYPE));                                           \
+                }                                                                          \
+            else                                                                       \
+                {                                                                          \
+                    printf("Memory allocation failed, please increase heap size to support " \
+                           "protocol unpack.\r\n");                                          \
+                    return 0;                                                                \
+                }                                                                          \
+        }
 
 #pragma pack(1)
-  typedef struct
-  {
+typedef struct
+{
     uint8_t byteArray[3];
-  } nint24_t;
+} nint24_t;
 
-  typedef struct
-  {
+typedef struct
+{
     uint8_t byteArray[3];
-  } nuint24_t;
+} nuint24_t;
 #pragma pack()
 
-  int32_t NLINK_ParseInt24(nint24_t data);
+int32_t NLINK_ParseInt24(nint24_t data);
 
-  uint32_t NLINK_ParseUint24(nuint24_t data);
+uint32_t NLINK_ParseUint24(nuint24_t data);
 
-  uint8_t NLINK_VerifyCheckSum(const void *data, size_t data_length);
+uint8_t NLINK_VerifyCheckSum(const void *data, size_t data_length);
 
-  void NLink_UpdateCheckSum(uint8_t *data, size_t data_length);
+void NLink_UpdateCheckSum(uint8_t *data, size_t data_length);
 
-  size_t NLink_StringToHex(const char *str, uint8_t *out);
+size_t NLink_StringToHex(const char *str, uint8_t *out);
 
-	//默认缩放倍率
+//默认缩放倍率
 //#define MULTIPLY_VOLTAGE 1000.0f
 //#define MULTIPLY_POS 1000.0f
 //#define MULTIPLY_DIS 1000.0f
@@ -80,7 +80,7 @@ extern "C"
 //#define MULTIPLY_RSSI -2.0f
 //#define MULTIPLY_EOP 100.0f
 
-	
+
 #define MULTIPLY_VOLTAGE 1.0f
 #define MULTIPLY_POS 1.0f
 #define MULTIPLY_DIS 1.0f

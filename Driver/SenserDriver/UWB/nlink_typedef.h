@@ -10,8 +10,8 @@ extern "C"
 #include <stdlib.h>
 #include <string.h>
 
-  typedef enum
-  {
+typedef enum
+{
     LINKTRACK_ROLE_NODE,
     LINKTRACK_ROLE_ANCHOR,
     LINKTRACK_ROLE_TAG,
@@ -19,12 +19,12 @@ extern "C"
     LINKTRACK_ROLE_DT_MASTER,
     LINKTRACK_ROLE_DT_SLAVE,
     LINKTRACK_ROLE_MONITOR,
-  } linktrack_role_e;
+} linktrack_role_e;
 
-  typedef uint32_t id_t;
+typedef uint32_t id_t;
 
-  #define MAX_ANCHOR_COUNT 16
-  #define MAX_TAG_COUNT 16
+#define MAX_ANCHOR_COUNT 16
+#define MAX_TAG_COUNT 16
 
 #ifdef __cplusplus
 }

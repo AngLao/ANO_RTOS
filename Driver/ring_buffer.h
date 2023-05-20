@@ -1,16 +1,16 @@
 #ifndef __RING_BUFFER_H_
 #define __RING_BUFFER_H_
- 
+
 #include <stdint.h>
 /**
  * @brief Ring buffer structure
  */
 typedef struct {
-	void *data;   /* the buffer holding the data*/
-	int count;
-	int itemSz;   /* the size of the allocated buffer*/
-	uint32_t head;/* data is added at offset (in % size)*/
-	uint32_t tail;/* data is extracted from off. (out % size)*/
+  void *data;   /* the buffer holding the data*/
+  int count;
+  int itemSz;   /* the size of the allocated buffer*/
+  uint32_t head;/* data is added at offset (in % size)*/
+  uint32_t tail;/* data is extracted from off. (out % size)*/
 } RINGBUFF_T;
 
 /**
@@ -24,7 +24,7 @@ typedef struct {
  * volatile typecasted tail index
  */
 #define RB_VTAIL(rb)              (*(volatile uint32_t *) &(rb)->tail)
-	
+
 /**
  * @brief	Initialize ring buffer
  * @param	RingBuff	: Pointer to ring buffer to initialize
@@ -45,7 +45,7 @@ int RingBuffer_Init(RINGBUFF_T *RingBuff, void *buffer, int itemSize, int count)
  */
 static inline void RingBuffer_Flush(RINGBUFF_T *RingBuff)
 {
-	RingBuff->head = RingBuff->tail = 0;
+  RingBuff->head = RingBuff->tail = 0;
 }
 
 /**
@@ -55,7 +55,7 @@ static inline void RingBuffer_Flush(RINGBUFF_T *RingBuff)
  */
 static inline int RingBuffer_GetSize(RINGBUFF_T *RingBuff)
 {
-	return RingBuff->count;
+  return RingBuff->count;
 }
 
 /**
@@ -65,7 +65,7 @@ static inline int RingBuffer_GetSize(RINGBUFF_T *RingBuff)
  */
 static inline int RingBuffer_GetCount(RINGBUFF_T *RingBuff)
 {
-	return RB_VHEAD(RingBuff) - RB_VTAIL(RingBuff);
+  return RB_VHEAD(RingBuff) - RB_VTAIL(RingBuff);
 }
 
 /**
@@ -75,7 +75,7 @@ static inline int RingBuffer_GetCount(RINGBUFF_T *RingBuff)
  */
 static inline int RingBuffer_GetFree(RINGBUFF_T *RingBuff)
 {
-	return RingBuff->count - RingBuffer_GetCount(RingBuff);
+  return RingBuff->count - RingBuffer_GetCount(RingBuff);
 }
 
 /**
@@ -85,7 +85,7 @@ static inline int RingBuffer_GetFree(RINGBUFF_T *RingBuff)
  */
 static inline int RingBuffer_IsFull(RINGBUFF_T *RingBuff)
 {
-	return (RingBuffer_GetCount(RingBuff) >= RingBuff->count);
+  return (RingBuffer_GetCount(RingBuff) >= RingBuff->count);
 }
 
 /**
@@ -95,7 +95,7 @@ static inline int RingBuffer_IsFull(RINGBUFF_T *RingBuff)
  */
 static inline int RingBuffer_IsEmpty(RINGBUFF_T *RingBuff)
 {
-	return RB_VHEAD(RingBuff) == RB_VTAIL(RingBuff);
+  return RB_VHEAD(RingBuff) == RB_VTAIL(RingBuff);
 }
 
 /**
@@ -143,4 +143,4 @@ int RingBuffer_Pop(RINGBUFF_T *RingBuff, void *data);
  */
 int RingBuffer_PopMult(RINGBUFF_T *RingBuff, void *data, int num);
 
-#endif 
+#endif
