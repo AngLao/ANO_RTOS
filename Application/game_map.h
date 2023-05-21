@@ -22,7 +22,7 @@ typedef struct {
 } plant_map_t;
 
 //每一小格的长和宽
-#define cell_x 500
+#define cell_x 515
 #define cell_y 500
 
 //-----------------X---------------------
@@ -55,7 +55,7 @@ typedef struct {
 #define plant_map_dot16_x  plant_map_dot2_x
 #define plant_map_dot23_x  plant_map_dot2_x
 
-#define plant_map_dot1_x  (plant_map_dot2_x + cell_x)
+#define plant_map_dot1_x  (plant_map_dot2_x + cell_x )
 #define plant_map_dot5_x   plant_map_dot1_x
 #define plant_map_dot11_x  plant_map_dot1_x
 #define plant_map_dot15_x  plant_map_dot1_x
@@ -98,7 +98,7 @@ typedef struct {
 
 extern plant_map_t  plant_map;
 
-plant_map_t  plant_map = {  .dot[0]  = {.x = (A0_POS_X + 690 ), .y = (A0_POS_Y + 3220 )}, //起飞点
+plant_map_t  plant_map = {  .dot[0]  = {.x = (A0_POS_X + 640 ), .y = (A0_POS_Y + 3220 )}, //起飞点
                             .dot[1]  = {.x = plant_map_dot1_x, .y = plant_map_dot1_y },
                             .dot[2]  = {.x = plant_map_dot2_x, .y = plant_map_dot2_y },
                             .dot[3]  = {.x = plant_map_dot3_x, .y = plant_map_dot3_y },

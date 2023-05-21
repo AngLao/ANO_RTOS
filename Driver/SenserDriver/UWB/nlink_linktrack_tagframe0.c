@@ -1,5 +1,4 @@
 #include "nlink_linktrack_tagframe0.h"
-
 #include "nlink_utils.h"
 
 #pragma pack(1)

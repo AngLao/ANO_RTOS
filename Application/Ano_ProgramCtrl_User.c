@@ -3,7 +3,7 @@
 
 
 #define MAX_PC_XYVEL_CMPS  30
-#define MAX_PC_ZVEL_CMPS   20
+#define MAX_PC_ZVEL_CMPS   30
 #define MAX_PC_PAL_DPS     100
 
 _pc_user_st pc_user;

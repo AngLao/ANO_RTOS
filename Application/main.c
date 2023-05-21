@@ -30,8 +30,8 @@
 #include "Ano_Imu.h"
 #include "Ano_FlightDataCal.h"
 #include "Ano_Sensor_Basic.h"
-
-
+#include "ano_usb.h"
+#include "Ano_ProgramCtrl_User.h"
 /* 基本传感器数据准备进程 该任务为精准进行的任务 执行频率精准1000Hz 优先级全局最高*/
 void basic_data_read(void *pvParameters)
 {
@@ -141,17 +141,30 @@ void height_loop(void *pvParameters)
 
     /*灯光控制*/
     LED_Task2(10);
+ 
+		
+		#if(debugHardwork == UART_3)
 
+			//数传响应
+			int len = RingBuffer_GetCount(&U3rxring);
+			u8 data = 0;
 
-    //数传响应
-    int len = RingBuffer_GetCount(&U3rxring);
-    u8 data = 0;
-
-    for (; len != 0 ; len--) {
-      RingBuffer_Pop(&U3rxring, &data);
-      AnoDTRxOneByte(data);
-    }
-
+			for (; len != 0 ; len--) {
+				RingBuffer_Pop(&U3rxring, &data);
+				AnoDTRxOneByte(data);
+			}		
+		#elif (debugHardwork == USB_CDC)
+		
+			static u8 usbdatarxbuf[100];
+						
+			u8 len = AnoUsbCdcRead(usbdatarxbuf,100);
+			if(len)
+			{
+				for(u8 i=0; i<len; i++)
+					AnoDTRxOneByte(usbdatarxbuf[i]);
+			}
+		#endif 
+		
     vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 100);
   }
 }
@@ -169,7 +182,11 @@ void position_loop(void *pvParameters)
 
     //通道二一键任务（swb杆往下拨）
     if (onekey.val) {
-      onekey.val = UWBTest_Task(20);
+			static char isFirst = 1;
+			if(isFirst){
+				
+				isFirst = UWBTest_Task(20); 
+			}
     }
 
     AnoOF_Check(20);
@@ -180,8 +197,12 @@ void position_loop(void *pvParameters)
     //解析UWB数据
     UWB_Get_Data_Task();
 
+		#if (debugHardwork != close)
+		
     /*数传数据交换*/
     ANO_DT_Task1Ms();
+		
+		#endif
 
     vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 50);
   }

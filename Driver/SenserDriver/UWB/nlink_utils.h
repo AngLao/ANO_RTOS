@@ -83,7 +83,7 @@ size_t NLink_StringToHex(const char *str, uint8_t *out);
 
 #define MULTIPLY_VOLTAGE 1.0f
 #define MULTIPLY_POS 1.0f
-#define MULTIPLY_DIS 1.0f
+#define MULTIPLY_DIS 10.0f
 #define MULTIPLY_VEL 1.0f
 #define MULTIPLY_ANGLE 1.0f
 #define MULTIPLY_RSSI -2.0f

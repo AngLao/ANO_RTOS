@@ -8,6 +8,13 @@
 #define LOG_COLOR_RED	  1
 #define LOG_COLOR_GREEN	2
 
+
+#define close -1
+#define USB_CDC 0
+#define UART_3 	1
+#define debugHardwork close
+
+
 typedef enum {
   CSID_X20,
   CSID_X21,
@@ -35,9 +42,6 @@ typedef enum {
   CSID_XFA,
   CSID_NUM
 } _enu_cyclesendid;
-
-
-
 
 extern u8 ano_dt_rec_data ;
 

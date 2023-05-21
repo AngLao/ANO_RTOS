@@ -90,10 +90,10 @@ u8 otherDataTmp[64];	//非循环发送数据临时缓冲
 #define GYR_RAW_Z      (sensor.Gyro[Z])
 #define SHOCK_STA      (0)
 //0x02
-#define ECP_RAW_X      (mag.val[0])
-#define ECP_RAW_Y      (mag.val[1])
-#define ECP_RAW_Z      (mag.val[2])
-#define BARO_ALT       (baro_height*100)
+#define ECP_RAW_X      (g_nlt_tagframe0.result.dis_arr[0]) //(mag.val[0])
+#define ECP_RAW_Y      (g_nlt_tagframe0.result.dis_arr[1]) //(mag.val[1])
+#define ECP_RAW_Z      (g_nlt_tagframe0.result.dis_arr[2]) //(mag.val[2])
+#define BARO_ALT       (g_nlt_tagframe0.result.dis_arr[3]) //(baro_height*100)
 #define TEMPERATURE    (sensor.Tempreature_C)
 #define BARO_STA       (0)
 #define ECP_STA        (0)
@@ -142,7 +142,7 @@ u8 otherDataTmp[64];	//非循环发送数据临时缓冲
 #define PWM_2          (motor[1])
 #define PWM_3          (motor[2])
 #define PWM_4          (motor[3])
-#define PWM_5          (0)//
+#define PWM_5 	         (0)//
 #define PWM_6          (0)
 #define PWM_7          (0)
 #define PWM_8          (0)
@@ -161,15 +161,15 @@ void ANO_DT_Init(void)
 //	//PWM
 //	dt.txSet_u2[CSID_X20].fre_ms = 100; //10ms
 //	//ACC-GRO
-//	dt.txSet_u2[CSID_X01].fre_ms = 100; //10ms
-//	//ECP-TEM-BARO
-//	dt.txSet_u2[CSID_X02].fre_ms = 200; //20ms
+//	dt.txSet_u2[CSID_X01].fre_ms = 1; //10ms
+	//ECP-TEM-BARO
+	dt.txSet_u2[CSID_X02].fre_ms = 5; //20ms
   //ATT_ANG
-  dt.txSet_u2[CSID_X03].fre_ms = 100; //ms
+  dt.txSet_u2[CSID_X03].fre_ms = 3; //ms
 //	//ATT_QUA
 //	dt.txSet_u2[CSID_X04].fre_ms = 0; //
   //height
-  dt.txSet_u2[CSID_X05].fre_ms = 50; //
+  dt.txSet_u2[CSID_X05].fre_ms = 10; //
 //	//fc_mode
 //	dt.txSet_u2[CSID_X06].fre_ms = 50;//
 //	//velocity
@@ -179,7 +179,7 @@ void ANO_DT_Init(void)
 //	//wind_vel
 //	dt.txSet_u2[CSID_X09].fre_ms = 100;//
   //电压
-  dt.txSet_u2[CSID_X0D].fre_ms = 100;//
+  dt.txSet_u2[CSID_X0D].fre_ms = 30;//
 //	//传感器状态
 //	dt.txSet_u2[CSID_X0E].fre_ms = 100;//
   //UWB数据
@@ -211,8 +211,16 @@ void ANO_DT_Init(void)
 //===========================================================
 void ANO_DT_Send_Data(u8 *dataToSend, u8 length)
 {
-//		Drv_Uart3SendBuf(dataToSend, length);
-		AnoUsbCdcSend(dataToSend, length);
+	#if(debugHardwork == UART_3)
+	
+		Drv_Uart3SendBuf(dataToSend, length);
+	
+	#elif (debugHardwork == USB_CDC)
+	
+		AnoUsbCdcSend(dataToSend, length); 
+	
+	#endif 
+		
 
 }
 //===========================================================
