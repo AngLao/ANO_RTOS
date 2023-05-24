@@ -406,56 +406,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>Driver</GroupName>
-          <Files>
-            <File>
-              <FileName>Drv_Bsp.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Driver\Drv_Bsp.c</FilePath>
-            </File>
-            <File>
-              <FileName>Drv_Adc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Driver\Drv_Adc.c</FilePath>
-            </File>
-            <File>
-              <FileName>Drv_Led.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Driver\Drv_Led.c</FilePath>
-            </File>
-            <File>
-              <FileName>Drv_Paramter.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Driver\Drv_Paramter.c</FilePath>
-            </File>
-            <File>
-              <FileName>Drv_RcIn.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Driver\Drv_RcIn.c</FilePath>
-            </File>
-            <File>
-              <FileName>Drv_PwmOut.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Driver\Drv_PwmOut.c</FilePath>
-            </File>
-            <File>
-              <FileName>Drv_Spi.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Driver\Drv_Spi.c</FilePath>
-            </File>
-            <File>
-              <FileName>Drv_Uart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Driver\Drv_Uart.c</FilePath>
-            </File>
-            <File>
-              <FileName>ring_buffer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Driver\ring_buffer.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>SenserDriver</GroupName>
           <Files>
             <File>
@@ -506,62 +456,102 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>Application</GroupName>
+          <GroupName>FreeRTOS</GroupName>
           <Files>
             <File>
-              <FileName>main.c</FileName>
+              <FileName>croutine.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Application\main.c</FilePath>
+              <FilePath>.\FreeRTOS\croutine.c</FilePath>
             </File>
             <File>
-              <FileName>sysconfig.h</FileName>
+              <FileName>event_groups.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\FreeRTOS\event_groups.c</FilePath>
+            </File>
+            <File>
+              <FileName>list.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\FreeRTOS\list.c</FilePath>
+            </File>
+            <File>
+              <FileName>queue.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\FreeRTOS\queue.c</FilePath>
+            </File>
+            <File>
+              <FileName>tasks.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\FreeRTOS\tasks.c</FilePath>
+            </File>
+            <File>
+              <FileName>timers.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\FreeRTOS\timers.c</FilePath>
+            </File>
+            <File>
+              <FileName>port.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\FreeRTOS\portable\RVDS\ARM_CM4F\port.c</FilePath>
+            </File>
+            <File>
+              <FileName>FreeRTOSConfig.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\Application\sysconfig.h</FilePath>
+              <FilePath>.\FreeRTOS\include\FreeRTOSConfig.h</FilePath>
             </File>
             <File>
-              <FileName>Ano_Parameter.c</FileName>
+              <FileName>heap_4.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Application\Ano_Parameter.c</FilePath>
+              <FilePath>.\FreeRTOS\portable\MemMang\heap_4.c</FilePath>
             </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Driver</GroupName>
+          <Files>
             <File>
-              <FileName>Ano_FlyCtrl.c</FileName>
+              <FileName>Drv_Bsp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Application\Ano_FlyCtrl.c</FilePath>
+              <FilePath>.\Driver\Drv_Bsp.c</FilePath>
             </File>
             <File>
-              <FileName>Ano_DT.c</FileName>
+              <FileName>Drv_Adc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Application\Ano_DT.c</FilePath>
+              <FilePath>.\Driver\Drv_Adc.c</FilePath>
             </File>
             <File>
-              <FileName>Ano_RC.c</FileName>
+              <FileName>Drv_Led.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Application\Ano_RC.c</FilePath>
+              <FilePath>.\Driver\Drv_Led.c</FilePath>
             </File>
             <File>
-              <FileName>Ano_LED.c</FileName>
+              <FileName>Drv_Paramter.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Application\Ano_LED.c</FilePath>
+              <FilePath>.\Driver\Drv_Paramter.c</FilePath>
             </File>
             <File>
-              <FileName>Ano_Usb.c</FileName>
+              <FileName>Drv_RcIn.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Application\Ano_Usb.c</FilePath>
+              <FilePath>.\Driver\Drv_RcIn.c</FilePath>
             </File>
             <File>
-              <FileName>Ano_ProgramCtrl_User.c</FileName>
+              <FileName>Drv_PwmOut.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Application\Ano_ProgramCtrl_User.c</FilePath>
+              <FilePath>.\Driver\Drv_PwmOut.c</FilePath>
             </File>
             <File>
-              <FileName>Ano_OF_DecoFusion.c</FileName>
+              <FileName>Drv_Spi.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Application\Ano_OF_DecoFusion.c</FilePath>
+              <FilePath>.\Driver\Drv_Spi.c</FilePath>
             </File>
             <File>
-              <FileName>game_map.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\Application\game_map.h</FilePath>
+              <FileName>Drv_Uart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Driver\Drv_Uart.c</FilePath>
+            </File>
+            <File>
+              <FileName>ring_buffer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Driver\ring_buffer.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -656,52 +646,72 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>FreeRTOS</GroupName>
+          <GroupName>Application</GroupName>
           <Files>
             <File>
-              <FileName>croutine.c</FileName>
+              <FileName>main.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\FreeRTOS\croutine.c</FilePath>
+              <FilePath>.\Application\main.c</FilePath>
             </File>
             <File>
-              <FileName>event_groups.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\FreeRTOS\event_groups.c</FilePath>
-            </File>
-            <File>
-              <FileName>list.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\FreeRTOS\list.c</FilePath>
-            </File>
-            <File>
-              <FileName>queue.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\FreeRTOS\queue.c</FilePath>
-            </File>
-            <File>
-              <FileName>tasks.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\FreeRTOS\tasks.c</FilePath>
-            </File>
-            <File>
-              <FileName>timers.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\FreeRTOS\timers.c</FilePath>
-            </File>
-            <File>
-              <FileName>port.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\FreeRTOS\portable\RVDS\ARM_CM4F\port.c</FilePath>
-            </File>
-            <File>
-              <FileName>FreeRTOSConfig.h</FileName>
+              <FileName>sysconfig.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\FreeRTOS\include\FreeRTOSConfig.h</FilePath>
+              <FilePath>.\Application\sysconfig.h</FilePath>
             </File>
             <File>
-              <FileName>heap_4.c</FileName>
+              <FileName>Ano_Parameter.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\FreeRTOS\portable\MemMang\heap_4.c</FilePath>
+              <FilePath>.\Application\Ano_Parameter.c</FilePath>
+            </File>
+            <File>
+              <FileName>Ano_FlyCtrl.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Application\Ano_FlyCtrl.c</FilePath>
+            </File>
+            <File>
+              <FileName>Ano_DT.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Application\Ano_DT.c</FilePath>
+            </File>
+            <File>
+              <FileName>Ano_RC.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Application\Ano_RC.c</FilePath>
+            </File>
+            <File>
+              <FileName>Ano_LED.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Application\Ano_LED.c</FilePath>
+            </File>
+            <File>
+              <FileName>Ano_Usb.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Application\Ano_Usb.c</FilePath>
+            </File>
+            <File>
+              <FileName>Ano_ProgramCtrl_User.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Application\Ano_ProgramCtrl_User.c</FilePath>
+            </File>
+            <File>
+              <FileName>Ano_OF_DecoFusion.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Application\Ano_OF_DecoFusion.c</FilePath>
+            </File>
+            <File>
+              <FileName>game_map.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Application\game_map.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Log</GroupName>
+          <Files>
+            <File>
+              <FileName>README.md</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\README.md</FilePath>
             </File>
           </Files>
         </Group>

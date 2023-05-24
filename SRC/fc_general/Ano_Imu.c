@@ -326,8 +326,6 @@ void calculate_RPY()
 
   t_temp = LIMIT(1 - my_pow(att_matrix[2][0]),0,1);
 
-  //imu_data.pit = asin(2*q1q3 - 2*q0q2)*57.30f;
-
   if(ABS(imu_data.z_vec[Z])>0.05f) { //避免奇点的运算
     imu_data.pit =  fast_atan2(att_matrix[2][0],my_sqrt(t_temp))*57.30f;
     imu_data.rol =  fast_atan2(att_matrix[2][1], att_matrix[2][2])*57.30f;

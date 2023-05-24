@@ -60,31 +60,20 @@ void IMU_Update_Task(u8 dT_ms)
 
   }
 
-  if(0) {
-    imu_state.gkp = 0.0f;
-    imu_state.gki = 0.0f;
+  /*设置重力互补融合修正kp系数*/
+  imu_state.gkp = 0.2f;//0.4f;
+  /*设置重力互补融合修正ki系数*/
+  imu_state.gki = 0.01f;
+  /*设置罗盘互补融合修正ki系数*/
+  //imu_state.mkp = 0.1f;
+  imu_state.mkp = 0;
 
-  } else {
-    if(0) {
-      imu_state.gkp = 0.2f;
-    } else {
-      /*设置重力互补融合修正kp系数*/
-      imu_state.gkp = 0.2f;//0.4f;
-    }
-
-    /*设置重力互补融合修正ki系数*/
-    imu_state.gki = 0.01f;
-
-    /*设置罗盘互补融合修正ki系数*/
-    //imu_state.mkp = 0.1f;
-    imu_state.mkp = 0;
-  }
-
-  imu_state.M_fix_en = sens_hd_check.mag_ok;		//磁力计修正使能
+  /*磁力计修正使能选择*/
+  imu_state.M_fix_en = sens_hd_check.mag_ok; 
 
 
   /*姿态计算，更新，融合*/
-  IMU_update(dT_ms *1e-3f, &imu_state,sensor.Gyro_rad, sensor.Acc_cmss, mag.val,&imu_data);//x3_dT_1[2] * 0.000001f
+  IMU_update(dT_ms *1e-3f, &imu_state,sensor.Gyro_rad, sensor.Acc_cmss, mag.val,&imu_data);
 
 }
 
@@ -196,11 +185,5 @@ void WCZ_Fus_Task(u8 dT_ms)
   WCZ_Data_Calc(dT_ms,wcz_f_pause,(s32)wcz_acc_use,(s32)(ref_height_used));
 
 }
-
-
-///////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////
-
 
 
