@@ -553,6 +553,11 @@
               <FileType>1</FileType>
               <FilePath>.\Driver\ring_buffer.c</FilePath>
             </File>
+            <File>
+              <FileName>Drv_Timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Driver\Drv_Timer.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

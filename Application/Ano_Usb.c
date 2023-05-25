@@ -290,3 +290,15 @@ uint16_t AnoUsbCdcDataAvailable()
   return USBBufferDataAvailable(&g_sRxBuffer);
 }
 
+
+/* USER CODE BEGIN 1 */
+#if 1
+#include <stdio.h>
+
+int fputc(int ch, FILE *stream)
+{ 
+	AnoUsbCdcSend((uint8_t*)&ch, 1);
+}
+#endif
+
+/* USER CODE END 1 */

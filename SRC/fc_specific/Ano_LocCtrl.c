@@ -71,7 +71,7 @@ float vel_fb_d_lpf[2];
 float vel_fb_h[2],vel_fb_w[2];
 float vel_fb_fix_w[2];
 /*位置速度环*/
-void Loc_1level_Ctrl(u16 dT_ms,s16 *CH_N)
+void Loc_1level_Ctrl(u16 dT_ms)
 {
   float pos_ctrl_h_out[2];
   float pos_ctrl_w_out[2];

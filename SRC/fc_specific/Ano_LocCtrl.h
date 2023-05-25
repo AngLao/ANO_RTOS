@@ -25,5 +25,5 @@ extern _PID_val_st loc_val_1[] ;
 /* Exported functions ------------------------------------------------------- */
 
 void Loc_1level_PID_Init(void);
-void Loc_1level_Ctrl(u16 dT_ms,s16 *CH_N);
+void Loc_1level_Ctrl(u16 dT_ms);
 #endif
