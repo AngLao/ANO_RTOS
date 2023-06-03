@@ -13,6 +13,9 @@
 //TM4C的串口7对应底板串口4
 //这里都以底板的串口标号为准，比如Drv_Uart1Init，为底板串口1的初始化，即TM4C的串口0
 
+
+#if(USER_SERIAL_1 == 1)
+
 u8 U1TxDataTemp[256];
 u8 U1TxInCnt = 0;
 u8 U1TxOutCnt = 0;
@@ -80,8 +83,14 @@ void Drv_Uart1TxCheck(void)
   while( (U1TxOutCnt != U1TxInCnt) && (ROM_UARTCharPutNonBlocking(UART0_BASE, U1TxDataTemp[U1TxOutCnt])) )
     U1TxOutCnt++;
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////
-u8 U2TxDataTemp[256];
+
+
+
+#endif
+
+
+#if(USER_SERIAL_2 == 1)
+u8 U2TxDataTemp[256] = {0};
 u8 U2TxInCnt = 0;
 u8 U2TxOutCnt = 0;
 void UART2_IRQHandler(void)
@@ -102,7 +111,7 @@ void UART2_IRQHandler(void)
   }
 }
 void Drv_Uart2Init(uint32_t baudrate)
-{
+{ 
   ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_UART4);
   ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
 
@@ -136,7 +145,11 @@ void Drv_Uart2TxCheck(void)
   while( (U2TxOutCnt != U2TxInCnt) && (ROM_UARTCharPutNonBlocking(UART4_BASE, U2TxDataTemp[U2TxOutCnt])) )
     U2TxOutCnt++;
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////
+
+#endif
+
+
+#if(USER_SERIAL_3 == 1)
 u8 U3TxDataTemp[256];
 u8 U3TxInCnt = 0;
 u8 U3TxOutCnt = 0;
@@ -203,7 +216,11 @@ void Drv_Uart3TxCheck(void)
   while( (U3TxOutCnt != U3TxInCnt) && (ROM_UARTCharPutNonBlocking(UART5_BASE, U3TxDataTemp[U3TxOutCnt])) )
     U3TxOutCnt++;
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////
+
+#endif
+
+#if(USER_SERIAL_4 == 1)
+
 #include "Ano_OF.h"
 u8 U4TxDataTemp[256];
 u8 U4TxInCnt = 0;
@@ -270,6 +287,9 @@ u8 U5TxDataTemp[256];
 u8 U5TxInCnt = 0;
 u8 U5TxOutCnt = 0;
 
+#endif
+
+#if(USER_SERIAL_5 == 1)
 u8 openMV_res = 0;
 void UART5_IRQHandler(void)
 {
@@ -335,4 +355,5 @@ void Drv_Uart5TxCheck(void)
   while( (U5TxOutCnt != U5TxInCnt) && (ROM_UARTCharPutNonBlocking(UART2_BASE, U5TxDataTemp[U5TxOutCnt])) )
     U5TxOutCnt++;
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////
+
+#endif

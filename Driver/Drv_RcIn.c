@@ -1,42 +1,24 @@
 #include "Drv_RcIn.h"
 #include "Timer.h"
 #include "hw_ints.h"
-#include "uart.h"
-//
-#include "Ano_RC.h"
+#include "uart.h" 
 
-union PPM  RC_PPM;
-//RCData_t   SbusData;
-/**********************************************************************************************************
-*函 数 名: PPM_Cal
-*功能说明: PPM通道数据计算
-*形    参: 无
-*返 回 值: 无
-**********************************************************************************************************/
-static void PPM_Cal(uint32_t  PulseHigh)
-{
-  static uint8_t Chan = 0;
+union PPM  RC_PPM; 
 
-  /*脉宽高于一定值说明一帧数据已经结束*/
-  if(PulseHigh > 5000) {
-    /*一帧数据解析完成*/
-
-    Chan = 0;
-
-  } else {
-    /*脉冲高度正常*/
-    if (PulseHigh > PULSE_MIN && PulseHigh < PULSE_MAX) {
-      if(Chan < 16) {
-        ch_watch_dog_feed(Chan);
-        RC_PPM.Captures[Chan++] = PulseHigh;
-      }
-    }
-  }
+//定义收到新数据的标志位
+uint8_t haveNewData = 0;
+//收到新数据回调函数
+static void receivedNewData(void){
+	//标志位置1表示接受了新的遥控数据
+	haveNewData = 1;
 }
+
 static void PPM_Decode(void)
 {
   static uint32_t	PeriodVal1, PeriodVal2 = 0;
   static uint32_t PulseHigh;
+	
+  static uint8_t Chan = 0;
   /*清除中断标志*/
   ROM_TimerIntClear( WTIMER1_BASE, TIMER_CAPB_EVENT );
   /*获取捕获值*/
@@ -48,7 +30,22 @@ static void PPM_Decode(void)
     PulseHigh =  (PeriodVal1  - PeriodVal2 + 0xffffff) / 80;
 
   PeriodVal2 = PeriodVal1;
-  PPM_Cal(PulseHigh);
+
+  /*脉宽高于一定值说明一帧数据已经结束*/
+  if(PulseHigh > 5000) {
+    /*一帧数据解析完成*/
+
+    Chan = 0;
+
+  } else {
+    /*脉冲高度正常*/
+    if (PulseHigh > PULSE_MIN && PulseHigh < PULSE_MAX) {
+      if(Chan < 16) {
+        receivedNewData();
+        RC_PPM.Captures[Chan++] = PulseHigh;
+      }
+    }
+  }
 }
 void Drv_PpmInit(void)
 {
@@ -117,18 +114,15 @@ static void Sbus_Decode(uint8_t data)
       Rc_Sbus_In[14] = (s16)(SUBS_RawData[21] & 0x1F) << 6 | (SUBS_RawData[20] >> 2);
       Rc_Sbus_In[15] = (s16)SUBS_RawData[22] << 3 | (SUBS_RawData[21] >> 5);
       sbus_flag = SUBS_RawData[23];
-      /*一帧数据解析完成*/
-
-      //user
-      //
-      if(sbus_flag & 0x10) {
+      /*一帧数据解析完成*/ 
+      //user 
+      if(sbus_flag & 0x04) {
         //如果有数据且能接收到有失控标记，则不处理，转嫁成无数据失控。
       } else {
-        //否则有数据就喂狗
-        for(u8 i = 0; i < 8; i++) { //原RC接收程序只设计了8个通道
-          ch_watch_dog_feed(i);
-        }
+        //遥控器在线
+        receivedNewData(); 
       }
+			//接收机在线处理
     } else {
       for( i = 0; i < 24; i++)
         SUBS_RawData[i] = SUBS_RawData[i + 1];

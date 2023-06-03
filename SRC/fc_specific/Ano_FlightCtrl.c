@@ -9,7 +9,7 @@
 #include "Ano_AltCtrl.h"
 #include "Ano_MotorCtrl.h"
 #include "Drv_led.h"
-#include "Ano_RC.h"
+#include "rc_update.h"
 #include "Drv_laser.h"
 #include "Ano_OF.h"
 #include "Ano_OF_DecoFusion.h"
@@ -27,16 +27,10 @@
 
 
 ===========================================================================*/
-/////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////////
 
 /*PID参数初始化*/
 void All_PID_Init(void)
 {
-
   /*姿态控制，角速度PID初始化*/
   Att_1level_PID_Init();
 
@@ -49,29 +43,9 @@ void All_PID_Init(void)
   /*高度控制，高度PID初始化*/
   Alt_2level_PID_Init();
 
-
   /*位置速度控制PID初始化*/
   Loc_1level_PID_Init();
-
 }
-
-/*控制参数改变任务*/
-void ctrl_parameter_change_task()
-{
-  if(flag.auto_take_off_land ==AUTO_TAKE_OFF) {
-
-    Set_Att_1level_Ki(2);
-  } else {
-
-    Set_Att_1level_Ki(1);
-  }
-
-  Set_Att_2level_Ki(1);
-
-}
-
-
-
 
 static u16 one_key_taof_start;
 /*一键起飞任务（主要功能为延迟）*/
@@ -132,11 +106,6 @@ float stop_baro_hpf;
 static s16 ld_delay_cnt ;
 void land_discriminat(s16 dT_ms)
 {
-//	static s16 acc_delta,acc_old;
-
-//	acc_delta = imu_data.w_acc[Z]- acc_old;
-//	acc_old = imu_data.w_acc[Z];
-
   /*油门归一值小于0.1  或者启动自动降落*/
   if((fs.speed_set_h_norm[Z] < 0.1f) || flag.auto_take_off_land == AUTO_LAND) {
     if(ld_delay_cnt>0) {
@@ -148,15 +117,14 @@ void land_discriminat(s16 dT_ms)
 
   /*意义是：如果向上推了油门，就需要等垂直方向加速度小于200cm/s2 保持200ms才开始检测*/
   if(ld_delay_cnt <= 0 && (flag.thr_low || flag.auto_take_off_land == AUTO_LAND) ) {
-    /*油门最终输出量小于250并且没有在手动解锁上锁过程中，持续1秒，认为着陆，然后上锁*/
-    if(mc.ct_val_thr<250 && flag.unlock_sta == 1 && flag.locking != 2) { //ABS(wz_spe_f1.out <20 ) //还应当 与上速度条件，速度小于正20厘米每秒。
+    /*油门最终输出量小于250持续1秒，认为着陆，然后上锁*/
+    if(mc.ct_val_thr<250 && flag.unlock_sta == 1) { //还应当 与上速度条件，速度小于正20厘米每秒。
       if(landing_cnt<1500) {
         landing_cnt += dT_ms;
       } else {
 
         flying_cnt = 0;
         flag.taking_off = 0;
-        ///////
         landing_cnt =0;
         flag.unlock_cmd =0;
 
@@ -176,14 +144,11 @@ void land_discriminat(s16 dT_ms)
 
 
 /*飞行状态任务*/
-
-void Flight_State_Task(u8 dT_ms,s16 *CH_N)
-{
-  s16 thr_deadzone;
+void Flight_State_Task(u8 dT_ms,const s16 *CH_N)
+{ 
   static float max_speed_lim,vel_z_tmp[2];
-  /*设置油门摇杆量*/
-  thr_deadzone = (flag.wifi_ch_en != 0) ? 0 : 50;
-  fs.speed_set_h_norm[Z] = my_deadzone(CH_N[CH_THR],0,thr_deadzone) *0.0023f;
+  /*设置油门摇杆量*/ 
+  fs.speed_set_h_norm[Z] = CH_N[CH_THR] * 0.0023f;
   fs.speed_set_h_norm_lpf[Z] += 0.5f *(fs.speed_set_h_norm[Z] - fs.speed_set_h_norm_lpf[Z]);
 
   /*推油门起飞*/
@@ -214,7 +179,7 @@ void Flight_State_Task(u8 dT_ms,s16 *CH_N)
     }
 
     //飞控系统Z速度目标量综合设定
-    vel_z_tmp[1] = vel_z_tmp[0] + program_ctrl.vel_cmps_h[Z] + pc_user.vel_cmps_set_z;
+    vel_z_tmp[1] = vel_z_tmp[0] + pc_user.vel_cmps_set_z;
     //
     vel_z_tmp[1] = LIMIT(vel_z_tmp[1],fc_stv.vel_limit_z_n,fc_stv.vel_limit_z_p);
     //
@@ -240,8 +205,8 @@ void Flight_State_Task(u8 dT_ms,s16 *CH_N)
   fc_stv.vel_limit_xy = max_speed_lim;
 
   //飞控系统XY速度目标量综合设定
-  speed_set_tmp[X] = fc_stv.vel_limit_xy *fs.speed_set_h_norm_lpf[X] + program_ctrl.vel_cmps_h[X] + pc_user.vel_cmps_set_h[X];
-  speed_set_tmp[Y] = fc_stv.vel_limit_xy *fs.speed_set_h_norm_lpf[Y] + program_ctrl.vel_cmps_h[Y] + pc_user.vel_cmps_set_h[Y];
+  speed_set_tmp[X] = fc_stv.vel_limit_xy *fs.speed_set_h_norm_lpf[X] + pc_user.vel_cmps_set_h[X];
+  speed_set_tmp[Y] = fc_stv.vel_limit_xy *fs.speed_set_h_norm_lpf[Y] + pc_user.vel_cmps_set_h[Y];
 
   length_limit(&speed_set_tmp[X],&speed_set_tmp[Y],fc_stv.vel_limit_xy,fs.speed_set_h_cms);
 
@@ -325,9 +290,9 @@ void Swtich_State_Task(u8 dT_ms)
       jsdata.of_qua = of_rdf.quality;
       jsdata.of_alt = Laser_height_cm;
     }
-
-    //
-    if(jsdata.of_qua>50 ) { //|| flag.flying == 0) //光流质量大于50 /*或者在飞行之前*/，认为光流可用，判定可用延迟时间为1秒
+		
+		//光流质量大于50，认为光流可用，判定可用延迟时间为500ms
+    if(jsdata.of_qua>50 ) {
       if(of_quality_delay<500) {
         of_quality_delay += dT_ms;
       } else {
@@ -390,56 +355,4 @@ void Swtich_State_Task(u8 dT_ms)
 
 }
 
-
-u8 speed_mode_old = 255;
-u8 flight_mode_old = 255;
-
-void Flight_Mode_Set(u8 dT_ms)
-{
-
-
-  if(speed_mode_old != flag.speed_mode) { //状态改变
-    speed_mode_old = flag.speed_mode;
-    //xy_speed_pid_init(flag.speed_mode);////////////
-  }
-
-///////////////////////////////////////////////////////
-  //CH_N[]+1500为上位机显示通道值
-  if(CH_N[AUX1] <-100 && CH_N[AUX1]>-200) { //接收机失控值，需要手工设置遥控器
-    //遥控设置的接收机输出的失控保护的信号。
-    flag.chn_failsafe = 1;
-  } else {
-    flag.chn_failsafe = 0;
-
-    flag.flight_mode = LOC_HOLD;
-
-
-    //通道2做一键起飞
-    if(CH_N[AUX2]<300) {
-      onekey.val = 0;
-    } else {
-      onekey.val = 1;
-    }
-  }
-
-  //通道1一键急停
-  if(CH_N[AUX1]>300) {
-    if(flag.unlock_sta) {
-      ANO_DT_SendString("Emergency stop OK!");
-      flag.unlock_cmd = 0;
-      flag.taking_off = 0;
-      flag.flying = 0;
-      program_ctrl.cmd_state[0] = 0;
-    }
-  }
-
-  //
-  if(flight_mode_old != flag.flight_mode) { //摇杆对应模式状态改变
-    flight_mode_old = flag.flight_mode;
-
-    flag.rc_loss_back_home = 0;
-
-  }
-
-}
-
+ 

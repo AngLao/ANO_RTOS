@@ -11,6 +11,7 @@
 #include "gpio.h"
 #include "sysctl.h"
 #include "interrupt.h"
+#include "rom.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -29,7 +30,7 @@ void Timer_Config(void)
   //配置定时器，将定时器拆分，并配置拆分后的定时器A为周期性计数
   TimerConfigure( TIMER0_BASE,  TIMER_CFG_SPLIT_PAIR|TIMER_CFG_A_PERIODIC_UP);
   //设置定时器装载值，
-  TimerLoadSet( TIMER0_BASE,  TIMER_A, SysCtlClockGet()/20000-1);
+  TimerLoadSet( TIMER0_BASE,  TIMER_A, ROM_SysCtlClockGet()/20000-1);
   //为定时器A注册中断函数
   TimerIntRegister( TIMER0_BASE,  TIMER_A, TIMER_IRQHandler);
   //使能time0的定时器A为超时中断
@@ -65,14 +66,14 @@ void task_census(void *pvParameters)
   while (1) {
     xLastWakeTime = xTaskGetTickCount(); //获取当前Tick次数,以赋给延时函数初值
 
-		memset(CPU_RunInfo,0,400);				//信息缓冲区清零
+//		memset(CPU_RunInfo,0,400);				//信息缓冲区清零
 
-		vTaskList((char *)&CPU_RunInfo);  //获取任务运行时间信息
+//		vTaskList((char *)&CPU_RunInfo);  //获取任务运行时间信息
 
-		printf("---------------------------------------------\r\n");
-		printf("任务名      任务状态 优先级   剩余栈 任务序号\r\n");
-		printf("%s", CPU_RunInfo);
-		printf("---------------------------------------------\r\n");
+//		printf("---------------------------------------------\r\n");
+//		printf("任务名      任务状态 优先级   剩余栈 任务序号\r\n");
+//		printf("%s", CPU_RunInfo);
+//		printf("---------------------------------------------\r\n");
 
 		memset(CPU_RunInfo,0,400);				//信息缓冲区清零
 
@@ -82,7 +83,7 @@ void task_census(void *pvParameters)
 		printf("%s", CPU_RunInfo);
 		printf("---------------------------------------------\r\n\n");
 		
-    vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 5);
+    vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 1);
   }
 }
 #endif

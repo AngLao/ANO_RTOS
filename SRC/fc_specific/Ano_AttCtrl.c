@@ -157,24 +157,18 @@ void Att_2level_Ctrl(float dT_s,s16 *CH_N)
   att_2l_ct.exp_pit = LIMIT(att_2l_ct.exp_pit,-MAX_ANGLE,MAX_ANGLE);
 
 
-  //////////////////////////////////////////////////////////////
-  if(flag.speed_mode == 3) {
-    max_yaw_speed = MAX_SPEED_YAW;
-  } else if(flag.speed_mode == 2 ) {
-    max_yaw_speed = 220;
-  } else {
-    max_yaw_speed = 200;
-  }
+ 
+  max_yaw_speed = 200; 
   //
   fc_stv.yaw_pal_limit = max_yaw_speed;
   /*摇杆量转换为YAW期望角速度 + 程控期望角速度*/
-  set_yaw_av_tmp = (s32)(0.0023f *my_deadzone(CH_N[CH_YAW],0,65) *max_yaw_speed) + (-program_ctrl.yaw_pal_dps) + pc_user.pal_dps_set;
+  set_yaw_av_tmp = (s32)(0.0023f *my_deadzone(CH_N[CH_YAW],0,65) *max_yaw_speed) + pc_user.pal_dps_set;
 
   /*最大YAW角速度限幅*/
   set_yaw_av_tmp = LIMIT(set_yaw_av_tmp,-max_yaw_speed,max_yaw_speed);
 
   /*没有起飞，复位*/
-  if(flag.taking_off==0) { //if(flag.locking)
+  if(flag.taking_off==0) {  
     att_2l_ct.exp_rol = att_2l_ct.exp_pit = set_yaw_av_tmp = 0;
     att_2l_ct.exp_yaw = att_2l_ct.fb_yaw;
   }
@@ -249,8 +243,16 @@ static float ct_val[4];
 /*角速度环控制*/
 void Att_1level_Ctrl(float dT_s)
 {
-  ////////////////改变控制参数任务（最小控制周期内）////////////////////////
-  ctrl_parameter_change_task();
+  ////////////////改变控制参数任务（最小控制周期内）//////////////////////// 
+  if(flag.auto_take_off_land ==AUTO_TAKE_OFF) {
+
+    Set_Att_1level_Ki(2);
+  } else {
+
+    Set_Att_1level_Ki(1);
+  }
+
+  Set_Att_2level_Ki(1);
 
 
   /*目标角速度赋值*/

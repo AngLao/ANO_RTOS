@@ -54,13 +54,7 @@ enum {
   m7,
   m8,
 
-};
-
-enum {
-  MPU_6050_0 = 0,
-  MPU_6050_1,
-
-};
+}; 
 
 enum {
   X = 0,
@@ -96,18 +90,12 @@ enum _power_alarm {
 
 enum _flight_mode {
   ATT_STAB = 0,//Attitude stabilization
+	HEIGHT_HOLD,
   LOC_HOLD,
   RETURN_HOME,
 
 };
-
-//thr_mode
-enum {
-  THR_MANUAL = 0,
-  THR_AUTO,
-
-};
-
+ 
 typedef struct {
   u8 first_f;
   float acc_offset[VEC_XYZ];
@@ -122,44 +110,34 @@ typedef struct {
 extern _save_st save;
 
 typedef struct {
-  //基本状态/传感器
-  u8 start_ok;
+  //基本状态/传感器 
   u8 sensor_imu_ok;
   u8 mems_temperature_ok;
 
   u8 motionless;
-  u8 power_state;
-  u8 wifi_ch_en;
-  u8 chn_failsafe;
+  u8 power_state;  
   u8 rc_loss;
   u8 rc_loss_back_home;
   u8 gps_ok;
 
 
-  //控制状态
-  u8 manual_locked;
+  //控制状态 
   u8 unlock_err;
   u8 unlock_cmd;
-  u8 unlock_sta;//unlocked
-  u8 thr_low;
-  u8 locking;
-  u8 taking_off; //起飞
-  u8 set_yaw;
+  u8 unlock_sta; 
+  u8 thr_low; 
+  u8 taking_off; //起飞 
   u8 ct_loc_hold;
   u8 ct_alt_hold;
 
 
   //飞行状态
   u8 flying;
-  u8 auto_take_off_land;
-  u8 home_location_ok;
-  u8 speed_mode;
+  u8 auto_take_off_land; 
   u8 thr_mode;
-  u8 flight_mode;
-  u8 flight_mode2;
+  u8 flight_mode; 
   u8 gps_mode_en;
-  u8 motor_preparation;
-  u8 locked_rotor;
+  u8 motor_preparation; 
 
 
 } _flag;
@@ -173,8 +151,7 @@ typedef struct {
 } _fc_sta_var_st; //state variable
 extern _fc_sta_var_st fc_stv;
 
-typedef struct {
-  u8 sonar_on;
+typedef struct { 
   u8 tof_on;
   u8 of_flow_on;
   u8 of_tof_on;
@@ -191,8 +168,7 @@ typedef struct {
   u8 acc_ok;
   u8 mag_ok;
   u8 baro_ok;
-  u8 gps_ok;
-  u8 sonar_ok;
+  u8 gps_ok; 
   u8 tof_ok;
   u8 of_ok;
   u8 of_df_ok;
@@ -203,8 +179,7 @@ extern _sensor_hd_check_st sens_hd_check;
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
 
-void data_save(void);
-void Para_Data_Init(void);
+void data_save(void); 
 
 
 #endif

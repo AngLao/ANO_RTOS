@@ -1,5 +1,8 @@
 #include "Drv_Spi.h"
 #include "ssi.h"
+#include "Drv_icm20602.h"
+#include "drv_ak8975.h"
+#include "drv_spl06.h"
 
 
 void Drv_Spi0Init(void)
@@ -15,6 +18,15 @@ void Drv_Spi0Init(void)
   ROM_SSIConfigSetExpClk(SPI0_BASE, ROM_SysCtlClockGet(), SSI_FRF_MOTO_MODE_3,  SSI_MODE_MASTER, 10000000,  8);
   /*开启SSI0*/
   ROM_SSIEnable(SPI0_BASE);
+	
+	//片选引脚初始化
+  Drv_Icm20602CSPinInit();
+  Drv_AK8975CSPinInit();
+  Drv_SPL06CSPinInit();
+
+  ROM_SysCtlPeripheralEnable(FLASH_CSPIN_SYSCTL);
+  ROM_GPIOPinTypeGPIOOutput(FLASH_CS_PORT, FLASH_CS_PIN);
+  ROM_GPIOPinWrite(FLASH_CS_PORT, FLASH_CS_PIN, FLASH_CS_PIN);
 }
 
 /* SPI读写函数 */

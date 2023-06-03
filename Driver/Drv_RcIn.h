@@ -26,8 +26,11 @@ union PPM {
   RCData_t Data;
 } ;
 
-//
+//声明收到新数据的标志位
+extern uint8_t haveNewData ;
+
 extern union PPM  RC_PPM;
+
 extern u16 Rc_Sbus_In[16];
 
 void Drv_PpmInit(void);

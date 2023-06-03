@@ -8,7 +8,7 @@
 
 #include "Ano_MotionCal.h"
 #include "Ano_Filter.h"
-#include "Ano_RC.h"
+#include "rc_update.h"
 
 /*
 Àƒ÷·£∫
@@ -30,14 +30,8 @@ _mc_st mc;
 u16 IDLING;//10*Ano_Parame.set.idle_speed_pwm  //200
 void Motor_Ctrl_Task(u8 dT_ms)
 {
-  u8 i;
-
-//	if(flag.taking_off)
-//	{
-//		flag.motor_preparation = 1;
-//		motor_prepara_cnt = 0;
-//	}
-
+  u8 i; 
+	
   if(flag.unlock_sta) {
     IDLING = 10*LIMIT(Ano_Parame.set.idle_speed_pwm,0,30);
 
@@ -62,10 +56,8 @@ void Motor_Ctrl_Task(u8 dT_ms)
     }
   } else {
     flag.motor_preparation = 0;
-  }
-
-
-
+  } 
+	
   if(flag.motor_preparation == 1) {
     motor_step[m1] = mc.ct_val_thr  +mc.ct_val_yaw -mc.ct_val_rol +mc.ct_val_pit;
     motor_step[m2] = mc.ct_val_thr  -mc.ct_val_yaw +mc.ct_val_rol +mc.ct_val_pit;
@@ -74,13 +66,8 @@ void Motor_Ctrl_Task(u8 dT_ms)
 
 
     for(i=0; i<MOTORSNUM; i++) {
-      motor_step[i] = LIMIT(motor_step[i],IDLING,1000);
-//			motor_lpf[i] += 0.5f *(motor_step[i] - motor_lpf[i]) ;
-
-    }
-
-
-
+      motor_step[i] = LIMIT(motor_step[i],IDLING,1000); 
+    } 
   }
 
   for(i=0; i<MOTORSNUM; i++) {
@@ -98,19 +85,7 @@ void Motor_Ctrl_Task(u8 dT_ms)
   //≈‰÷√ ‰≥ˆ
   for(u8 i =0; i<4; i++) {
     Drv_MotorPWMSet(i,motor[i]);
-  }
-
-//#define Cali_Set_ESC
-#ifdef Cali_Set_ESC
-  //≈‰÷√ ‰≥ˆ
-  for(u8 i =0; i<4; i++) {
-    motor[i] = CH_N[CH_THR]+500;
-    Drv_MotorPWMSet(i,motor[i]);
-  }
-
-#endif
-  //test
-//	Drv_MotorPWMSet(4,200);
+  } 
 
 }
 

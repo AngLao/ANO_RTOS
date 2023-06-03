@@ -643,11 +643,6 @@
               <FileType>1</FileType>
               <FilePath>.\SRC\fc_specific\Ano_MotorCtrl.c</FilePath>
             </File>
-            <File>
-              <FileName>Ano_Power.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\SRC\fc_specific\Ano_Power.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -679,11 +674,6 @@
               <FilePath>.\Application\Ano_DT.c</FilePath>
             </File>
             <File>
-              <FileName>Ano_RC.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Application\Ano_RC.c</FilePath>
-            </File>
-            <File>
               <FileName>Ano_LED.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Application\Ano_LED.c</FilePath>
@@ -707,6 +697,16 @@
               <FileName>game_map.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Application\game_map.h</FilePath>
+            </File>
+            <File>
+              <FileName>rc_update.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Application\rc_update.c</FilePath>
+            </File>
+            <File>
+              <FileName>power_management.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SRC\fc_specific\power_management.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -60,7 +60,7 @@ void Loc_1level_PID_Init()
     loc_arg_1_fix[X].k_ff = 0.0f;
 
     loc_arg_1_fix[Y] = loc_arg_1_fix[X];
-  } 
+  }
 
 }
 

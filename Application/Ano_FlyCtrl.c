@@ -10,9 +10,7 @@
 #include "Drv_Uart.h"
 
 #define  T_CONFIRM_TIMES    10
-#define  STEP_CONFIRM_TIMES 40
-
-_fly_ct_st program_ctrl;
+#define  STEP_CONFIRM_TIMES 40 
 
 #include "Ano_FcData.h"
 #include "Ano_FlightCtrl.h"
@@ -65,7 +63,7 @@ unsigned char UWBTest_Task(unsigned char dT_ms)
     25, 18, 14, 10,  8,  4,
     3,  7,  9, 13, 17, 24,
     23, 16, 12,  6,  2,
-    1,  5 , 11 , 15 , 22 ,
+    1,  5, 11, 15, 22,
     0
   };
   //执行任务点个数
@@ -184,4 +182,4 @@ unsigned char UWBTest_Task(unsigned char dT_ms)
 
   return 1; //任务正在运行
 
-} 
+}

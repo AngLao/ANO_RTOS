@@ -12,8 +12,8 @@
 #define close -1
 #define USB_CDC 0
 #define UART_3 	1
-#define debugHardwork close
-
+//数传输出硬件选择
+#define debugHardwork UART_3 
 
 typedef enum {
   CSID_X20,
@@ -50,7 +50,7 @@ void AnoDTRxOneByteUart( u8 data );
 void AnoDTRxOneByteUsb( u8 data );
 void AnoDTSendStr(u8 dest_addr, u8 string_color, char *str);
 void ANO_DT_Init(void);
-void ANO_DT_Task1Ms(void);
+void dtTask(void);
 
 
 

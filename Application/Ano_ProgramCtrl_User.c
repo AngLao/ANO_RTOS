@@ -24,12 +24,6 @@ void Program_Ctrl_User_Set_HXYcmps(float hx_vel_cmps, float hy_vel_cmps)
   length_limit(&pc_user.vel_cmps_set_h[0], &pc_user.vel_cmps_set_h[1], MAX_PC_XYVEL_CMPS, pc_user.vel_cmps_set_h);
 }
 
-
-//=====2、无头模式参考坐标系程控功速度能接口函数（暂无，稍后开发，或者参考上位机程控功能）=====
-//
-//
-//
-
 //=====3、通用程控速度功能接口函数=====
 /**********************************************************************************************************
 *函 数 名: Program_Ctrl_User_Set_WHZcmps

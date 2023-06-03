@@ -17,21 +17,16 @@ typedef	int8_t 		s8;
 #include "pin_map.h"
 #include "Drv_Bsp.h"
 
-//======
 #define Delay_ms MyDelayMs
-//#define ANO_DT_USE_USART2
-//#define ANO_DT_USE_USART3
-#define ANO_DT_USE_USB
-//======
 
 #define HW_ALL		 0xFF
-#define HW_TYPE		 05
+#define HW_TYPE		 0x05
 #define SWJ_ADDR 	 0xAF
-#define SOFT_VER 	 17
-#define HW_VER		 666666
-#define SW_VER  	 666666
-#define BL_VER		 666666
-#define PT_VER		 666666
+#define SOFT_VER 	 9527
+#define HW_VER		 9527
+#define SW_VER  	 9527
+#define BL_VER		 9527
+#define PT_VER		 9527
 //======
 #define LED_R	0x01
 #define LED_G	0x02
@@ -60,15 +55,7 @@ typedef	int8_t 		s8;
 #define LED2_PIN			GPIO_PIN_1
 #define LED3_PIN			GPIO_PIN_6
 #define LEDS_PIN			GPIO_PIN_4
-///**********PWM输出引脚配置*************/
-//#define M0TO_PWM1_FUNCTION	GPIO_PB6_M0PWM0
-//#define M0TO_PWM2_FUNCTION	GPIO_PB7_M0PWM1
-//#define M0TO_PWM3_FUNCTION	GPIO_PB4_M0PWM2
-//#define M0TO_PWM4_FUNCTION	GPIO_PB5_M0PWM3
-/*油门行程为[0:1000]*/
-//#define MINTHROTTLE	    	0				//最小油门值
-//#define MAXTHROTTLE 		1000            //最大油门值
-//#define PWM_PERIOD_MAX		3125			//周期为2.5ms(400hz)
+
 /**********spi引脚配置*************/
 /*传感器用*/
 #define SPI0_SYSCTL			SYSCTL_PERIPH_GPIOA
@@ -80,6 +67,7 @@ typedef	int8_t 		s8;
 #define SPI0_RX				GPIO_PA4_SSI0RX
 #define SPI0_TX				GPIO_PA5_SSI0TX
 #define SPI0_BASE			SSI0_BASE
+
 /**********ICM20602的引脚配置*************/
 #define ICM_CSPIN_SYSCTL	SYSCTL_PERIPH_GPIOA
 #define ICM20602_CS_PORT	GPIOA_BASE
@@ -88,18 +76,22 @@ typedef	int8_t 		s8;
 #define ICM20602_READY_PORT	    GPIOB_BASE
 #define ICM20602_READY_INT_PORT INT_GPIOB
 #define ICM20602_READY_PIN	    GPIO_PIN_2
+
 /**********AK8975的CS使能引脚配置*************/
 #define AK_CSPIN_SYSCTL		SYSCTL_PERIPH_GPIOD
 #define AK8975_CS_PORT		GPIOD_BASE
 #define AK8975_CS_PIN		GPIO_PIN_2
+
 /**********spl06的CS使能引脚配置*************/
 #define SPL_CSPIN_SYSCTL	SYSCTL_PERIPH_GPIOD
 #define SPL06_CS_PORT		GPIOD_BASE
 #define SPL06_CS_PIN		GPIO_PIN_3
+
 /**********Flash的CS使能引脚配置*************/
 #define FLASH_CSPIN_SYSCTL	SYSCTL_PERIPH_GPIOE
 #define FLASH_CS_PORT		GPIOE_BASE
 #define FLASH_CS_PIN		GPIO_PIN_2
+
 /**********PWM输出引脚配置*************/
 #define M0TO_PWM1_FUNCTION	GPIO_PB6_M0PWM0
 #define M0TO_PWM2_FUNCTION	GPIO_PB7_M0PWM1
@@ -110,16 +102,12 @@ typedef	int8_t 		s8;
 #define M0TO_PWM7_FUNCTION	GPIO_PF2_M1PWM6
 #define M0TO_PWM8_FUNCTION	GPIO_PF3_M1PWM7
 #define HEAT_PWM_FUNCTION	GPIO_PA7_M1PWM3
+
 /*油门行程为[0:1000]*/
 #define MINTHROTTLE	    	0				//最小油门值           
 #define MAXTHROTTLE 		1000            //最大油门值
 #define PWM_PERIOD_MAX		3125			//周期为2.5ms(400hz)
-///**********Uart引脚配置*************/
-//#define	UART0_RX			GPIO_PA0_U0RX
-//#define	UART0_TX			GPIO_PA1_U0TX
-//#define	UART0_PORT			GPIOA_BASE
-//#define	UART0_PIN_RX		GPIO_PIN_0
-//#define	UART0_PIN_TX		GPIO_PIN_1
+
 /**********PPM定时器配置*************/
 #define PPM_SYSCTL			SYSCTL_PERIPH_GPIOC
 #define PPM_FUNCTION		GPIO_PC7_WT1CCP1
@@ -127,25 +115,27 @@ typedef	int8_t 		s8;
 #define PPM_PIN				GPIO_PIN_7
 #define PULSE_MIN   800
 #define PULSE_MAX   2200
+
 /**********ADC引脚配置*************/
 #define ADC_PORT			GPIOE_BASE
 #define ADC_PIN				GPIO_PIN_3
+
 /**********串口引脚配置*************/
 #define SBUS_SYSCTL			SYSCTL_PERIPH_GPIOC
-#define SBUS_UART			UART3_BASE
+#define SBUS_UART			  UART3_BASE
 #define SBUS_BAUDRATE		100000
-#define	UART3_RX			GPIO_PC6_U3RX
+#define	UART3_RX			  GPIO_PC6_U3RX
 #define	UART3_PORT			GPIOC_BASE
 #define	UART3_PIN_RX		GPIO_PIN_6
 
-#define	UART0_RX			GPIO_PA0_U0RX
-#define	UART0_TX			GPIO_PA1_U0TX
+#define	UART0_RX			  GPIO_PA0_U0RX
+#define	UART0_TX			  GPIO_PA1_U0TX
 #define	UART0_PORT			GPIOA_BASE
 #define	UART0_PIN_RX		GPIO_PIN_0
 #define	UART0_PIN_TX		GPIO_PIN_1
 
-#define	UART2_RX			GPIO_PD6_U2RX
-#define	UART2_TX			GPIO_PD7_U2TX
+#define	UART2_RX				GPIO_PD6_U2RX
+#define	UART2_TX				GPIO_PD7_U2TX
 #define	UART2_PORT			GPIOD_BASE
 #define	UART2_PIN_RX		GPIO_PIN_6
 #define	UART2_PIN_TX		GPIO_PIN_7

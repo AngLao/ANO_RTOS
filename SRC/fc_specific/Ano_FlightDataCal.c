@@ -24,12 +24,10 @@ void Aux_read(void *pvParameters)
   while (1) {
     xLastWakeTime = xTaskGetTickCount(); //获取当前Tick次数,以赋给延时函数初值
 
-    if(flag.start_ok) {
-      /*读取电子罗盘磁力计数据*/
-      Drv_AK8975_Read();
-      /*读取气压计数据*/
-      baro_height = (s32)Drv_Spl0601_Read();
-    }
+    /*读取电子罗盘磁力计数据*/
+    Drv_AK8975_Read();
+    /*读取气压计数据*/
+    baro_height = (s32)Drv_Spl0601_Read();
 
     vTaskDelayUntil(&xLastWakeTime,configTICK_RATE_HZ/50);
   }
@@ -69,7 +67,7 @@ void IMU_Update_Task(u8 dT_ms)
   imu_state.mkp = 0;
 
   /*磁力计修正使能选择*/
-  imu_state.M_fix_en = sens_hd_check.mag_ok; 
+  imu_state.M_fix_en = sens_hd_check.mag_ok;
 
 
   /*姿态计算，更新，融合*/

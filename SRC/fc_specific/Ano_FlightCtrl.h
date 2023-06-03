@@ -72,12 +72,10 @@ void one_key_land(void);
 void app_one_key_roll(void);
 void app_one_key_roll_reset(void);
 void one_key_take_off_task(u16 dt_ms);
+ 
 
-void ctrl_parameter_change_task(void);
+void Flight_State_Task(u8,const s16 *CH_N);
 
-void Flight_State_Task(u8,s16 *CH_N);
-
-void Flight_Mode_Set(u8 dT_ms);
 
 void Swtich_State_Task(u8 dT_ms);
 #endif

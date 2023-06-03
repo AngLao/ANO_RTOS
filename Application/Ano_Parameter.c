@@ -110,7 +110,7 @@ void Parame_Reset(u8 mode)
 {
   if(mode >= 1) {
     //参数初始化
-    Ano_Parame.set.pwmInMode = PPM;
+    Ano_Parame.set.pwmInMode = SBUS;
     Ano_Parame.set.heatSwitch = 0;
     Ano_Parame.set.bat_cell = 4;
     Ano_Parame.set.warn_power_voltage = 3.70f;
@@ -238,7 +238,11 @@ s32 AnoParRead(u16 _id)
   case PAR_SW_VER:
     p_val = SW_VER;
     break;
-
+	
+  case PAR_BL_VER:
+    p_val = BL_VER;
+    break;
+	
   //====设置
   case PAR_BAT_CELLS:
     p_val = Ano_Parame.set.bat_cell;
@@ -266,6 +270,11 @@ s32 AnoParRead(u16 _id)
 
   case PAR_TAKEOFFHIGH:
     p_val = Ano_Parame.set.auto_take_off_height;
+    break;
+
+
+  case PAR_RCINMODE:
+    p_val = Ano_Parame.set.pwmInMode ;
     break;
 
   case PAR_UNLOCKPWM:
@@ -365,8 +374,12 @@ s32 AnoParRead(u16 _id)
     p_val = 1e3f * Ano_Parame.set.pid_alt_2level[0];
     break;
 
-//		case PAR_PID_8_I: p_val = 1e3f *Ano_Parame.set.pid_alt_2level[1]; break;
-//		case PAR_PID_8_D: p_val = 1e3f *Ano_Parame.set.pid_alt_2level[2]; break;
+  case PAR_PID_8_I:
+    p_val = 1e3f *Ano_Parame.set.pid_alt_2level[1];
+    break;
+  case PAR_PID_8_D:
+    p_val = 1e3f *Ano_Parame.set.pid_alt_2level[2];
+    break;
   //水平速度
   case PAR_PID_9_P:
     p_val = 1e3f * Ano_Parame.set.pid_loc_1level[0];
@@ -528,6 +541,10 @@ void AnoParWrite(u16 _id, s32 _val)
 
   case PAR_TAKEOFFHIGH:
     Ano_Parame.set.auto_take_off_height = LIMIT(_val, 0, 65535);
+    break;
+
+  case PAR_RCINMODE:
+    Ano_Parame.set.pwmInMode = LIMIT(_val, 0, 255);
     break;
 
   case PAR_UNLOCKPWM:
@@ -787,3 +804,4 @@ void AnoParWrite(u16 _id, s32 _val)
     break;
   }
 }
+

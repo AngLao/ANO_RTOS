@@ -10,9 +10,7 @@ typedef struct {
   unsigned short  x;
   unsigned short  y;
 } map_dot_t;
-
-
-map_dot_t mydot = {.x = 50, .y = 560};
+ 
 //植保无人机地图二维化数组
 //此地图最大长度X=5000mm 最大宽度Y=4000mm
 

@@ -33,8 +33,7 @@ float		OF_ATT_S1, OF_ATT_S2, OF_ATT_S3, OF_ATT_S4;
 void AnoOF_DataAnl(uint8_t *data_buf, uint8_t num);
 
 static uint8_t _datatemp[50];
-static u8 _data_cnt = 0;
-static u8 anoof_data_ok;
+static u8 _data_cnt = 0; 
 
 
 //AnoOF_GetOneByte是初级数据解析函数，串口每接收到一字节光流数据，调用本函数一次，函数参数就是串口收到的数据

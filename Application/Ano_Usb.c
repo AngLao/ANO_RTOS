@@ -296,8 +296,9 @@ uint16_t AnoUsbCdcDataAvailable()
 #include <stdio.h>
 
 int fputc(int ch, FILE *stream)
-{ 
-	AnoUsbCdcSend((uint8_t*)&ch, 1);
+{
+  AnoUsbCdcSend((uint8_t*)&ch, 1);
+  return 0;
 }
 #endif
 

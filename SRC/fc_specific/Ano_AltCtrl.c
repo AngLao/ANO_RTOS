@@ -153,8 +153,7 @@ void Alt_1level_Ctrl(float dT_s)
 {
   u8 out_en;
   out_en = (flag.taking_off != 0) ? 1 : 0;
-
-  flag.thr_mode = THR_AUTO;//THR_MANUAL;
+ 
 
   loc_ctrl_1.exp[Z] = 0.6f *fs.alt_ctrl_speed_set + alt_val_2.out;//速度前馈0.6f，直接给速度
 

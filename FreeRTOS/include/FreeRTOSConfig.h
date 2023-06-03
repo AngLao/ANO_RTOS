@@ -86,7 +86,7 @@
 /*                                        FreeRTOS基础配置配置选项                                              */
 /***************************************************************************************************************/
 #define configUSE_PREEMPTION										1                       //1使用抢占式内核，0使用协程
-#define configUSE_TIME_SLICING									1						//1使能时间片调度(默认式使能的)
+#define configUSE_TIME_SLICING									1												//1使能时间片调度(默认式使能的)
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION	1                       //1启用特殊方法来选择下一个要运行的任务
                                                                         //一般是硬件计算前导零指令，如果所使用的
                                                                         //MCU没有这些硬件指令的话此宏应该设置为0！
@@ -96,7 +96,7 @@
 #define configTICK_RATE_HZ									(1000)                  //时钟节拍频率，这里设置为1000，周期就是1ms
 #define configMAX_PRIORITIES								(5)                    	//可使用的最大优先级
 #define configMINIMAL_STACK_SIZE						((unsigned short)128)   //空闲任务使用的堆栈大小
-#define configMAX_TASK_NAME_LEN							(16)                    //任务名字字符串长度
+#define configMAX_TASK_NAME_LEN							(25)                    //任务名字字符串长度
 
 #define configUSE_16_BIT_TICKS							0                       //系统节拍计数器变量数据类型，
                                                                         //1表示为16位无符号整形，0表示为32位无符号整形
@@ -128,11 +128,15 @@
 /***************************************************************************************************************/
 /*                                FreeRTOS与运行时间和任务状态收集有关的配置选项                                 */
 /***************************************************************************************************************/
-#define configGENERATE_RUN_TIME_STATS	        1	                      //为1时启用运行时间统计功能
+#define configGENERATE_RUN_TIME_STATS	        0	                      //为1时启用运行时间统计功能
+#if(configGENERATE_RUN_TIME_STATS == 1)
+
 extern volatile uint32_t CPU_RunTime; 
 
 #define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() (CPU_RunTime = 0ul) 
 #define portGET_RUN_TIME_COUNTER_VALUE() CPU_RunTime
+
+#endif
 
 #define configUSE_TRACE_FACILITY							1                       //为1启用可视化跟踪调试
 #define configUSE_STATS_FORMATTING_FUNCTIONS	1                       //与宏configUSE_TRACE_FACILITY同时为1时会编译下面3个函数
