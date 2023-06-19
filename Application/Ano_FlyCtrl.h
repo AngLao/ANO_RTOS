@@ -1,17 +1,7 @@
 #ifndef _FLY_CTRL_H
 #define	_FLY_CTRL_H
 
-#include "sysconfig.h"
-typedef struct {
-  //sta
-  u8 state_ok;
-  u8 val;
-  u8 update_f;
-  u8 en;
-
-} _onekey_ct_st;
-
-extern _onekey_ct_st onekey;
+#include "sysconfig.h" 
  
 //public
 void FlyCtrlDataAnl(u8 *data);

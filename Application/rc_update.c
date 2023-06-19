@@ -5,25 +5,22 @@ int16_t CH_N[CH_NUM] = {0};
 //遥控掉线保护
 static void offLineProtection()
 {
-	//摇杆控制量归零
+  //摇杆控制量归零
   CH_N[CH_THR] = 0;
   CH_N[CH_ROL] = 0;
   CH_N[CH_PIT] = 0;
   CH_N[CH_YAW] = 0;
- 
+
   //如果飞控处于解锁状态，自动降落标记置位
-  if(flag.unlock_sta) {
-    if(switchs.gps_on == 0) {
-      flag.auto_take_off_land = AUTO_LAND;
-    } else {
-      flag.rc_loss_back_home = 1;
-    } 
-  }
+  if(flag.unlock_sta &&  flag.auto_take_off_land != AUTO_LAND)
+    flag.auto_take_off_land = AUTO_LAND;
+
 }
 
-//遥控器掉线检测回调函数
-static void vDetectionRcConnection( void *pvParameters )
+//低速状态变化检测回调函数
+static void vSlowDetection( void *pvParameters )
 {
+	//遥控信号检测
   //在定时器设定范围内有新数据到来,遥控器在线
   if(haveNewData) {
     //认为信号正常
@@ -34,20 +31,121 @@ static void vDetectionRcConnection( void *pvParameters )
 
       if(flag.taking_off)
         flag.auto_take_off_land = AUTO_TAKE_OFF_FINISH; //解除下降
+			
+			debugOutput("remote connected"); 
     }
   } else {
-    //丢失遥控信号
-    flag.rc_loss = 1;
+		
+    if(flag.rc_loss == 0) {
+			//丢失遥控信号
+			flag.rc_loss = 1;
 
-    //打开丢失遥控信号指示灯
-    LED_STA.noRc = 1;
+			//打开丢失遥控信号指示灯
+			LED_STA.noRc = 1;
 
-    //执行遥控掉线保护
-    offLineProtection();
+			//执行遥控掉线保护
+			offLineProtection();
 
+			debugOutput("remote disconnection"); 
+		}
   }
+	
+	
+	//任务变化检测
+	//通道2检测
+  static uint8_t channelTwoState = 0;
+  //开关回到零点
+  if(CH_N[AUX2]<-100)
+    channelTwoState = 0;
+
+  if(channelTwoState == 0) { 
+    //开关打到高值
+    if(CH_N[AUX2] > 300) {
+      channelTwoState = 2;
+      debugOutput("CH_N[AUX2]  = 2");
+ 
+    } 
+    //开关打到中值
+    else if(CH_N[AUX2] > -100) { 
+      channelTwoState = 1;
+      debugOutput("CH_N[AUX2]  = 1");
+    }
+  }
+	
+	//通道3检测
+  static uint8_t channelThreeState = 0;
+  //开关回到零点
+  if(CH_N[AUX3]<-100)
+    channelThreeState = 0;
+
+  if(channelThreeState == 0) { 
+    //开关打到高值
+    if(CH_N[AUX3] > 300) {
+      channelThreeState = 2;
+      debugOutput("CH_N[AUX3]  = 2");
+ 
+    } 
+    //开关打到中值
+    else if(CH_N[AUX3] > -100) { 
+      channelThreeState = 1;
+      debugOutput("CH_N[AUX3]  = 1");
+    }
+  }
+	
+	//通道4检测
+  static uint8_t channelFourState = 0;
+  //开关回到零点
+  if(CH_N[AUX4]<-100)
+    channelFourState = 0;
+
+  if(channelFourState == 0) { 
+    //开关打到高值
+    if(CH_N[AUX4] > 300) {
+      channelFourState = 2;
+      debugOutput("CH_N[AUX4]  = 2");
+ 
+    } 
+    //开关打到中值
+    else if(CH_N[AUX4] > -100) { 
+      channelFourState = 1;
+      debugOutput("CH_N[AUX4]  = 1");
+    }
+  }
+	
 }
 
+//高速状态变化检测回调函数
+static void vFastDetection(void *pvParameters )
+{
+  flag.flight_mode = LOC_HOLD;
+
+  //通道1检测
+  static uint8_t channelOneState = 0;
+  //开关回到零点
+  if(CH_N[AUX1]<-100)
+    channelOneState = 0;
+
+	//开关打到高值
+	else if(CH_N[AUX1] > 300){ 
+		//急停键按下后持续上锁
+		if(flag.unlock_cmd == 1){ 
+			flag.unlock_cmd = 0;
+			debugOutput("The emergency stop button is pressed");
+		}
+		
+		if(channelOneState == 0) {  
+			channelOneState = 2;
+
+			//通道1一键急停
+			debugOutput("Emergency stop!");
+			flag.unlock_sta = 0;
+			flag.unlock_cmd = 0;
+			flag.taking_off = 0;
+			flag.flying = 0;
+    } 
+	}
+  
+}
 
 //解锁监测
 static void unlockDetection(void)
@@ -79,10 +177,10 @@ static void unlockDetection(void)
 
   //正在操作flash
   if( para_sta.save_trig != 0) {
-    flag.unlock_err = 4;//操作flash ，不允许解锁
+    flag.unlock_err = 5;//操作flash ，不允许解锁
   }
 
-	//飞控上锁、解锁检测要油门在拉低时才进行
+  //飞控上锁、解锁检测要油门在拉低时才进行
   if(CH_N[CH_THR] > -UN_THR_VALUE  ) {
     flag.thr_low = 0;//油门非低
   } else {
@@ -98,52 +196,57 @@ static void unlockDetection(void)
     if(xFirstWakeTime == 0) {
       xFirstWakeTime = xTaskGetTickCount();
     }
-		
+
     TickType_t xThisWakeTime = xTaskGetTickCount(); //获取当前时间
     //到达指定时间差
     if(xThisWakeTime - xFirstWakeTime > pdMS_TO_TICKS(1500)) {
       //根据飞行状态决定上锁还是解锁(上锁状态就解锁,解锁状态就上锁)
       flag.unlock_cmd = !flag.unlock_sta ;
-			xFirstWakeTime  = 0;
-    } 
+      xFirstWakeTime  = 0;
+    }
   } else {
+
+    //退出内八状态计数清零
     xFirstWakeTime = 0;
   }
-	
+
   //飞控处于上锁状态 收到解锁命令
   if(flag.unlock_sta == 0 && flag.unlock_cmd == 1 ) {
     //系统存在错误,禁止解锁
-    if(flag.unlock_err != 0) { 
-      flag.unlock_cmd = 0; 
+    if(flag.unlock_err != 0) {
+      flag.unlock_cmd = 0;
     }
 
     //打印解锁情况信息
     switch(flag.unlock_err) {
     case 0:
-      ANO_DT_SendString("unlocking succeeded");
+      debugOutput("unlocking succeeded");
       break;
     case 1:
-      ANO_DT_SendString("imu error");
+      debugOutput("imu error");
       break;
     case 2:
-      ANO_DT_SendString("barometer  error");
+      debugOutput("barometer  error");
       break;
     case 3:
-      ANO_DT_SendString("inertial sensor error");
+      debugOutput("inertial sensor error");
       break;
     case 4:
-      ANO_DT_SendString("undervoltage error");
+      debugOutput("undervoltage error");
+      break;
+    case 5:
+      debugOutput("flash error");
       break;
     }
   } else if (flag.unlock_sta == 1 && flag.unlock_cmd == 0 ) {
     //飞控处于解锁状态 收到上锁命令
-    ANO_DT_SendString("flight control is locked");
+    debugOutput("flight control is locked");
 
   }
 
   //飞控上锁状态切换
   flag.unlock_sta = flag.unlock_cmd;
- 
+
 }
 
 
@@ -166,48 +269,19 @@ static void dataStandardization(void)
   }
 }
 
- 
-//遥控器除摇杆外开关变化检测
-static void taskSwitchDetection(void)
-{  
-	flag.flight_mode = LOC_HOLD; 
 
-  //通道1一键急停
-  if(CH_N[AUX1]>300) {
-    if(flag.unlock_sta) {
-      ANO_DT_SendString("Emergency stop OK!");
-			flag.unlock_sta = 0;
-      flag.unlock_cmd = 0;
-      flag.taking_off = 0;
-      flag.flying = 0; 
-    }
-  }
- 
-	//通道2做一键起飞
-	if(CH_N[AUX2]<300) {
-		onekey.val = 0;
-	} else {
-		onekey.val = 1;
-	} 
-	 
-}
-
-
-
-void receivingTask(void) 
+void receivingTask(void)
 {
+  //解锁监测(不可阻塞,否则失控无法上锁)
+  unlockDetection();
+
   //遥控器在线是接下来操作的前提
-  if(flag.rc_loss == 1)  {
+  if(flag.rc_loss == 1)
     return;
-  }
 
   //遥控数据标准化
   dataStandardization();
-  //解锁监测
-  unlockDetection();
-	
-	/*飞行模式设置任务*/
-	taskSwitchDetection();
+ 
 }
 
 //接收机模式初始化
@@ -220,18 +294,35 @@ void receivingModeInit()
     Drv_PpmInit();
   }
 
-  //创建检测遥控器连接状态定时器
-  TimerHandle_t xDetectionRcConnectionTimer = xTimerCreate(
-        "Detection remote control connection",
-        800,
+  //创建缓慢检测状态变化定时器（如检测遥控失联，任务启动等功能）
+  TimerHandle_t xSlowDetectionTimer = xTimerCreate(
+        "low-speed callback Detection",
+        500,
         pdTRUE,
         0,
-        vDetectionRcConnection
+        vSlowDetection
       );
-  if( xDetectionRcConnectionTimer != NULL ) {
+
+  if( xSlowDetectionTimer != NULL ) {
     //开启检测遥控器连接状态定时器
-    xTimerStart( xDetectionRcConnectionTimer, 0 );
+    xTimerStart( xSlowDetectionTimer, 0 );
   } else {
     //内存不够处理
-  } 
+  }
+	
+	//创建快速检测状态变化定时器（用于实时检测，如急停等功能）
+  TimerHandle_t xFastDetectionTimer = xTimerCreate(
+        "high-speed callback Detection",
+        25,
+        pdTRUE,
+        0,
+        vFastDetection
+      );
+
+  if( xFastDetectionTimer != NULL ) {
+    //开启遥控器按键状态变化检测定时器
+    xTimerStart( xFastDetectionTimer, 0 );
+  } else {
+    //内存不够处理
+  }
 }

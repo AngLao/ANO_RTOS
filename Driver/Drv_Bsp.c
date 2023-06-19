@@ -1,5 +1,4 @@
-#include "Drv_Bsp.h"
-#include "pwm.h"
+#include "Drv_Bsp.h" 
 #include "Drv_RcIn.h"
 #include "Drv_Spi.h"
 #include "Drv_Led.h"
@@ -23,14 +22,15 @@
 #include "task.h"
 
 
-extern void xPortSysTickHandler(void);
-
 void SysTick_Init(void )
 {
   ROM_SysTickPeriodSet(ROM_SysCtlClockGet() / 1000);
   ROM_SysTickIntEnable();
   ROM_SysTickEnable();
 }
+
+//声明freeRTOS滴答回调
+void xPortSysTickHandler( void );
 
 void SysTick_Handler(void)
 {
@@ -105,8 +105,10 @@ void Drv_BspInit(void)
 	
   //飞控传感器计算初始化
   Sensor_Basic_Init();
+	
   //飞控PID初始化
   All_PID_Init();
+	
   //电机输出初始化
   Drv_PwmOutInit();
 

@@ -1,23 +1,16 @@
 #include "Drv_heating.h"
-#include "Drv_PwmOut.h"
-//void Drv_HeatingInit(void)
-//{
-
-//}
-
-void Drv_HeatingSet(u8 val)
-{
-  Drv_HeatSet((val * 10));
-//	if(val > 99)
-//		TIM10->CCR1 = 99;
-//	else
-//		TIM10->CCR1 = val;
-}
+#include "Drv_PwmOut.h" 
 
 #include "Ano_DT.h"
 #include "Ano_Sensor_Basic.h"
 #include "Ano_Parameter.h"
 #include "Ano_math.h"
+
+void Drv_HeatingSet(u8 val)
+{
+  Drv_HeatSet((val * 10)); 
+}
+
 
 //用上位机设置恒温功能开关
 //#define USE_THERMOSTATIC

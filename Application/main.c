@@ -22,8 +22,7 @@
 #include "Ano_MagProcess.h"
 #include "Ano_OF.h"
 #include "Drv_heating.h"
-#include "Ano_FlyCtrl.h"
-#include "Ano_UWB.h"
+#include "Ano_FlyCtrl.h" 
 #include "Ano_OF_DecoFusion.h"
 #include "Drv_Uart.h"
 #include "Ano_Imu.h"
@@ -34,6 +33,10 @@
 #include "Drv_Timer.h"
 #include "ano_usb.h"
 #include "power_management.h"
+#include "Drv_Uart.h"
+#include "ring_buffer.h"
+#include "nlink_utils.h"
+#include "nlink_linktrack_tagframe0.h"
 
 /* 基本传感器数据准备进程 该任务为精准进行的任务 执行频率精准1000Hz 优先级全局最高*/
 void basic_data_read(void *pvParameters)
@@ -63,9 +66,7 @@ void basic_data_read(void *pvParameters)
 
     /*光流融合数据准备任务*/
     ANO_OF_Data_Prepare_Task(0.001f);
-
-
-
+ 
     //灯光驱动
     LED_1ms_DRV();
 
@@ -154,24 +155,10 @@ void position_loop(void *pvParameters)
     xLastWakeTime = xTaskGetTickCount(); //获取当前Tick次数,以赋给延时函数初值
 
     /*罗盘数据处理任务*/
-    Mag_Update_Task(20);
-
-    //通道二一键任务（swb杆往下拨）
-    if (onekey.val) {
-      static char isFirst = 1;
-      if(isFirst) {
-
-        isFirst = UWBTest_Task(20);
-      }
-    }
-
-    AnoOF_Check(20);
+    Mag_Update_Task(20); 
 
     /*位置速度环控制*/
     Loc_1level_Ctrl(20);
-
-    //解析UWB数据
-    UWB_Get_Data_Task();
  
     /*数传数据交换*/
     dtTask();
@@ -181,7 +168,7 @@ void position_loop(void *pvParameters)
 }
 
 
-/* 恒温控制进程 该任务为精准进行的任务 执行频率精准20Hz 优先级第四*/
+/* 恒温控制进程 该任务为精准进行的任务 执行频率精准20Hz */
 void temperature_loop(void *pvParameters)
 {
   TickType_t xLastWakeTime;         //用于精准定时的变量
@@ -197,11 +184,38 @@ void temperature_loop(void *pvParameters)
 
     /*延时存储任务*/
     Ano_Parame_Write_task(50);
-
+		
     vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 20);
   }
 }
 
+
+/* 自定义进程 */
+void user_loop(void *pvParameters)
+{
+  TickType_t xLastWakeTime;         //用于精准定时的变量
+
+  while (1) {
+    xLastWakeTime = xTaskGetTickCount(); //获取当前Tick次数,以赋给延时函数初值
+
+    //解析UWB数据 
+		//读环形缓冲区
+		static int RingBufferDataLen = 0;
+		static unsigned char pData[128 * 5];
+		RingBufferDataLen = RingBuffer_GetCount(&U1rxring) ;
+
+		//解析uwb数据
+		if(RingBufferDataLen) {
+			RingBuffer_PopMult(&U1rxring, pData, RingBufferDataLen);
+
+			if (g_nlt_tagframe0.UnpackData(pData, RingBufferDataLen)) {
+				return;
+			}
+		}
+ 
+    vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 50);
+  }
+}
  
 int main(void)
 {
@@ -224,13 +238,11 @@ int main(void)
 
   /* 恒温控制进程 20Hz*/
   xTaskCreate(temperature_loop, "temperature_loop", 128, NULL, 2, NULL);
-  
-#if(configGENERATE_RUN_TIME_STATS == 1)
-  Timer_Config();
-  xTaskCreate(task_census, "task_census", 512, NULL, 2, NULL);
+	
+	
+//  /* 自定义进程 50Hz*/
+//  xTaskCreate(user_loop, "user_loop", 128, NULL, 3, NULL); 
 
-#endif
- 
   //启用任务调度器
   vTaskStartScheduler();
 

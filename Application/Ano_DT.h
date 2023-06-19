@@ -9,11 +9,11 @@
 #define LOG_COLOR_GREEN	2
 
 
-#define close -1
+#define CLOSE -1 
 #define USB_CDC 0
-#define UART_3 	1
+#define UART 	1 
 //数传输出硬件选择
-#define debugHardwork UART_3 
+#define DEBUG_CONFIG USB_CDC 
 
 typedef enum {
   CSID_X20,
@@ -54,7 +54,7 @@ void dtTask(void);
 
 
 
-#define		 ANO_DT_SendString(str ) 	AnoDTSendStr(0xFF, LOG_COLOR_GREEN , str )
+#define		 debugOutput(str) 	AnoDTSendStr(0xFF, LOG_COLOR_RED , str )
 
 #endif
 

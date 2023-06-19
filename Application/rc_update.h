@@ -10,6 +10,7 @@
 #include "Ano_LED.h"
 #include "Ano_FcData.h"
 #include "Ano_FlyCtrl.h"
+#include "Ano_FlightCtrl.h"
 
 #include "FreeRTOS.h"
 #include "task.h"

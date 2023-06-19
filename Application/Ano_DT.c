@@ -160,37 +160,37 @@ void ANO_DT_Init(void)
 {
   //串口1发送配置/////////////////////////////////////////////////////////////
   //PWM
-  dt.txSet_u2[CSID_X20].fre_ms = 100;  
+  dt.txSet_u2[CSID_X20].fre_ms = 10; 
   //ACC-GRO
-  dt.txSet_u2[CSID_X01].fre_ms = 5;  
+  dt.txSet_u2[CSID_X01].fre_ms = 10;   
   //ECP-TEM-BARO
-  dt.txSet_u2[CSID_X02].fre_ms = 5;  
+  dt.txSet_u2[CSID_X02].fre_ms = 10;   
   //ATT_ANG
-  dt.txSet_u2[CSID_X03].fre_ms = 5;  
-  //ATT_QUA
-  dt.txSet_u2[CSID_X04].fre_ms = 5;  
+  dt.txSet_u2[CSID_X03].fre_ms = 10;   
+//  //ATT_QUA
+//  dt.txSet_u2[CSID_X04].fre_ms = 5;  
   //height
-  dt.txSet_u2[CSID_X05].fre_ms = 5; 
+  dt.txSet_u2[CSID_X05].fre_ms = 10;  
   //fc_mode
-  dt.txSet_u2[CSID_X06].fre_ms = 4; 
+  dt.txSet_u2[CSID_X06].fre_ms = 15; 
   //velocity
-  dt.txSet_u2[CSID_X07].fre_ms = 5;//
+  dt.txSet_u2[CSID_X07].fre_ms = 10; //
   //pos
-  dt.txSet_u2[CSID_X08].fre_ms = 5;//
-  //wind_vel
-  dt.txSet_u2[CSID_X09].fre_ms = 5;//
+  dt.txSet_u2[CSID_X08].fre_ms = 10; //
+//  //wind_vel
+//  dt.txSet_u2[CSID_X09].fre_ms = 5;//
   //电压
-  dt.txSet_u2[CSID_X0D].fre_ms = 5;//
+  dt.txSet_u2[CSID_X0D].fre_ms = 10; //
   //传感器状态
-  dt.txSet_u2[CSID_X0E].fre_ms = 5;//
+  dt.txSet_u2[CSID_X0E].fre_ms = 10; //
   //UWB数据
-  dt.txSet_u2[CSID_X32].fre_ms = 5;//
+  dt.txSet_u2[CSID_X32].fre_ms = 10; //
   //遥控数据
-  dt.txSet_u2[CSID_X40].fre_ms = 4;//
-  //实时控制数据
-  dt.txSet_u2[CSID_X41].fre_ms = 5;//
-  //FC_RGB
-  dt.txSet_u2[CSID_X0F].fre_ms = 5;//
+  dt.txSet_u2[CSID_X40].fre_ms = 10; //
+//  //实时控制数据
+//  dt.txSet_u2[CSID_X41].fre_ms = 5;//
+//  //FC_RGB
+//  dt.txSet_u2[CSID_X0F].fre_ms = 5;//
 
 }
 
@@ -212,11 +212,11 @@ void ANO_DT_Init(void)
 //===========================================================
 void ANO_DT_Send_Data(u8 *dataToSend, u8 length)
 {
-#if(debugHardwork == UART_3)
+#if(DEBUG_CONFIG == UART)
 
   Drv_Uart3SendBuf(dataToSend, length);
 
-#elif (debugHardwork == USB_CDC)
+#elif (DEBUG_CONFIG == USB_CDC)
 
   AnoUsbCdcSend(dataToSend, length);
 
@@ -555,6 +555,7 @@ u8 CheckDotWts(u8 id_addr)
   if(id_addr >= CSID_NUM) {
     return 0;
   }
+
 
   if((*_dot_WTS)) {
     //复位等待发送标记
@@ -1006,9 +1007,9 @@ static void AnoDTDataAnl(u8 *data, u8 len)
 void dtTask(void)
 {
 	
-#if (debugHardwork != close)
+#if (DEBUG_CONFIG != CLOSE)
 
-#if(debugHardwork == UART_3)
+#if(DEBUG_CONFIG == UART)
 
     //数传响应
     int len = RingBuffer_GetCount(&U3rxring);
@@ -1018,7 +1019,7 @@ void dtTask(void)
       RingBuffer_Pop(&U3rxring, &data);
       AnoDTRxOneByte(data);
     }
-#elif (debugHardwork == USB_CDC)
+#elif (DEBUG_CONFIG == USB_CDC)
 
     static u8 usbdatarxbuf[100];
 

@@ -49,11 +49,11 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\build\</OutputDirectory>
-          <OutputName>ANO_PioneerPro_Ti</OutputName>
+          <OutputName>test</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>0</CreateHexFile>
-          <DebugInformation>1</DebugInformation>
+          <DebugInformation>0</DebugInformation>
           <BrowseInformation>1</BrowseInformation>
           <ListingPath>.\build\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
@@ -437,11 +437,6 @@
               <FileName>Ano_OF.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Driver\SenserDriver\Ano_OF.c</FilePath>
-            </File>
-            <File>
-              <FileName>Ano_UWB.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Driver\SenserDriver\Ano_UWB.c</FilePath>
             </File>
             <File>
               <FileName>nlink_linktrack_tagframe0.c</FileName>

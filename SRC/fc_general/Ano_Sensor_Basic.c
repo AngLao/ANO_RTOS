@@ -166,7 +166,7 @@ void MPU6050_Data_Offset()
             }
           }
           sensor.gyr_CALIBRATE = 0;
-//					ANO_DT_SendString("GYR init OK!");
+//					debugOutput("GYR init OK!");
 
         }
       }
@@ -193,7 +193,7 @@ void MPU6050_Data_Offset()
 
           acc_sum_cnt =0;
           sensor.acc_CALIBRATE = 0;
-//					ANO_DT_SendString("ACC init OK!");
+//					debugOutput("ACC init OK!");
 
           data_save();
         }

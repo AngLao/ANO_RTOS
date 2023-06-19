@@ -16,9 +16,7 @@
 #include "Ano_FlightCtrl.h"
 #include "ANO_IMU.h"
 #include "Drv_Uart.h"
-
-//自添加代码
-_onekey_ct_st onekey;
+ 
 
 unsigned char broadcasting_Task(unsigned char dT_ms)
 {
@@ -26,7 +24,7 @@ unsigned char broadcasting_Task(unsigned char dT_ms)
   static unsigned char tick = 0;
 
   if( time == 0 ) {
-//					ANO_DT_SendString("flash light\r\n"  );
+//					debugOutput("flash light\r\n"  );
     ROM_GPIOPinWrite(GPIOF_BASE, GPIO_PIN_0, 1);
   }
 
@@ -35,7 +33,7 @@ unsigned char broadcasting_Task(unsigned char dT_ms)
 #define continue_time 500
 
   if( time == continue_time ) {
-//					ANO_DT_SendString("close light\r\n"  );
+//					debugOutput("close light\r\n"  );
     ROM_GPIOPinWrite(GPIOF_BASE, GPIO_PIN_0, 0);
     time = -continue_time;
     //播洒次数
@@ -77,9 +75,9 @@ unsigned char UWBTest_Task(unsigned char dT_ms)
     if(flag.unlock_err == 0 && take_off_flag == 0 ) {
       take_off_flag = 1;
       //一键起飞
-      ANO_DT_SendString("Take off start\r\n"  );
-//						ANO_DT_SendString("targe_index:%d\r\n",targe_index );
-//						ANO_DT_SendString("x %d y %d\r\n",plant_map.dot[targe_buf[targe_index]].y,
+      debugOutput("Take off start\r\n"  );
+//						debugOutput("targe_index:%d\r\n",targe_index );
+//						debugOutput("x %d y %d\r\n",plant_map.dot[targe_buf[targe_index]].y,
 //																			plant_map.dot[targe_buf[targe_index]].x );
       one_key_take_off();
     }
@@ -125,23 +123,23 @@ unsigned char UWBTest_Task(unsigned char dT_ms)
           if(targe_index == targe_len - 1) {
             /*一键降落*/
             one_key_land();
-            ANO_DT_SendString("886\r\n");
+            debugOutput("886\r\n");
             //任务运行结束	+++++++++++++++++++++++++++++++++++++++++
             return 0;
           }
 
           //根据MV结果判断是否播洒 如果res=0则是在白色区域，res=1是起飞点，res=2是A点，res=3是绿色块
-//								ANO_DT_SendString("openMV_res:%d\r\n",openMV_res );
+//								debugOutput("openMV_res:%d\r\n",openMV_res );
           if(openMV_res > 1) { //需要执行任务
             //开始执行播洒任务
             is_broadcasting = 1 ;
-            ANO_DT_SendString("broadcasting" );
+            debugOutput("broadcasting" );
           } else {
             targe_index += 1; //索引加一 将目标点设置为下一个点位
-            ANO_DT_SendString("is not green" );
+            debugOutput("is not green" );
 
-//									ANO_DT_SendString("targe_dot:%d\r\n",targe_buf[targe_index] );
-//									ANO_DT_SendString("x %d y %d\r\n",plant_map.dot[targe_buf[targe_index]].y,
+//									debugOutput("targe_dot:%d\r\n",targe_buf[targe_index] );
+//									debugOutput("x %d y %d\r\n",plant_map.dot[targe_buf[targe_index]].y,
 //																						plant_map.dot[targe_buf[targe_index]].x );
           }
 
@@ -170,9 +168,9 @@ unsigned char UWBTest_Task(unsigned char dT_ms)
       if(is_broadcasting == 0) {
         targe_index += 1; //索引加一 将目标点设置为下一个点位
 
-        ANO_DT_SendString("next dot" );
-//								ANO_DT_SendString("targe_index:%d\r\n",targe_index );
-//								ANO_DT_SendString("x %d y %d\r\n",plant_map.dot[targe_buf[targe_index]].y,
+        debugOutput("next dot" );
+//								debugOutput("targe_index:%d\r\n",targe_index );
+//								debugOutput("x %d y %d\r\n",plant_map.dot[targe_buf[targe_index]].y,
 //																					plant_map.dot[targe_buf[targe_index]].x );
 
       }

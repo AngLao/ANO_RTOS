@@ -73,7 +73,7 @@ void PID_Rest()
   Ano_Parame.set.pid_gps_loc_2level[KD] = 0;           //位置控制位置环PID参数(NULL)
 
 
-  ANO_DT_SendString("PID reset!");
+  debugOutput("PID reset!");
 }
 
 
@@ -150,13 +150,11 @@ void Parame_Reset(u8 mode)
 
       Ano_Parame.set.body_central_pos_cm[i] = 0;
     }
-  }
-
-  //Parame_Copy_Para2fc();
-
+  } 
+	
   Parame_Copy_Para2fc();
 
-  ANO_DT_SendString("parameter reset!");
+  debugOutput("parameter reset!");
 }
 
 
@@ -207,7 +205,7 @@ void Ano_Parame_Write_task(u16 dT_ms)
         para_sta.save_trig = 0;  //存储标记复位
         Ano_Parame_Write();      //执行存储
 
-        ANO_DT_SendString("Set save OK!");
+        debugOutput("Set save OK!");
         LED_STA.saving = 0;
       }
     } else {
@@ -390,24 +388,24 @@ s32 AnoParRead(u16 _id)
     break;
 
 //		case PAR_PID_9_D: p_val = 1e3f *Ano_Parame.set.pid_loc_1level[2];	break;
-  //水平位置
+//  //水平位置
 //		case PAR_PID_10_P: p_val = 1e3f *Ano_Parame.set.pid_loc_2level[0];	break;
 //		case PAR_PID_10_I: p_val = 1e3f *Ano_Parame.set.pid_loc_2level[1];	break;
 //		case PAR_PID_10_D: p_val = 1e3f *Ano_Parame.set.pid_loc_2level[2];	break;
-  //GPS速度环
-  case PAR_PID_11_P:
-    p_val = 1e3f * Ano_Parame.set.pid_gps_loc_1level[0];
-    break;
+//  //GPS速度环
+//  case PAR_PID_11_P:
+//    p_val = 1e3f * Ano_Parame.set.pid_gps_loc_1level[0];
+//    break;
 
-  case PAR_PID_11_I:
-    p_val = 1e3f * Ano_Parame.set.pid_gps_loc_1level[1];
-    break;
+//  case PAR_PID_11_I:
+//    p_val = 1e3f * Ano_Parame.set.pid_gps_loc_1level[1];
+//    break;
 
 //		case PAR_PID_11_D: p_val = 1e3f *Ano_Parame.set.pid_gps_loc_1level[2];	break;
-  //GPS位置环
-  case PAR_PID_12_P:
-    p_val = 1e3f * Ano_Parame.set.pid_gps_loc_2level[0];
-    break;
+//  //GPS位置环
+//  case PAR_PID_12_P:
+//    p_val = 1e3f * Ano_Parame.set.pid_gps_loc_2level[0];
+//    break;
 
 //		case PAR_PID_12_I: p_val = 1e3f *Ano_Parame.set.pid_gps_loc_2level[1];	break;
 //		case PAR_PID_12_D: p_val = 1e3f *Ano_Parame.set.pid_gps_loc_2level[2];	break;

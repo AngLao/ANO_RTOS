@@ -128,6 +128,7 @@ void land_discriminat(s16 dT_ms)
         landing_cnt =0;
         flag.unlock_cmd =0;
 
+				debugOutput("着陆上锁");
         flag.flying = 0;
 
       }
@@ -218,12 +219,14 @@ void Flight_State_Task(u8 dT_ms,const s16 *CH_N)
 
   /*倾斜过大上锁*/
   if(rolling_flag.rolling_step == ROLL_END) {
-    if(imu_data.z_vec[Z]<0.25f) { //75度  ////////////////////////////////////////*************************** 倾斜过大上锁，慎用。
+    if(imu_data.z_vec[Z]<0.25f) { //75度 倾斜过大上锁，慎用。
       //
       if(mag.mag_CALIBRATE==0) {
         imu_state.G_reset = 1;
       }
       flag.unlock_cmd = 0;
+			
+			debugOutput("侧翻上锁");
     }
 
   }
@@ -242,7 +245,7 @@ void Flight_State_Task(u8 dT_ms,const s16 *CH_N)
     if(flag.sensor_imu_ok == 0) {
       flag.sensor_imu_ok = 1;
       LED_STA.rst_imu = 0;
-      ANO_DT_SendString("IMU OK!");
+      debugOutput("IMU OK!");
     }
   }
 
