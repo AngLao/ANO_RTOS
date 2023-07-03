@@ -14,5 +14,4 @@ void data_save(void)
   para_sta.save_en = !flag.unlock_sta;
   para_sta.save_trig = 1;
 }
-
  

@@ -195,20 +195,17 @@ void user_loop(void *pvParameters)
 {
   TickType_t xLastWakeTime;         //用于精准定时的变量
 
+	static unsigned char pFrame[128];
+	
   while (1) {
     xLastWakeTime = xTaskGetTickCount(); //获取当前Tick次数,以赋给延时函数初值
 
-    //解析UWB数据 
-		//读环形缓冲区
-		static int RingBufferDataLen = 0;
-		static unsigned char pData[128 * 5];
-		RingBufferDataLen = RingBuffer_GetCount(&U1rxring) ;
+		//读环形缓冲区 
+		if(RingBuffer_GetCount(&U1rxring)  >= 128) {
+			RingBuffer_PopMult(&U1rxring, pFrame, 128);
 
-		//解析uwb数据
-		if(RingBufferDataLen) {
-			RingBuffer_PopMult(&U1rxring, pData, RingBufferDataLen);
-
-			if (g_nlt_tagframe0.UnpackData(pData, RingBufferDataLen)) {
+			//解析uwb数据
+			if (g_nlt_tagframe0.UnpackData(pFrame, 128)) {
 				return;
 			}
 		}
@@ -240,8 +237,8 @@ int main(void)
   xTaskCreate(temperature_loop, "temperature_loop", 128, NULL, 2, NULL);
 	
 	
-//  /* 自定义进程 50Hz*/
-//  xTaskCreate(user_loop, "user_loop", 128, NULL, 3, NULL); 
+  /* 自定义进程 50Hz*/
+  xTaskCreate(user_loop, "user_loop", 128, NULL, 3, NULL); 
 
   //启用任务调度器
   vTaskStartScheduler();
