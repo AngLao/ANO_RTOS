@@ -9,8 +9,7 @@
 void Drv_HeatingSet(u8 val)
 {
   Drv_HeatSet((val * 10)); 
-}
-
+} 
 
 //用上位机设置恒温功能开关
 //#define USE_THERMOSTATIC
@@ -25,8 +24,7 @@ void Drv_HeatingSet(u8 val)
 #define TEMPERATURE_KP 2.5f
 #define TEMPERATURE_KI 5.0f
 #define TEMPERATURE_KD 3.5f
-
-//float test_temperature_ctrl_arg[3] ;
+ 
 float temperature_fb[3], temperature_err, temperature_err_i, temperature_diff, temperature_ctrl_val;
 static u16 temperature_cnt;
 static u8 thermostatic_en;
@@ -47,10 +45,8 @@ void Thermostatic_Ctrl_Task(u8 dT_ms)
         AnoDTSendStr( 0xA0, 1, "Thermostatic ON......");
       }
     } else {
-      if(thermostatic_en) {
-        //
-        thermostatic_en = 0;
-        //
+      if(thermostatic_en) { 
+        thermostatic_en = 0; 
 
         AnoDTSendStr(0xA0, 1, "Thermostatic OFF,Please Restart ANO_Pioneer_pro!");
       }

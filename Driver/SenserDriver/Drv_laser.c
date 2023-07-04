@@ -19,13 +19,7 @@ u16 Laser_height_cm;
 u8 Drv_Laser_Init(void)
 {
   LASER_LINKOK = 2;
-
-  for(u16 i = 0; i < 1000; i++) {
-    if(LASER_LINKOK == 1)
-      break;
-    else
-      Delay_ms(1);
-  }
+  
 
   if(LASER_LINKOK == 2)
     LASER_LINKOK = 0;

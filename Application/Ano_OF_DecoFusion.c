@@ -37,9 +37,7 @@
 //需要引用的文件：
 #include "Ano_Sensor_Basic.h"
 #include "Drv_laser.h"
-
-
-#define delay_ms MyDelayMs
+ 
 
 #define CIRCLE_P(n,a,b) ((a) + ((n)-(a))%((b)-(a)))
 #define OF_BUFFER_NUM 14

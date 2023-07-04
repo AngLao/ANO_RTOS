@@ -98,8 +98,7 @@ static void Parame_Copy_Fc2para()
     Ano_Parame.set.gyr_zero_offset[i]	=	save.gyro_offset[i];
     Ano_Parame.set.mag_offset[i]	=	save.mag_offset[i];
     Ano_Parame.set.mag_gain[i]		=	save.mag_gain[i];
-
-
+ 
     //center_pos参数不需要反向赋值
   }
 }

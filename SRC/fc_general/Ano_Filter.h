@@ -133,7 +133,7 @@ void step_filter(float step,float in,float *out);
 void fir_arrange_filter(float *arr,u16 len,u8 *fil_cnt,float in,float *arr_out);  //len<=255 len >= 3
 
 #define LPF_1_(hz,t,in,out) ((out) += ( 1 / ( 1 + 1 / ( (hz) *6.28f *(t) ) ) ) *( (in) - (out) ))
-#define S_LPF_1(a,in,out) ((out) += (a) *( (in) - (out) )) 
+#define S_LPF_1(a,in,out) ((out) += (a) *( (in) - (out) ))
 
 //void LPF_1(float hz,//截止频率
 //					float time,//周期

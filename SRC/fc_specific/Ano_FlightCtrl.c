@@ -128,7 +128,7 @@ void land_discriminat(s16 dT_ms)
         landing_cnt =0;
         flag.unlock_cmd =0;
 
-				debugOutput("веб╫иокЬ");
+				debugOutput("Landing lock");
         flag.flying = 0;
 
       }
@@ -226,7 +226,7 @@ void Flight_State_Task(u8 dT_ms,const s16 *CH_N)
       }
       flag.unlock_cmd = 0;
 			
-			debugOutput("╡Ю╥╜иокЬ");
+			debugOutput("Rollover locks");
     }
 
   }
