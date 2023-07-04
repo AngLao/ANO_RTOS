@@ -20,6 +20,7 @@
 #include "Ano_ProgramCtrl_User.h"
 #include "nlink_linktrack_tagframe0.h"
 
+#include "hw_ints.h"
 #include "rc_update.h" 
 #include "power_management.h" 
   
@@ -168,6 +169,40 @@ void auxiliary_loop(void *pvParameters)
   }
 }
 
+/* 看门狗进程 该任务为精准进行的任务 执行频率精准2Hz */
+void wdt0_loop(void *pvParameters)
+{
+	// Enable the peripherals used by this example.
+	MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_WDOG0);
+	
+	// Enable the watchdog interrupt.
+	MAP_IntEnable(INT_WATCHDOG);
+
+	// Set the period of the watchdog timer.
+	MAP_WatchdogReloadSet(WATCHDOG0_BASE, MAP_SysCtlClockGet()); /* 1s触发中断 */
+
+	// Enable reset generation from the watchdog timer.
+	MAP_WatchdogResetEnable(WATCHDOG0_BASE);
+
+	// Enable the watchdog timer.
+	MAP_WatchdogEnable(WATCHDOG0_BASE);
+	
+	static TickType_t xLastWakeTime;         //用于精准定时的变量
+	
+	xLastWakeTime = xTaskGetTickCount(); //获取当前Tick次数,以赋给延时函数初值
+	
+	while(1)
+	{
+		MAP_WatchdogIntClear(WATCHDOG0_BASE);	/* 喂狗 */
+		printf("Feed wdt0\r\n");
+		vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 2);
+	}
+}
+void WDT0_Handler(void)
+{
+	printf("WDT0_Handler\r\n");
+	printf("MCU Fuck Game Over\r\n");
+}
 
 /* 自定义进程 */
 void user_loop(void *pvParameters)
@@ -222,10 +257,11 @@ int main(void)
   /* 辅助任务进程 20Hz*/
   xTaskCreate(auxiliary_loop, "auxiliary_loop", 128, NULL, 2, NULL);
 	
-	
+  
   /* 自定义进程 50Hz*/
   xTaskCreate(user_loop, "user_loop", 128, NULL, 3, NULL); 
- 
+  
+  xTaskCreate(wdt0_loop, "wdt0_loop", 96 + 32, NULL, 1, NULL);  
   //启用任务调度器
   vTaskStartScheduler(); 
 	
