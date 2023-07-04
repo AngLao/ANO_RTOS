@@ -553,6 +553,11 @@
               <FileType>1</FileType>
               <FilePath>.\Driver\Drv_Timer.c</FilePath>
             </File>
+            <File>
+              <FileName>watch_dog.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Driver\watch_dog.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
