@@ -74,16 +74,22 @@ static void vSlowDetection( void *pvParameters )
 	
 	//通道3检测
   static uint8_t channelThreeState = 0;
+	static uint8_t sartCalibration = 0;
   //开关回到零点
-  if(CH_N[AUX3]<-100)
+  if(CH_N[AUX3]<-100){
     channelThreeState = 0;
-
+		sartCalibration = 0;
+	}
   if(channelThreeState == 0) { 
     //开关打到高值
     if(CH_N[AUX3] > 300) {
       channelThreeState = 2;
       debugOutput("CH_N[AUX3]  = 2");
  
+      debugOutput("sartCalibration");
+			if(flag.unlock_sta == 1){
+				sartCalibration = 1;
+			} 
     } 
     //开关打到中值
     else if(CH_N[AUX3] > -100) { 
@@ -94,23 +100,39 @@ static void vSlowDetection( void *pvParameters )
 	
 	//通道4检测
   static uint8_t channelFourState = 0;
-  //开关回到零点
-  if(CH_N[AUX4]<-100)
-    channelFourState = 0;
 
+	//校准 
+	#include "Drv_PwmOut.h"
+	if(channelFourState == 1) { 
+		//开关回到零点
+		if(CH_N[AUX4]<-100){ 
+			channelFourState = 0;
+			if(sartCalibration){ 
+				for(u8 i =0; i<4; i++) {
+					Drv_MotorPWMSet(i,0);
+				}  
+			}
+			
+      debugOutput("low");
+		}
+  }
+		
   if(channelFourState == 0) { 
     //开关打到高值
     if(CH_N[AUX4] > 300) {
-      channelFourState = 2;
+      channelFourState = 1;
       debugOutput("CH_N[AUX4]  = 2");
  
-    } 
-    //开关打到中值
-    else if(CH_N[AUX4] > -100) { 
-      channelFourState = 1;
-      debugOutput("CH_N[AUX4]  = 1");
-    }
+			if(sartCalibration){ 
+				for(u8 i =0; i<4; i++) {
+					Drv_MotorPWMSet(i,999);
+				}  
+			}
+      debugOutput("high");
+    }  
   }
+	
+	
 	
 }
 

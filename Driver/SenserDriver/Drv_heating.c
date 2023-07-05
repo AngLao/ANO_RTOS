@@ -53,7 +53,7 @@ void Thermostatic_Ctrl_Task(u8 dT_ms)
     }
   }
 
-  //
+	
   if(thermostatic_en) {
     //上次反馈
     temperature_fb[1] = temperature_fb[0];
@@ -66,13 +66,12 @@ void Thermostatic_Ctrl_Task(u8 dT_ms)
     //计算偏差
     temperature_err = EXP_TEMPERATURE - temperature_fb[2];
 
-    //-----
-    if(1) { //((temperature_ctrl_val)<100)
-      //积分偏差限幅
-      temperature_err_i += LIMIT(temperature_err, -10, 10) * dT_ms * 0.001f;
-      //积分限幅
-      temperature_err_i = LIMIT(temperature_err_i, -20, 20);
-    }
+		
+		//积分偏差限幅
+		temperature_err_i += LIMIT(temperature_err, -10, 10) * dT_ms * 0.001f;
+		//积分限幅
+		temperature_err_i = LIMIT(temperature_err_i, -20, 20);
+		
 
     //计算控制输出量
     temperature_ctrl_val =
@@ -101,7 +100,8 @@ void Thermostatic_Ctrl_Task(u8 dT_ms)
         temperature_cnt = 0;
       }
     }
-  } else { //不使用恒温功能
+  } else { 
+		//不使用恒温功能
     flag.mems_temperature_ok = 1;
     Drv_HeatingSet((u8)0);
   }

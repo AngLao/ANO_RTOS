@@ -13,7 +13,7 @@
 #include "Ano_LocCtrl.h"
 #include "Ano_AltCtrl.h"
 #include "Ano_MotorCtrl.h" 
-#include "Ano_OF.h"
+#include "Ano_OF.h" 
 #include "Ano_OF_DecoFusion.h"
 #include "Ano_FlyCtrl.h" 
 #include "Ano_FlightDataCal.h" 
@@ -165,6 +165,9 @@ void auxiliary_loop(void *pvParameters)
     /*延时存储任务*/
     Ano_Parame_Write_task(50);
 		
+		//不使用恒温功能
+    flag.mems_temperature_ok = 1;
+		
     vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 20);
   }
 }
@@ -226,7 +229,7 @@ int main(void)
 	
   
   /* 自定义进程 50Hz*/
-  xTaskCreate(user_loop, "user_loop", 128, NULL, 3, NULL); 
+//  xTaskCreate(user_loop, "user_loop", 128, NULL, 3, NULL); 
   
   xTaskCreate(wdt0_loop, "wdt0_loop", 96 + 32, NULL, 1, NULL);  
 	
