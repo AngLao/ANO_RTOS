@@ -3,7 +3,9 @@
   
 #include "Drv_Bsp.h"	
 #include "Drv_Uart.h"
+#include "Drv_laser.h"
 #include "Drv_Timer.h" 
+#include "Drv_UP_flow.h"
 #include "Drv_heating.h"
 
 #include "Ano_Imu.h"
@@ -142,7 +144,10 @@ void position_loop(void *pvParameters)
 
     /*位置速度环控制*/
     Loc_1level_Ctrl(20);
- 
+		
+		/* 匿名科创光流解耦合与融合任务 */
+		ANO_OFDF_Task(20);
+		
     /*数传数据交换*/
     dtTask();
  
@@ -167,6 +172,11 @@ void auxiliary_loop(void *pvParameters)
 		
 		//不使用恒温功能
     flag.mems_temperature_ok = 1;
+		
+		#if defined(USE_KS103)
+		//超声波任务
+		Ultra_Duty();
+		#endif
 		
     vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 20);
   }
@@ -195,8 +205,6 @@ void user_loop(void *pvParameters)
 				RingBuffer_Flush(&U1rxring);
 			}
 		}
-		   
-		
 		vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 10);
 	}
 }
@@ -222,10 +230,10 @@ int main(void)
   xTaskCreate(height_loop, "height_loop", 248, NULL, 3, NULL);
 
   /* 位置环控制进程 50Hz*/
-  xTaskCreate(position_loop, "position_loop", 184, NULL, 2, NULL);
+  xTaskCreate(position_loop, "position_loop", 160+32, NULL, 2, NULL);
 
   /* 辅助任务进程 20Hz*/
-  xTaskCreate(auxiliary_loop, "auxiliary_loop", 128, NULL, 2, NULL);
+  xTaskCreate(auxiliary_loop, "auxiliary_loop", 104+32, NULL, 2, NULL);
 	
   
   /* 自定义进程 50Hz*/
@@ -233,6 +241,7 @@ int main(void)
   
   xTaskCreate(wdt0_loop, "wdt0_loop", 96 + 32, NULL, 1, NULL);  
 	
+	xTaskCreate(up_flow_loop, "up_flow_loop", 112 + 32, NULL, 1, NULL);	
   //启用任务调度器
   vTaskStartScheduler(); 
 	

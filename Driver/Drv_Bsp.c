@@ -56,9 +56,6 @@ void Drv_BspInit(void)
   ROM_FPULazyStackingEnable();
   ROM_FPUEnable();
 
-	
-
-	
   //板载USB虚拟串口初始化
   AnoUsbCdcInit();
 	
@@ -99,10 +96,6 @@ void Drv_BspInit(void)
   Drv_Uart1Init(3000000);	//接UWB
 
   Drv_Uart3Init(115200);  //接数传
-
-  Drv_Uart4Init(921600);	//接匿名光流
-
-  Drv_Uart5Init(921600);	//openmv
 	
   //飞控传感器计算初始化
   Sensor_Basic_Init();

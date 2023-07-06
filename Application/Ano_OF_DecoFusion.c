@@ -36,15 +36,16 @@
 //=========mapping===============
 //需要引用的文件：
 #include "Ano_Sensor_Basic.h"
+#include "Drv_UP_Flow.h"
 #include "Drv_laser.h"
  
 
-#define CIRCLE_P(n,a,b) ((a) + ((n)-(a))%((b)-(a)))
-#define OF_BUFFER_NUM 14
+//#define CIRCLE_P(n,a,b) ((a) + ((n)-(a))%((b)-(a)))
+//#define OF_BUFFER_NUM 14
 
-uint8_t of_init_cnt;
-uint8_t of_buf_update_cnt;
-uint8_t OF_DATA[OF_BUFFER_NUM];
+//uint8_t of_init_cnt;
+//uint8_t of_buf_update_cnt;
+//uint8_t OF_DATA[OF_BUFFER_NUM];
 
 //需要调用引用的外部变量：
 #define LASER_ONLINE              (1)//LASER_LINKOK
@@ -69,7 +70,7 @@ float of_fus_err[2], of_fus_err_i[2];
 #define UPOF_PIXELPDEG_Y    160.0f       //每1角度对应的像素个数，与分辨率和焦距有关，需要调试标定。
 #define UPOF_CMPPIXEL_X     0.00012f     //每像素对应的地面距离，与焦距和高度有关，需要调试标定。//目前粗略标定
 #define UPOF_CMPPIXEL_Y     0.00012f     //每像素对应的地面距离，与焦距和高度有关，需要调试标定。
-#define FUS_KP              2.0f
+#define FUS_KP              5.0f
 #define FUS_KI              1.0f
 //
 #define UPOF_UP_DW          0             //0:朝下；1：朝上

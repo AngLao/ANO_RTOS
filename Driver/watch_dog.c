@@ -15,19 +15,19 @@
 void wdt0_loop(void *pvParameters)
 {
 	// Enable the peripherals used by this example.
-	MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_WDOG0);
+	ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_WDOG0);
 	
 	// Enable the watchdog interrupt.
-	MAP_IntEnable(INT_WATCHDOG);
+	ROM_IntEnable(INT_WATCHDOG);
 
 	// Set the period of the watchdog timer.
-	MAP_WatchdogReloadSet(WATCHDOG0_BASE, MAP_SysCtlClockGet()); /* 1s触发中断 */
+	ROM_WatchdogReloadSet(WATCHDOG0_BASE, MAP_SysCtlClockGet()); /* 1s触发中断 */
 
 	// Enable reset generation from the watchdog timer.
-	MAP_WatchdogResetEnable(WATCHDOG0_BASE);
+	ROM_WatchdogResetEnable(WATCHDOG0_BASE);
 
 	// Enable the watchdog timer.
-	MAP_WatchdogEnable(WATCHDOG0_BASE);
+	ROM_WatchdogEnable(WATCHDOG0_BASE);
 	
 	static TickType_t xLastWakeTime;         //用于精准定时的变量
 	
@@ -35,7 +35,7 @@ void wdt0_loop(void *pvParameters)
 	
 	while(1)
 	{
-		MAP_WatchdogIntClear(WATCHDOG0_BASE);	/* 喂狗 */ 
+		ROM_WatchdogIntClear(WATCHDOG0_BASE);	/* 喂狗 */ 
 		vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 2);
 	}
 }
@@ -43,7 +43,7 @@ void wdt0_loop(void *pvParameters)
 void WDT0_Handler(void)
 {
 	//进入中断程序已跑飞 
-	MAP_WatchdogIntClear(WATCHDOG0_BASE);	 
+	ROM_WatchdogIntClear(WATCHDOG0_BASE);	 
 //	MAP_IntDisable(INT_WATCHDOG);
 //	MAP_WatchdogResetDisable(WATCHDOG0_BASE);
 	
@@ -58,3 +58,5 @@ void WDT0_Handler(void)
 	//复位
 	ROM_SysCtlReset();   
 }
+
+
