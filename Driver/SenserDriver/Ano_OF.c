@@ -6,9 +6,7 @@
  * 描述    ：光流数据解析
 **********************************************************************************/
 #include "Ano_OF.h"
-#include "Ano_FcData.h"
-#include "Drv_Bsp.h"
-
+#include "Ano_FcData.h" 
 /*
 OF_STATE :
 0bit: 1-高度有效；0-高度无效
@@ -36,6 +34,8 @@ static uint8_t _datatemp[50];
 static u8 _data_cnt = 0; 
 
 
+
+u8 of_init_type;
 //AnoOF_GetOneByte是初级数据解析函数，串口每接收到一字节光流数据，调用本函数一次，函数参数就是串口收到的数据
 //当本函数多次被调用，最终接收到完整的一帧数据后，会自动调用数据解析函数AnoOF_DataAnl
 void AnoOF_GetOneByte(uint8_t data)

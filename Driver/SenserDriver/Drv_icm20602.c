@@ -7,8 +7,16 @@
 **********************************************************************************/
 #include "Drv_icm20602.h"
 #include "Drv_spi.h"
-#include "Drv_Bsp.h"
 #include "hw_ints.h" 
+
+
+static void icm_delay(void){
+	for(unsigned int i = 0; i<12 ; i++){
+		for(unsigned int a = 0; a<1000 ; a++){
+			__nop();
+		}
+	}
+}
 
 void Drv_Icm20602CSPinInit(void)
 {
@@ -41,38 +49,7 @@ static u8 icm20602_writebyte(u8 reg, u8 data)
   Drv_Spi0SingleWirteAndRead(data);
   icm20602_enable(0);
   return status;
-}
-/**************************实现函数********************************************
-*功　　能:	  读 修改 写 指定设备 指定寄存器一个字节 中的1个位
-reg	   寄存器地址
-bitNum  要修改目标字节的bitNum位
-data  为0 时，目标位将被清0 否则将被置位
-*******************************************************************************/
-static void icm20602_writeBit(u8 reg, u8 bitNum, u8 data)
-{
-  u8 b;
-  icm20602_readbuf(reg, 1, &b);
-  b = (data != 0) ? (b | (1 << bitNum)) : (b & ~(1 << bitNum));
-  icm20602_writebyte(reg, b);
-}
-/**************************实现函数********************************************
-*功　　能:	    读 修改 写 指定设备 指定寄存器一个字节 中的多个位
-reg	   寄存器地址
-bitStart  目标字节的起始位
-length   位长度
-data    存放改变目标字节位的值
-******************************************************************************
-static void icm20602_writeBits(u8 reg,u8 bitStart,u8 length,u8 data)
-{
-    u8 b,mask;
-    icm20602_readbuf(reg, 1, &b);
-    mask = (0xFF << (bitStart + 1)) | 0xFF >> ((8 - bitStart) + length - 1);
-    data <<= (8 - length);
-    data >>= (7 - bitStart);
-    b &= mask;
-    b |= data;
-    icm20602_writebyte(reg, b);
-}*/
+} 
 
 
 /**************************实现函数********************************************
@@ -82,9 +59,9 @@ static u8 ICM_ID;
 u8 Drv_Icm20602Init(void)
 {
   icm20602_writebyte(MPU_RA_PWR_MGMT_1, 0x80);
-  MyDelayMs(10);
+  icm_delay();
   icm20602_writebyte(MPU_RA_PWR_MGMT_1, 0x01);
-  MyDelayMs(10);
+  icm_delay();
 
   u8 tmp;
   icm20602_readbuf(MPUREG_WHOAMI, 1, &tmp);
@@ -94,37 +71,37 @@ u8 Drv_Icm20602Init(void)
 
   /*复位reg*/
   icm20602_writebyte(MPU_RA_SIGNAL_PATH_RESET, 0x03);
-  MyDelayMs(10);
+  icm_delay();
   /*复位reg*/
   icm20602_writebyte(MPU_RA_USER_CTRL, 0x01);
-  MyDelayMs(10);
+  icm_delay();
 
   icm20602_writebyte(0x70, 0x40); //dmp
-  MyDelayMs(10);
+  icm_delay();
   icm20602_writebyte(MPU_RA_PWR_MGMT_2, 0x00);
-  MyDelayMs(10);
+  icm_delay();
   //不分频，配置内部lpf以后，最高1000hz采样，同时对应产生1ms中断
   icm20602_writebyte(MPU_RA_SMPLRT_DIV, 0);
-  MyDelayMs(10);
+  icm_delay();
 
   /*陀螺仪LPF 20HZ*/
   icm20602_writebyte(MPU_RA_CONFIG, ICM20602_LPF_20HZ);
-  MyDelayMs(10);
+  icm_delay();
   /*陀螺仪量程 +-2000dps*/
   icm20602_writebyte(MPU_RA_GYRO_CONFIG, (3 << 3));
-  MyDelayMs(10);
+  icm_delay();
   /*加速度计量程 +-16G*/
   icm20602_writebyte(MPU_RA_ACCEL_CONFIG, (3 << 3));
-  MyDelayMs(10);
+  icm_delay();
   /*加速度计LPF 20HZ*/
   icm20602_writebyte(0X1D, 0x04);
-  MyDelayMs(10);
+  icm_delay();
   /*关闭低功耗*/
   icm20602_writebyte(0X1E, 0x00);
-  MyDelayMs(10);
+  icm_delay();
   /*关闭FIFO*/
   icm20602_writebyte(0X23, 0x00);
-  MyDelayMs(10);
+  icm_delay();
 
   //读取ID
   icm20602_readbuf(MPU_RA_WHO_AM_I, 1, &ICM_ID);
@@ -139,24 +116,19 @@ u8 Drv_Icm20602Init(void)
 
 
 
-u8 mpu_buffer[14];
+static u8 mpu_buffer[14];
 
+#include "Ano_Sensor_Basic.h" 
 void Drv_Icm20602_Read( void )
 {
   //读取传感器寄存器，连续读14个字节
   icm20602_readbuf(MPUREG_ACCEL_XOUT_H, 14, mpu_buffer);
   //数据赋值
-  ICM_Get_Data();
-}
-
-#include "Ano_Sensor_Basic.h"
-void ICM_Get_Data()
-{
   s16 temp[2][3];
   //	/*读取buffer原始数据*/
-  temp[0][X] = (s16)((((u16)mpu_buffer[0]) << 8) | mpu_buffer[1]);//>>1;// + 2 *sensor.Tempreature_C;// + 5 *sensor.Tempreature_C;
-  temp[0][Y] = (s16)((((u16)mpu_buffer[2]) << 8) | mpu_buffer[3]);//>>1;// + 2 *sensor.Tempreature_C;// + 5 *sensor.Tempreature_C;
-  temp[0][Z] = (s16)((((u16)mpu_buffer[4]) << 8) | mpu_buffer[5]);//>>1;// + 4 *sensor.Tempreature_C;// + 7 *sensor.Tempreature_C;
+  temp[0][X] = (s16)((((u16)mpu_buffer[0]) << 8) | mpu_buffer[1]); 
+  temp[0][Y] = (s16)((((u16)mpu_buffer[2]) << 8) | mpu_buffer[3]); 
+  temp[0][Z] = (s16)((((u16)mpu_buffer[4]) << 8) | mpu_buffer[5]); 
 
   temp[1][X] = (s16)((((u16)mpu_buffer[ 8]) << 8) | mpu_buffer[ 9]) ;
   temp[1][Y] = (s16)((((u16)mpu_buffer[10]) << 8) | mpu_buffer[11]) ;

@@ -92,8 +92,8 @@
                                                                         //MCU没有这些硬件指令的话此宏应该设置为0！
 #define configUSE_TICKLESS_IDLE							0                       //1启用低功耗tickless模式
 #define configUSE_QUEUE_SETS								1                       //为1时启用队列
-#define configCPU_CLOCK_HZ									(80*1000*1000)       				//CPU频率
-#define configTICK_RATE_HZ									(1000)                  //时钟节拍频率，这里设置为1000，周期就是1ms
+#define configCPU_CLOCK_HZ									(80*1000*1000)       		//CPU频率
+#define configTICK_RATE_HZ									(2000)                  //时钟节拍频率
 #define configMAX_PRIORITIES								(5)                    	//可使用的最大优先级
 #define configMINIMAL_STACK_SIZE						((unsigned short)128)   //空闲任务使用的堆栈大小
 #define configMAX_TASK_NAME_LEN							(25)                    //任务名字字符串长度
@@ -117,7 +117,7 @@
 /*                                FreeRTOS与内存申请有关配置选项                                                */
 /***************************************************************************************************************/
 #define configSUPPORT_DYNAMIC_ALLOCATION        1                       //支持动态内存申请
-#define configTOTAL_HEAP_SIZE					((size_t)(12*1024)) 	 						//系统所有总的堆大小
+#define configTOTAL_HEAP_SIZE					((size_t)(10*1024)) 	 						//系统所有总的堆大小
 
 /***************************************************************************************************************/
 /*                                FreeRTOS与钩子函数有关的配置选项                                              */

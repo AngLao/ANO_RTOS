@@ -1,4 +1,9 @@
-#include "Drv_Bsp.h" 
+#include "Drv_Bsp.h"
+ 
+#include "FreeRTOS.h"
+#include "task.h"
+
+#include "sysconfig.h" 
 #include "Drv_RcIn.h"
 #include "Drv_Spi.h"
 #include "Drv_Led.h"
@@ -6,25 +11,24 @@
 #include "Drv_PwmOut.h"
 #include "Drv_Adc.h"
 #include "Drv_Uart.h"
-#include "Ano_FcData.h"
-#include "Ano_Sensor_Basic.h"
-#include "rc_update.h"
-#include "Ano_FlightCtrl.h"
-#include "ano_usb.h"
 #include "Drv_laser.h"
-#include "Ano_DT.h"
-#include "Ano_Parameter.h"
 #include "Drv_icm20602.h"
 #include "drv_ak8975.h"
 #include "drv_spl06.h"
 
-#include "FreeRTOS.h"
-#include "task.h"
+#include "Ano_FlightCtrl.h"
+#include "Ano_DT.h"
+#include "Ano_Parameter.h"
+#include "Ano_FcData.h"
+#include "Ano_Sensor_Basic.h"
+#include "ano_usb.h"
+
+#include "rc_update.h"
 
 
-void SysTick_Init(void )
+static void SysTick_Init(void )
 {
-  ROM_SysTickPeriodSet(ROM_SysCtlClockGet() / 1000);
+  ROM_SysTickPeriodSet(ROM_SysCtlClockGet() / 2000);
   ROM_SysTickIntEnable();
   ROM_SysTickEnable();
 }
@@ -38,16 +42,10 @@ void SysTick_Handler(void)
     xPortSysTickHandler();
   } 
 }
+   
 
-void MyDelayMs(u32 time)
-{
-  ROM_SysCtlDelay(80000 * time / 3);
-}
- 
-
-u8 of_init_type;
 void Drv_BspInit(void)
-{
+{ 
   /*设置系统主频为80M*/
   ROM_SysCtlClockSet(SYSCTL_SYSDIV_2_5 | SYSCTL_USE_PLL | SYSCTL_XTAL_16MHZ | SYSCTL_OSC_MAIN);
 
@@ -58,6 +56,9 @@ void Drv_BspInit(void)
   ROM_FPULazyStackingEnable();
   ROM_FPUEnable();
 
+	
+
+	
   //板载USB虚拟串口初始化
   AnoUsbCdcInit();
 	
@@ -117,8 +118,6 @@ void Drv_BspInit(void)
   ROM_GPIOPinTypeGPIOOutput(GPIOF_BASE, GPIO_PIN_0);
 
   ROM_GPIOPinWrite(GPIOF_BASE, GPIO_PIN_0, 0);
-
-
 }
 
 

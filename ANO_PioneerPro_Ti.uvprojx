@@ -53,7 +53,7 @@
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>0</CreateHexFile>
-          <DebugInformation>0</DebugInformation>
+          <DebugInformation>1</DebugInformation>
           <BrowseInformation>1</BrowseInformation>
           <ListingPath>.\build\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
@@ -552,6 +552,11 @@
               <FileName>Drv_Timer.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Driver\Drv_Timer.c</FilePath>
+            </File>
+            <File>
+              <FileName>watch_dog.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Driver\watch_dog.c</FilePath>
             </File>
           </Files>
         </Group>

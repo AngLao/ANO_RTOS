@@ -119,7 +119,7 @@ void MPU6050_Data_Offset()
 
 
 
-///////////////////复位校准值///////////////////////////
+    ///////////////////复位校准值///////////////////////////
     if(flag.motionless == 0 || sensor_val[A_Z]<(GRAVITY_ACC_PN16G/2) || (flag.mems_temperature_ok == 0)) {
       gyro_sum_cnt = 0;
       acc_sum_cnt=0;
@@ -131,10 +131,6 @@ void MPU6050_Data_Offset()
       sum_temp[TEM] = 0;
     }
 
-
-
-
-///////////////////////////////////////////////////////////
     off_cnt++;
     if(off_cnt>=10) {
       off_cnt=0;
@@ -142,7 +138,6 @@ void MPU6050_Data_Offset()
 
 
       if(sensor.gyr_CALIBRATE) {
-        //
         LED_STA_CALI_GYR = 1;
 
         gyro_sum_cnt++;
@@ -171,7 +166,7 @@ void MPU6050_Data_Offset()
         }
       }
 
-      if(sensor.acc_CALIBRATE == 1) {
+      if(sensor.acc_CALIBRATE) {
         //
         LED_STA_CALI_ACC = 1;
         acc_sum_cnt++;
@@ -228,8 +223,6 @@ void Sensor_Data_Prepare(u8 dT_ms)
   float hz = 0 ;
   if(dT_ms != 0) hz = 1000/dT_ms;
 
-//	sensor_rotate_func(dT);
-
   /*静止检测*/
   motionless_check(dT_ms);
 
@@ -237,40 +230,11 @@ void Sensor_Data_Prepare(u8 dT_ms)
 
 
   /*得出校准后的数据*/
-  for(u8 i=0; i<3; i++) {
-
-    sensor_val[A_X+i] = sensor.Acc_Original[i] ;
-
-    sensor_val[G_X+i] = sensor.Gyro_Original[i] - save.gyro_offset[i] ;
-    //sensor_val[G_X+i] = (sensor_val[G_X+i] >>2) <<2;
+  for(u8 i=0; i<3; i++) { 
+    sensor_val[A_X+i] = sensor.Acc_Original[i] ; 
+    sensor_val[G_X+i] = sensor.Gyro_Original[i] - save.gyro_offset[i] ; 
   }
 
-  /*可将整个传感器坐标进行旋转*/
-//	for(u8 j=0;j<3;j++)
-//	{
-//		float t = 0;
-//
-//		for(u8 i=0;i<3;i++)
-//		{
-//
-//			t += sensor_val[A_X + i] *wh_matrix[j][i];
-//		}
-//
-//		sensor_val_rot[A_X + j] = t;
-//	}
-
-//	for(u8 j=0;j<3;j++)
-//	{
-//		float t = 0;
-//
-//		for(u8 i=0;i<3;i++)
-//		{
-//
-//			t += sensor_val[G_X + i] *wh_matrix[j][i];
-//		}
-//
-//		sensor_val_rot[G_X + j] = t;
-//	}
 
   /*赋值*/
   for(u8 i = 0; i<6; i++) {
@@ -303,9 +267,6 @@ void Sensor_Data_Prepare(u8 dT_ms)
       gyr_f[j-1][X +i] += GYR_ACC_FILTER *(gyr_f[j][X +i] - gyr_f[j-1][X +i]);
       acc_f[j-1][X +i] += GYR_ACC_FILTER *(acc_f[j][X +i] - acc_f[j-1][X +i]);
     }
-
-//		LPF_1_(100,dT_ms*1e-3f,sensor_val_ref[G_X + i],sensor.Gyro[X +i]);
-//		LPF_1_(100,dT_ms*1e-3f,sensor_val_ref[A_X + i],sensor.Acc[X +i]);
 
   }
 

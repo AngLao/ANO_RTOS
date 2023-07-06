@@ -6,8 +6,7 @@
  * 描述    ：电子罗盘驱动
 **********************************************************************************/
 #include "drv_ak8975.h"
-#include "Drv_spi.h"
-#include "Drv_Bsp.h"
+#include "Drv_spi.h" 
 
 void Drv_AK8975CSPinInit(void)
 {

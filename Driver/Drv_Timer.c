@@ -1,6 +1,17 @@
 
 #include "Drv_Timer.h"
 
+
+/*---------------------------------
+	//开启定时器计算各个任务占用率示例
+	
+	Timer_Config();
+	//自定义进程 50Hz 
+	xTaskCreate(task_census, "task_census", 300, NULL, 2, NULL); 
+---------------------------------*/
+ 
+
+
 //为1时启用运行时间统计功能
 
 #if(configGENERATE_RUN_TIME_STATS == 1)

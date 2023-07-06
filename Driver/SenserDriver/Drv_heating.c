@@ -9,8 +9,7 @@
 void Drv_HeatingSet(u8 val)
 {
   Drv_HeatSet((val * 10)); 
-}
-
+} 
 
 //用上位机设置恒温功能开关
 //#define USE_THERMOSTATIC
@@ -25,8 +24,7 @@ void Drv_HeatingSet(u8 val)
 #define TEMPERATURE_KP 2.5f
 #define TEMPERATURE_KI 5.0f
 #define TEMPERATURE_KD 3.5f
-
-//float test_temperature_ctrl_arg[3] ;
+ 
 float temperature_fb[3], temperature_err, temperature_err_i, temperature_diff, temperature_ctrl_val;
 static u16 temperature_cnt;
 static u8 thermostatic_en;
@@ -47,17 +45,15 @@ void Thermostatic_Ctrl_Task(u8 dT_ms)
         AnoDTSendStr( 0xA0, 1, "Thermostatic ON......");
       }
     } else {
-      if(thermostatic_en) {
-        //
-        thermostatic_en = 0;
-        //
+      if(thermostatic_en) { 
+        thermostatic_en = 0; 
 
         AnoDTSendStr(0xA0, 1, "Thermostatic OFF,Please Restart ANO_Pioneer_pro!");
       }
     }
   }
 
-  //
+	
   if(thermostatic_en) {
     //上次反馈
     temperature_fb[1] = temperature_fb[0];
@@ -70,13 +66,12 @@ void Thermostatic_Ctrl_Task(u8 dT_ms)
     //计算偏差
     temperature_err = EXP_TEMPERATURE - temperature_fb[2];
 
-    //-----
-    if(1) { //((temperature_ctrl_val)<100)
-      //积分偏差限幅
-      temperature_err_i += LIMIT(temperature_err, -10, 10) * dT_ms * 0.001f;
-      //积分限幅
-      temperature_err_i = LIMIT(temperature_err_i, -20, 20);
-    }
+		
+		//积分偏差限幅
+		temperature_err_i += LIMIT(temperature_err, -10, 10) * dT_ms * 0.001f;
+		//积分限幅
+		temperature_err_i = LIMIT(temperature_err_i, -20, 20);
+		
 
     //计算控制输出量
     temperature_ctrl_val =
@@ -105,7 +100,8 @@ void Thermostatic_Ctrl_Task(u8 dT_ms)
         temperature_cnt = 0;
       }
     }
-  } else { //不使用恒温功能
+  } else { 
+		//不使用恒温功能
     flag.mems_temperature_ok = 1;
     Drv_HeatingSet((u8)0);
   }
