@@ -44,11 +44,7 @@ void IMU_Update_Task(u8 dT_ms)
   if(flag.unlock_sta ) {
     imu_state.G_reset = imu_state.M_reset = 0;
     reset_imu_f = 0;
-  } else {
-    if(flag.motionless == 0) {
-//						imu_state.G_reset = 1;//自动复位
-      //sensor.gyr_CALIBRATE = 2;
-    }
+  } else { 
 
     if(reset_imu_f==0 ) { //&& flag.motionless == 1)
       imu_state.G_reset = 1;//自动复位

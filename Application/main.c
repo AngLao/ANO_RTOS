@@ -27,11 +27,9 @@
 /* 基本传感器数据准备进程 该任务为精准进行的任务 执行频率精准1000Hz 优先级全局最高*/
 void basic_data_read(void *pvParameters)
 {
-  TickType_t xLastWakeTime;         //用于精准定时的变量
+  TickType_t xLastWakeTime = xTaskGetTickCount(); //获取当前Tick次数,以赋给延时函数初值
 
-  while (1) {
-    xLastWakeTime = xTaskGetTickCount(); //获取当前Tick次数,以赋给延时函数初值
-
+  while (1) { 
     /*读取陀螺仪加速度计数据*/
     Drv_Icm20602_Read();
 
@@ -64,11 +62,9 @@ void basic_data_read(void *pvParameters)
 /* 姿态角速度环控制进程 该任务为精准进行的任务 执行频率精准500Hz 优先级第二*/
 void inner_loop(void *pvParameters)
 {
-  TickType_t xLastWakeTime;         //用于精准定时的变量
+  TickType_t xLastWakeTime = xTaskGetTickCount(); //获取当前Tick次数,以赋给延时函数初值
 
-  while (1) {
-    xLastWakeTime = xTaskGetTickCount(); //获取当前Tick次数,以赋给延时函数初值
-
+  while (1) {  
     /*姿态角速度环控制*/
     Att_1level_Ctrl(2 * 1e-3f);
 
@@ -83,11 +79,9 @@ void inner_loop(void *pvParameters)
 /* 姿态角度环控制进程 该任务为精准进行的任务 执行频率精准200Hz 优先级第二*/
 void outer_loop(void *pvParameters)
 {
-  TickType_t xLastWakeTime;         //用于精准定时的变量
+  TickType_t xLastWakeTime = xTaskGetTickCount(); //获取当前Tick次数,以赋给延时函数初值
 
-  while (1) {
-    xLastWakeTime = xTaskGetTickCount(); //获取当前Tick次数,以赋给延时函数初值
-
+  while (1) {  
     /*获取姿态角（ROLL PITCH YAW）*/
     calculate_RPY();
 
@@ -102,14 +96,9 @@ void outer_loop(void *pvParameters)
 /* 高度环控制进程 该任务为精准进行的任务 执行频率精准100Hz 优先级第三 */
 void height_loop(void *pvParameters)
 {
-  TickType_t xLastWakeTime;         //用于精准定时的变量
+  TickType_t xLastWakeTime = xTaskGetTickCount(); //获取当前Tick次数,以赋给延时函数初值
 
-  while (1) {
-    xLastWakeTime = xTaskGetTickCount(); //获取当前Tick次数,以赋给延时函数初值
-
-    /*遥控器数据处理任务*/
-    receivingTask();
-
+  while (1) {  
     /*高度数据融合任务*/
     WCZ_Fus_Task(10); 
 
@@ -132,11 +121,9 @@ void height_loop(void *pvParameters)
 /* 位置环控制进程 该任务为精准进行的任务 执行频率精准50Hz 优先级第四*/
 void position_loop(void *pvParameters)
 {
-  TickType_t xLastWakeTime;         //用于精准定时的变量
+  TickType_t xLastWakeTime = xTaskGetTickCount(); //获取当前Tick次数,以赋给延时函数初值
 
-  while (1) {
-    xLastWakeTime = xTaskGetTickCount(); //获取当前Tick次数,以赋给延时函数初值
-
+  while (1) { 
     /*罗盘数据处理任务*/
     Mag_Update_Task(20); 
 
@@ -154,16 +141,14 @@ void position_loop(void *pvParameters)
 /* 辅助任务进程 该任务为精准进行的任务 执行频率精准20Hz */
 void auxiliary_loop(void *pvParameters)
 {
-  TickType_t xLastWakeTime;         //用于精准定时的变量
-
-  while (1) {
-    xLastWakeTime = xTaskGetTickCount(); //获取当前Tick次数,以赋给延时函数初值
-
+  TickType_t xLastWakeTime = xTaskGetTickCount(); //获取当前Tick次数,以赋给延时函数初值    
+	
+  while (1) {  
     /*更新电压值*/
     batteryUpdate(); 
 
     /*延时存储任务*/
-    Ano_Parame_Write_task(50);
+    Ano_Parame_Write_task(50); //储存操作耗时较长 注意看门狗复位
 		
 		//不使用恒温功能
     flag.mems_temperature_ok = 1;
@@ -176,20 +161,20 @@ void auxiliary_loop(void *pvParameters)
 /* 自定义进程 */
 void user_loop(void *pvParameters)
 {
-  TickType_t xLastWakeTime;         //用于精准定时的变量
+  TickType_t xLastWakeTime = xTaskGetTickCount(); //获取当前Tick次数,以赋给延时函数初值
 
 	static unsigned char pFrame[128];
 	
-  while (1) {
-    xLastWakeTime = xTaskGetTickCount(); //获取当前Tick次数,以赋给延时函数初值
-
+  while (1) {  
 		//读环形缓冲区  
 		if(RingBuffer_GetCount(&U1rxring) > 128) { 
 			
+			memset(pFrame,0,128);
 			RingBuffer_PopMult(&U1rxring, pFrame, 128);
 			
 			//解析uwb数据
 			uint8_t res = g_nlt_tagframe0.UnpackData(pFrame, 128);
+			switchs.uwb_on = res;
 			//接收有误刷新缓冲区
 			if (res == 0) { 
 				RingBuffer_Flush(&U1rxring);
@@ -197,7 +182,7 @@ void user_loop(void *pvParameters)
 		}
 		   
 		
-		vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 10);
+		vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 50);
 	}
 }
  
@@ -209,29 +194,33 @@ int main(void)
 	
   Drv_BspInit(); 
 
-  /* 基本传感器数据准备进程 1000Hz*/
-  xTaskCreate(basic_data_read, "basic_data_read", 152, NULL, 4, NULL);
+  /* 基本传感器数据准备进程 */
+  xTaskCreate(basic_data_read, "basic_data_read", 120, NULL, 4, NULL);
 
-  /* 姿态角速度环控制进程 500Hz*/
-  xTaskCreate(inner_loop, "inner_loop", 104, NULL, 3, NULL);
+  /* 姿态角速度环控制进程 */
+  xTaskCreate(inner_loop, "inner_loop", 120, NULL, 3, NULL);
 
-  /* 姿态角度环控制进程 200Hz*/
-  xTaskCreate(outer_loop, "outer_loop", 104, NULL, 3, NULL);
+  /* 姿态角度环控制进程 */
+  xTaskCreate(outer_loop, "outer_loop", 120, NULL, 3, NULL);
 
-  /* 高度环控制进程 100Hz*/
-  xTaskCreate(height_loop, "height_loop", 248, NULL, 3, NULL);
+  /* 高度环控制进程 */
+  xTaskCreate(height_loop, "height_loop", 120, NULL, 3, NULL);
 
-  /* 位置环控制进程 50Hz*/
-  xTaskCreate(position_loop, "position_loop", 184, NULL, 2, NULL);
+  /* 位置环控制进程 */
+  xTaskCreate(position_loop, "position_loop", 180, NULL, 2, NULL);
 
-  /* 辅助任务进程 20Hz*/
-  xTaskCreate(auxiliary_loop, "auxiliary_loop", 128, NULL, 2, NULL);
+  /* 辅助任务进程 */
+  xTaskCreate(auxiliary_loop, "auxiliary_loop", 120, NULL, 1, NULL);
 	
-  
-  /* 自定义进程 50Hz*/
-//  xTaskCreate(user_loop, "user_loop", 128, NULL, 3, NULL); 
-  
-  xTaskCreate(wdt0_loop, "wdt0_loop", 96 + 32, NULL, 1, NULL);  
+   
+  /* 启动遥控器数据处理任务 */ 
+  xTaskCreate(receivingTask, "receivingTask", 120, NULL, 3, NULL);  
+		
+  /* 启动硬件看门狗 */
+  xTaskCreate(wdt0_loop, "wdt0_loop", 120, NULL, 1, NULL);  
+	
+  /* 自定义进程 */
+//  xTaskCreate(user_loop, "user_loop", 120, NULL, 3, NULL); 
 	
   //启用任务调度器
   vTaskStartScheduler(); 

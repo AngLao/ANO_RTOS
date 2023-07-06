@@ -18,7 +18,7 @@
 //500~2000KV 0.4f~0.3f
 //2000kv以上 0.3f-0.2f
 
-#define FINAL_P 			 0.33f  //电机输出量比例系数
+#define FINAL_P 			 0.32f  //电机输出量比例系数
 
 #define MOTOR_ESC_TYPE 1  //2：无刷电机带刹车的电调，1：无刷电机不带刹车的电调，
 #define MOTORSNUM 4

@@ -41,7 +41,8 @@ extern int16_t CH_N[] ;
 
  
 void receivingModeInit(void);
-void receivingTask(void);
+
+void receivingTask(void *pvParameters);
 
 
 

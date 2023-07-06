@@ -7,17 +7,10 @@
 #include "Ano_Math.h"
 #include "Ano_Pid.h"
 /* Exported types ------------------------------------------------------------*/
-
-enum {
-  ROLL_END=0,
-  ROLL_UP,
-  ROLL_ROLLING,
-  ROLL_KEEP,
-};
+ 
 
 typedef struct {
-  u8 roll_mode;
-  u8 rolling_step;
+  u8 roll_mode; 
   u8 roll_thr_step;
 
   float rol_angle[2];
@@ -29,8 +22,7 @@ typedef struct {
   s16 roll_up_speed;
   u8 roll_height_ok;
 //	s16 roll_acc_fix;
-} _rolling_flag_st;
-extern _rolling_flag_st rolling_flag;
+} _rolling_flag_st; 
 
 typedef struct {
   float set_yaw_speed;

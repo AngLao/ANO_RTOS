@@ -19,7 +19,7 @@ static void offLineProtection()
 
 //低速状态变化检测回调函数
 static void vSlowDetection( void *pvParameters )
-{
+{ 
 	//遥控信号检测
   //在定时器设定范围内有新数据到来,遥控器在线
   if(haveNewData) {
@@ -50,7 +50,6 @@ static void vSlowDetection( void *pvParameters )
 		}
   }
 	
-	
 	//任务变化检测
 	//通道2检测
   static uint8_t channelTwoState = 0;
@@ -63,6 +62,12 @@ static void vSlowDetection( void *pvParameters )
     if(CH_N[AUX2] > 300) {
       channelTwoState = 2;
       debugOutput("CH_N[AUX2]  = 2");
+			
+			
+			//////////////////////////////////////////////////////
+			
+			while(1);
+			///////////////////////////////////////////////////////
  
     } 
     //开关打到中值
@@ -86,9 +91,11 @@ static void vSlowDetection( void *pvParameters )
       channelThreeState = 2;
       debugOutput("CH_N[AUX3]  = 2");
  
-      debugOutput("sartCalibration");
-			if(flag.unlock_sta == 1){
+			//断开电池供电状态才进入校准模式
+			if(flag.power_state == 3){
 				sartCalibration = 1;
+				
+				debugOutput("sartCalibration");
 			} 
     } 
     //开关打到中值
@@ -111,9 +118,9 @@ static void vSlowDetection( void *pvParameters )
 				for(u8 i =0; i<4; i++) {
 					Drv_MotorPWMSet(i,0);
 				}  
+				debugOutput("low");
 			}
 			
-      debugOutput("low");
 		}
   }
 		
@@ -127,8 +134,8 @@ static void vSlowDetection( void *pvParameters )
 				for(u8 i =0; i<4; i++) {
 					Drv_MotorPWMSet(i,999);
 				}  
+				debugOutput("high");
 			}
-      debugOutput("high");
     }  
   }
 	
@@ -138,7 +145,8 @@ static void vSlowDetection( void *pvParameters )
 
 //高速状态变化检测回调函数
 static void vFastDetection(void *pvParameters )
-{
+{ 
+	
   flag.flight_mode = LOC_HOLD;
 
   //通道1检测
@@ -159,11 +167,11 @@ static void vFastDetection(void *pvParameters )
 			channelOneState = 2;
 
 			//通道1一键急停
-			debugOutput("Emergency stop!");
 			flag.unlock_sta = 0;
 			flag.unlock_cmd = 0;
 			flag.taking_off = 0;
 			flag.flying = 0;
+			debugOutput("Emergency stop!");
     } 
 	}
   
@@ -177,29 +185,29 @@ static void unlockDetection(void)
 
   //imu传感器异常
   if(!flag.sensor_imu_ok) {
-    flag.unlock_err = 1;//imu异常，不允许解锁
+    flag.unlock_err = 1; 
   }
 
   //气压计异常
   if(!sens_hd_check.baro_ok) {
     LED_STA.errBaro = 1;
-    flag.unlock_err = 2;//气压计异常，不允许解锁。
+    flag.unlock_err = 2; 
   }
 
   //惯性传感器异常
   if(!sens_hd_check.acc_ok && !sens_hd_check.gyro_ok) {
     LED_STA.errMpu = 1;
-    flag.unlock_err = 3;//惯性传感器异常，不允许解锁。
+    flag.unlock_err = 3; 
   }
 
-  //只有电池电压最低
+  //电池电压异常
   if(flag.power_state > 2) {
-    flag.unlock_err = 4;//电池电压异常，不允许解锁
+    flag.unlock_err = 4; 
   }
 
   //正在操作flash
   if( para_sta.save_trig != 0) {
-    flag.unlock_err = 5;//操作flash ，不允许解锁
+    flag.unlock_err = 5; 
   }
 
   //飞控上锁、解锁检测要油门在拉低时才进行
@@ -218,14 +226,18 @@ static void unlockDetection(void)
     if(xFirstWakeTime == 0) {
       xFirstWakeTime = xTaskGetTickCount();
     }
-
-    TickType_t xThisWakeTime = xTaskGetTickCount(); //获取当前时间
-    //到达指定时间差
-    if(xThisWakeTime - xFirstWakeTime > pdMS_TO_TICKS(1500)) {
-      //根据飞行状态决定上锁还是解锁(上锁状态就解锁,解锁状态就上锁)
-      flag.unlock_cmd = !flag.unlock_sta ;
-      xFirstWakeTime  = 0;
-    }
+		//本次摇杆内八状态未执行解锁操作
+		if(xFirstWakeTime != 1){  
+			TickType_t xThisWakeTime = xTaskGetTickCount(); //获取当前时间
+			//到达指定时间差
+			if(xThisWakeTime - xFirstWakeTime > pdMS_TO_TICKS(1000)) {
+				//根据飞行状态决定上锁还是解锁(上锁状态就解锁,解锁状态就上锁)
+				flag.unlock_cmd = !flag.unlock_sta ;
+				//xFirstWakeTime为1说明当前摇杆处于内八状态且执行过一次解锁检测，直到松开内八才会归零检测下一次是否需要解锁
+				xFirstWakeTime  = 1; 
+				debugOutput("rc change lock status");
+			}
+		}
   } else {
 
     //退出内八状态计数清零
@@ -238,28 +250,29 @@ static void unlockDetection(void)
     if(flag.unlock_err != 0) {
       flag.unlock_cmd = 0;
     }
-
-    //打印解锁情况信息
-    switch(flag.unlock_err) {
-    case 0:
-      debugOutput("unlocking succeeded");
-      break;
-    case 1:
-      debugOutput("imu error");
-      break;
-    case 2:
-      debugOutput("barometer  error");
-      break;
-    case 3:
-      debugOutput("inertial sensor error");
-      break;
-    case 4:
-      debugOutput("undervoltage error");
-      break;
-    case 5:
-      debugOutput("flash error");
-      break;
-    }
+		
+			
+		//打印解锁情况信息
+		switch(flag.unlock_err) {
+		case 0:
+			debugOutput("unlocking succeeded");
+			break;
+		case 1:
+			debugOutput("imu error");
+			break;
+		case 2:
+			debugOutput("barometer  error");
+			break;
+		case 3:
+			debugOutput("inertial sensor error");
+			break;
+		case 4:
+			debugOutput("undervoltage error");
+			break;
+		case 5:
+			debugOutput("flash error");
+			break;
+		}
   } else if (flag.unlock_sta == 1 && flag.unlock_cmd == 0 ) {
     //飞控处于解锁状态 收到上锁命令
     debugOutput("flight control is locked");
@@ -292,20 +305,6 @@ static void dataStandardization(void)
 }
 
 
-void receivingTask(void)
-{
-  //解锁监测(不可阻塞,否则失控无法上锁)
-  unlockDetection();
-
-  //遥控器在线是接下来操作的前提
-  if(flag.rc_loss == 1)
-    return;
-
-  //遥控数据标准化
-  dataStandardization();
- 
-}
-
 //接收机模式初始化
 void receivingModeInit()
 {
@@ -319,7 +318,7 @@ void receivingModeInit()
   //创建缓慢检测状态变化定时器（如检测遥控失联，任务启动等功能）
   TimerHandle_t xSlowDetectionTimer = xTimerCreate(
         "low-speed callback Detection",
-        500,
+        1000,
         pdTRUE,
         0,
         vSlowDetection
@@ -347,4 +346,27 @@ void receivingModeInit()
   } else {
     //内存不够处理
   }
+}
+
+
+
+void receivingTask(void *pvParameters)
+{
+	
+  TickType_t xLastWakeTime = xTaskGetTickCount(); //获取当前Tick次数,以赋给延时函数初值
+
+  while (1) { 
+		//解锁监测(不可阻塞,否则失控无法上锁)
+		unlockDetection();
+
+		//遥控器在线是接下来操作的前提
+		if(flag.rc_loss != 1){ 
+			//遥控数据标准化
+			dataStandardization();
+		}
+
+		
+		//高速sbus信号7ms1帧 约150hz
+		vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 150);
+	}
 }

@@ -119,12 +119,75 @@ void Set_Att_2level_Ki(u8 mode)
 }
 
 
-_att_2l_ct_st att_2l_ct;
+#define POS_V_DAMPING 0.02f
+static float exp_rol_tmp,exp_pit_tmp;
 
 static s32 max_yaw_speed,set_yaw_av_tmp;
 
-#define POS_V_DAMPING 0.02f
-static float exp_rol_tmp,exp_pit_tmp;
+
+static _att_1l_ct_st att_1l_ct;
+static _att_2l_ct_st att_2l_ct;
+
+static float ct_val[4];
+
+/*角速度环控制*/
+void Att_1level_Ctrl(float dT_s)
+{
+  ////////////////改变控制参数任务（最小控制周期内）//////////////////////// 
+  if(flag.auto_take_off_land ==AUTO_TAKE_OFF) {
+
+    Set_Att_1level_Ki(2);
+  } else {
+
+    Set_Att_1level_Ki(1);
+  }
+
+  Set_Att_2level_Ki(1);
+
+
+  /*目标角速度赋值*/
+  for(u8 i = 0; i<3; i++) {
+    att_1l_ct.exp_angular_velocity[i] = val_2[i].out;// val_2[i].out;//
+  }
+
+  /*目标角速度限幅*/
+  att_1l_ct.exp_angular_velocity[ROL] = LIMIT(att_1l_ct.exp_angular_velocity[ROL],-MAX_ROLLING_SPEED,MAX_ROLLING_SPEED);
+  att_1l_ct.exp_angular_velocity[PIT] = LIMIT(att_1l_ct.exp_angular_velocity[PIT],-MAX_ROLLING_SPEED,MAX_ROLLING_SPEED);
+
+
+  /*反馈角速度赋值*/
+  att_1l_ct.fb_angular_velocity[ROL] = ( sensor.Gyro_deg[X] );
+  att_1l_ct.fb_angular_velocity[PIT] = (-sensor.Gyro_deg[Y] );
+  att_1l_ct.fb_angular_velocity[YAW] = (-sensor.Gyro_deg[Z] );
+
+
+  /*PID计算*/
+  for(u8 i = 0; i<3; i++) {
+    PID_calculate( dT_s,            //周期（单位：秒）
+                   0,				//前馈值
+                   att_1l_ct.exp_angular_velocity[i],				//期望值（设定值）
+                   att_1l_ct.fb_angular_velocity[i],			//反馈值（）
+                   &arg_1[i], //PID参数结构体
+                   &val_1[i],	//PID数据结构体
+                   200,//积分误差限幅
+                   CTRL_1_INTE_LIM *flag.taking_off			//integration limit，积分幅度限幅
+                 )	;
+
+
+    ct_val[i] = (val_1[i].out);
+  }
+
+
+  /*赋值，最终比例调节*/
+  mc.ct_val_rol =                   FINAL_P *ct_val[ROL];
+  mc.ct_val_pit = 									FINAL_P *ct_val[PIT];
+  mc.ct_val_yaw =                   FINAL_P *ct_val[YAW];
+  /*输出量限幅*/
+  mc.ct_val_rol = LIMIT(mc.ct_val_rol,-1000,1000);
+  mc.ct_val_pit = LIMIT(mc.ct_val_pit,-1000,1000);
+  mc.ct_val_yaw = LIMIT(mc.ct_val_yaw,-400,400);
+}
+ 
 
 /*角度环控制*/
 void Att_2level_Ctrl(float dT_s,s16 *CH_N)
@@ -237,66 +300,3 @@ void Att_2level_Ctrl(float dT_s,s16 *CH_N)
                )	;
 
 }
-
-_att_1l_ct_st att_1l_ct;
-static float ct_val[4];
-/*角速度环控制*/
-void Att_1level_Ctrl(float dT_s)
-{
-  ////////////////改变控制参数任务（最小控制周期内）//////////////////////// 
-  if(flag.auto_take_off_land ==AUTO_TAKE_OFF) {
-
-    Set_Att_1level_Ki(2);
-  } else {
-
-    Set_Att_1level_Ki(1);
-  }
-
-  Set_Att_2level_Ki(1);
-
-
-  /*目标角速度赋值*/
-  for(u8 i = 0; i<3; i++) {
-    att_1l_ct.exp_angular_velocity[i] = val_2[i].out;// val_2[i].out;//
-  }
-
-  /*目标角速度限幅*/
-  att_1l_ct.exp_angular_velocity[ROL] = LIMIT(att_1l_ct.exp_angular_velocity[ROL],-MAX_ROLLING_SPEED,MAX_ROLLING_SPEED);
-  att_1l_ct.exp_angular_velocity[PIT] = LIMIT(att_1l_ct.exp_angular_velocity[PIT],-MAX_ROLLING_SPEED,MAX_ROLLING_SPEED);
-
-
-  /*反馈角速度赋值*/
-  att_1l_ct.fb_angular_velocity[ROL] = ( sensor.Gyro_deg[X] );
-  att_1l_ct.fb_angular_velocity[PIT] = (-sensor.Gyro_deg[Y] );
-  att_1l_ct.fb_angular_velocity[YAW] = (-sensor.Gyro_deg[Z] );
-
-
-  /*PID计算*/
-  for(u8 i = 0; i<3; i++) {
-    PID_calculate( dT_s,            //周期（单位：秒）
-                   0,				//前馈值
-                   att_1l_ct.exp_angular_velocity[i],				//期望值（设定值）
-                   att_1l_ct.fb_angular_velocity[i],			//反馈值（）
-                   &arg_1[i], //PID参数结构体
-                   &val_1[i],	//PID数据结构体
-                   200,//积分误差限幅
-                   CTRL_1_INTE_LIM *flag.taking_off			//integration limit，积分幅度限幅
-                 )	;
-
-
-    ct_val[i] = (val_1[i].out);
-  }
-
-
-  /*赋值，最终比例调节*/
-  mc.ct_val_rol =                   FINAL_P *ct_val[ROL];
-  mc.ct_val_pit = 									FINAL_P *ct_val[PIT];
-  mc.ct_val_yaw =                   FINAL_P *ct_val[YAW];
-  /*输出量限幅*/
-  mc.ct_val_rol = LIMIT(mc.ct_val_rol,-1000,1000);
-  mc.ct_val_pit = LIMIT(mc.ct_val_pit,-1000,1000);
-  mc.ct_val_yaw = LIMIT(mc.ct_val_yaw,-400,400);
-}
-
-_rolling_flag_st rolling_flag;
-

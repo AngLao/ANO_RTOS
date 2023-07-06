@@ -96,8 +96,8 @@ u8 otherDataTmp[64];	//非循环发送数据临时缓冲
 #define ECP_RAW_Z      (mag.val[2])
 #define BARO_ALT       (baro_height*100)
 #define TEMPERATURE    (sensor.Tempreature_C)
-#define BARO_STA       (0)
-#define ECP_STA        (0)
+#define BARO_STA       (sens_hd_check.baro_ok)
+#define ECP_STA        (sens_hd_check.mag_ok)
 //0x03
 #define ANGLE_ROL      (imu_data.rol)
 #define ANGLE_PIT      (imu_data.pit)
@@ -162,31 +162,31 @@ void ANO_DT_Init(void)
   //PWM
   dt.txSet_u2[CSID_X20].fre_ms = 10; 
   //ACC-GRO
-  dt.txSet_u2[CSID_X01].fre_ms = 10;   
+  dt.txSet_u2[CSID_X01].fre_ms = 5;   
   //ECP-TEM-BARO
-  dt.txSet_u2[CSID_X02].fre_ms = 10;   
+  dt.txSet_u2[CSID_X02].fre_ms = 5;   
   //ATT_ANG
-  dt.txSet_u2[CSID_X03].fre_ms = 10;   
+  dt.txSet_u2[CSID_X03].fre_ms = 5;   
 //  //ATT_QUA
 //  dt.txSet_u2[CSID_X04].fre_ms = 5;  
   //height
-  dt.txSet_u2[CSID_X05].fre_ms = 10;  
+  dt.txSet_u2[CSID_X05].fre_ms = 5;  
   //fc_mode
   dt.txSet_u2[CSID_X06].fre_ms = 15; 
   //velocity
-  dt.txSet_u2[CSID_X07].fre_ms = 10; //
+  dt.txSet_u2[CSID_X07].fre_ms = 5; //
   //pos
-  dt.txSet_u2[CSID_X08].fre_ms = 10; //
+  dt.txSet_u2[CSID_X08].fre_ms = 5; //
 //  //wind_vel
 //  dt.txSet_u2[CSID_X09].fre_ms = 5;//
   //电压
-  dt.txSet_u2[CSID_X0D].fre_ms = 10; //
+  dt.txSet_u2[CSID_X0D].fre_ms = 5; //
   //传感器状态
   dt.txSet_u2[CSID_X0E].fre_ms = 10; //
   //UWB数据
-  dt.txSet_u2[CSID_X32].fre_ms = 10; //
+  dt.txSet_u2[CSID_X32].fre_ms = 5; //
   //遥控数据
-  dt.txSet_u2[CSID_X40].fre_ms = 10; //
+  dt.txSet_u2[CSID_X40].fre_ms = 5; //
 //  //实时控制数据
 //  dt.txSet_u2[CSID_X41].fre_ms = 5;//
 //  //FC_RGB
@@ -1002,7 +1002,7 @@ static void AnoDTDataAnl(u8 *data, u8 len)
 
 
 //===========================================================
-//整体数据通信的调度器，需要1ms调用一次
+//整体数据通信的调度器 
 //===========================================================
 void dtTask(void)
 {

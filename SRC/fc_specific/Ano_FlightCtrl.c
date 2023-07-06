@@ -217,19 +217,16 @@ void Flight_State_Task(u8 dT_ms,const s16 *CH_N)
   /*调用检测着陆的函数*/
   land_discriminat(dT_ms);
 
-  /*倾斜过大上锁*/
-  if(rolling_flag.rolling_step == ROLL_END) {
-    if(imu_data.z_vec[Z]<0.25f) { //75度 倾斜过大上锁，慎用。
-      //
-      if(mag.mag_CALIBRATE==0) {
-        imu_state.G_reset = 1;
-      }
-      flag.unlock_cmd = 0;
-			
-			debugOutput("Rollover locks");
-    }
-
-  }
+  /*倾斜过大上锁*/ 
+	if(imu_data.z_vec[Z]<0.25f && flag.unlock_cmd != 0) {  
+		//
+		if(mag.mag_CALIBRATE==0) {
+			imu_state.G_reset = 1;
+		}
+		flag.unlock_cmd = 0;
+		
+		debugOutput("Rollover locks");
+	} 
   //////////////////////////////////////////////////////////
   /*校准中，复位重力方向*/
   if(sensor.gyr_CALIBRATE != 0 || sensor.acc_CALIBRATE != 0 ||sensor.acc_z_auto_CALIBRATE) {
@@ -237,15 +234,15 @@ void Flight_State_Task(u8 dT_ms,const s16 *CH_N)
   }
 
   /*复位重力方向时，认为传感器失效*/
-  if(imu_state.G_reset == 1) {
+  if(imu_state.G_reset == 1) { 
     flag.sensor_imu_ok = 0;
     LED_STA.rst_imu = 1;
-    WCZ_Data_Reset(); //复位高度数据融合
+    WCZ_Data_Reset(); //复位高度数据融合 
   } else if(imu_state.G_reset == 0) {
     if(flag.sensor_imu_ok == 0) {
       flag.sensor_imu_ok = 1;
       LED_STA.rst_imu = 0;
-      debugOutput("IMU OK!");
+      debugOutput("IMU OK");
     }
   }
 
@@ -255,14 +252,9 @@ void Flight_State_Task(u8 dT_ms,const s16 *CH_N)
     landing_cnt = 0;
     flag.taking_off = 0;
     flying_cnt = 0;
-
-
+ 
     flag.rc_loss_back_home = 0;
-
-    //复位融合
-    if(flag.taking_off == 0) {
-//			wxyz_fusion_reset();
-    }
+ 
   }
 
 

@@ -1,13 +1,6 @@
-#include "Ano_MotorCtrl.h"
-#include "Ano_Math.h"
-#include "Ano_Parameter.h"
-#include "Drv_icm20602.h"
-#include "Drv_spl06.h"
-#include "Ano_Imu.h"
+#include "Ano_MotorCtrl.h" 
 #include "Drv_PwmOut.h"
-
-#include "Ano_MotionCal.h"
-#include "Ano_Filter.h"
+ 
 #include "rc_update.h"
 
 /*
@@ -22,8 +15,7 @@
       Æ¨¹É
 */
 s16 motor[MOTORSNUM];
-s16 motor_step[MOTORSNUM];
-//float motor_lpf[MOTORSNUM];
+s16 motor_step[MOTORSNUM]; 
 
 static u16 motor_prepara_cnt;
 _mc_st mc;
