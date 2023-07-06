@@ -1,85 +1,85 @@
 
 /*==========================================================================
- * ÃèÊö    £º¶ÔÓÅÏñ¹âÁ÷(UP_OF)´«»ØµÄÊý¾Ý½øÐÐ´¦Àí£¬²¢½â³ýÒò»úÌå¸©Ñö¡¢ºá¹öÐý×ª
-             ¶øÔì³É¹âÁ÷Êä³öµÄñîºÏ£¬Ò²³Æ×÷¡°Ðý×ª½âñî¡±»ò¡°Ðý×ª²¹³¥¡±¡£È»ºóÓë¸ß¶È
-						 ½øÐÐ»»ËãµÃµ½µØÃæËÙ¶È£¬ÔÙÓë¼ÓËÙ¶È¼Æ²âÁ¿Êý¾Ý½øÐÐÈÚºÏ£¬µÃµ½¸üÎÈ¶¨
-						 µÄµØÃæËÙ¶ÈÊä³ö¡£
+ * æè¿°    ï¼šå¯¹ä¼˜åƒå…‰æµ(UP_OF)ä¼ å›žçš„æ•°æ®è¿›è¡Œå¤„ç†ï¼Œå¹¶è§£é™¤å› æœºä½“ä¿¯ä»°ã€æ¨ªæ»šæ—‹è½¬
+             è€Œé€ æˆå…‰æµè¾“å‡ºçš„è€¦åˆï¼Œä¹Ÿç§°ä½œâ€œæ—‹è½¬è§£è€¦â€æˆ–â€œæ—‹è½¬è¡¥å¿â€ã€‚ç„¶åŽä¸Žé«˜åº¦
+						 è¿›è¡Œæ¢ç®—å¾—åˆ°åœ°é¢é€Ÿåº¦ï¼Œå†ä¸ŽåŠ é€Ÿåº¦è®¡æµ‹é‡æ•°æ®è¿›è¡Œèžåˆï¼Œå¾—åˆ°æ›´ç¨³å®š
+						 çš„åœ°é¢é€Ÿåº¦è¾“å‡ºã€‚
 
- * ¸üÐÂÊ±¼ä£º2019-07-13
- * ×÷Õß		 £ºÄäÃû¿Æ´´-Jyoun
- * ¹ÙÍø    £ºwww.anotc.com
- * ÌÔ±¦    £ºanotc.taobao.com
- * ¼¼ÊõQÈº £º190169595
- * ÏîÄ¿ºÏ×÷£º18084888982£¬18061373080
+ * æ›´æ–°æ—¶é—´ï¼š2019-07-13
+ * ä½œè€…		 ï¼šåŒ¿åç§‘åˆ›-Jyoun
+ * å®˜ç½‘    ï¼šwww.anotc.com
+ * æ·˜å®    ï¼šanotc.taobao.com
+ * æŠ€æœ¯Qç¾¤ ï¼š190169595
+ * é¡¹ç›®åˆä½œï¼š18084888982ï¼Œ18061373080
 ============================================================================
- * ÄäÃû¿Æ´´ÍÅ¶Ó¸ÐÐ»´ó¼ÒµÄÖ§³Ö£¬»¶Ó­´ó¼Ò½øÈº»¥Ïà½»Á÷¡¢ÌÖÂÛ¡¢Ñ§Ï°¡£
- * ÈôÄú¾õµÃÄäÃûÓÐ²»ºÃµÄµØ·½£¬»¶Ó­ÄúÅÄ×©ÌáÒâ¼û¡£
- * ÈôÄú¾õµÃÄäÃûºÃ£¬Çë¶à¶à°ïÎÒÃÇÍÆ¼ö£¬Ö§³ÖÎÒÃÇ¡£
- * ÄäÃû¿ªÔ´³ÌÐò´úÂë»¶Ó­ÄúµÄÒýÓÃ¡¢ÑÓÉìºÍÍØÕ¹£¬²»¹ýÔÚÏ£ÍûÄúÔÚÊ¹ÓÃÊ±ÄÜ×¢Ã÷³ö´¦¡£
- * ¾ý×ÓÌ¹µ´µ´£¬Ð¡ÈË³£ÆÝÆÝ£¬ÄäÃû¼á¾ö²»»áÇëË®¾ü¡¢ÇëÅç×Ó£¬Ò²´ÓÎ´ÓÐ¹ýÄ¨ºÚÍ¬ÐÐµÄÐÐÎª¡£
- * ¿ªÔ´²»Ò×£¬Éú»î¸ü²»ÈÝÒ×£¬Ï£Íû´ó¼Ò»¥Ïà×ðÖØ¡¢»¥°ï»¥Öú£¬¹²Í¬½ø²½¡£
- * Ö»ÓÐÄúµÄÖ§³Ö£¬ÄäÃû²ÅÄÜ×öµÃ¸üºÃ¡£
+ * åŒ¿åç§‘åˆ›å›¢é˜Ÿæ„Ÿè°¢å¤§å®¶çš„æ”¯æŒï¼Œæ¬¢è¿Žå¤§å®¶è¿›ç¾¤äº’ç›¸äº¤æµã€è®¨è®ºã€å­¦ä¹ ã€‚
+ * è‹¥æ‚¨è§‰å¾—åŒ¿åæœ‰ä¸å¥½çš„åœ°æ–¹ï¼Œæ¬¢è¿Žæ‚¨æ‹ç –ææ„è§ã€‚
+ * è‹¥æ‚¨è§‰å¾—åŒ¿åå¥½ï¼Œè¯·å¤šå¤šå¸®æˆ‘ä»¬æŽ¨èï¼Œæ”¯æŒæˆ‘ä»¬ã€‚
+ * åŒ¿åå¼€æºç¨‹åºä»£ç æ¬¢è¿Žæ‚¨çš„å¼•ç”¨ã€å»¶ä¼¸å’Œæ‹“å±•ï¼Œä¸è¿‡åœ¨å¸Œæœ›æ‚¨åœ¨ä½¿ç”¨æ—¶èƒ½æ³¨æ˜Žå‡ºå¤„ã€‚
+ * å›å­å¦è¡è¡ï¼Œå°äººå¸¸æˆšæˆšï¼ŒåŒ¿ååšå†³ä¸ä¼šè¯·æ°´å†›ã€è¯·å–·å­ï¼Œä¹Ÿä»Žæœªæœ‰è¿‡æŠ¹é»‘åŒè¡Œçš„è¡Œä¸ºã€‚
+ * å¼€æºä¸æ˜“ï¼Œç”Ÿæ´»æ›´ä¸å®¹æ˜“ï¼Œå¸Œæœ›å¤§å®¶äº’ç›¸å°Šé‡ã€äº’å¸®äº’åŠ©ï¼Œå…±åŒè¿›æ­¥ã€‚
+ * åªæœ‰æ‚¨çš„æ”¯æŒï¼ŒåŒ¿åæ‰èƒ½åšå¾—æ›´å¥½ã€‚
 ============================================================================
-¸üÐÂ£º
+æ›´æ–°ï¼š
 
-201908012354-Jyoun£ºÔö¼ÓÓÅÏñ¹âÁ÷³¯ÉÏµÄ¹âÁ÷½âËã³ÌÐò¡£
-±¾°æ±¸×¢£ºÓÅÏñ¹âÁ÷°²×°·½Ïò»¹ÊÇ½ÓÏß·½³¯×ó£¨¸©ÊÓ·É»ú£©£¬ÐèÒªÏÈÉè¶¨²ÎÕÕÎïµÄ¸ß¶È¡£
+201908012354-Jyounï¼šå¢žåŠ ä¼˜åƒå…‰æµæœä¸Šçš„å…‰æµè§£ç®—ç¨‹åºã€‚
+æœ¬ç‰ˆå¤‡æ³¨ï¼šä¼˜åƒå…‰æµå®‰è£…æ–¹å‘è¿˜æ˜¯æŽ¥çº¿æ–¹æœå·¦ï¼ˆä¿¯è§†é£žæœºï¼‰ï¼Œéœ€è¦å…ˆè®¾å®šå‚ç…§ç‰©çš„é«˜åº¦ã€‚
 ===========================================================================*/
 
-//Ä¬ÈÏÒýÓÃ
+//é»˜è®¤å¼•ç”¨
 #include "Ano_OF_DecoFusion.h"
 #include "Ano_IMU.h"
 #include "Ano_Math.h"
 #include "Ano_Filter.h"
 
-//Êý¾Ý½Ó¿Ú¶¨Òå£º
+//æ•°æ®æŽ¥å£å®šä¹‰ï¼š
 //=========mapping===============
-//ÐèÒªÒýÓÃµÄÎÄ¼þ£º
+//éœ€è¦å¼•ç”¨çš„æ–‡ä»¶ï¼š
 #include "Ano_Sensor_Basic.h"
 #include "Drv_UP_Flow.h"
 #include "Drv_laser.h"
  
+ 
+#define CIRCLE_P(n,a,b) ((a) + ((n)-(a))%((b)-(a)))
+#define OF_BUFFER_NUM 14
 
-//#define CIRCLE_P(n,a,b) ((a) + ((n)-(a))%((b)-(a)))
-//#define OF_BUFFER_NUM 14
+uint8_t of_init_cnt;
+uint8_t of_buf_update_cnt;
+uint8_t OF_DATA[OF_BUFFER_NUM]; 
 
-//uint8_t of_init_cnt;
-//uint8_t of_buf_update_cnt;
-//uint8_t OF_DATA[OF_BUFFER_NUM];
-
-//ÐèÒªµ÷ÓÃÒýÓÃµÄÍâ²¿±äÁ¿£º
+//éœ€è¦è°ƒç”¨å¼•ç”¨çš„å¤–éƒ¨å˜é‡ï¼š
 #define LASER_ONLINE              (1)//LASER_LINKOK
 #define BUF_UPDATE_CNT            (of_buf_update_cnt)
 #define OF_DATA_BUF               (OF_DATA)
 #define RADPS_X                   (sensor.Gyro_rad[0])
 #define RADPS_Y                   (sensor.Gyro_rad[1])
-#define RELATIVE_HEIGHT_CM        (Laser_height_cm)  //Ïà¶Ô¸ß¶È
-//ÐèÒª²Ù×÷¸³ÖµµÄÍâ²¿±äÁ¿£º
+#define RELATIVE_HEIGHT_CM        (Laser_height_cm)  //ç›¸å¯¹é«˜åº¦
+//éœ€è¦æ“ä½œèµ‹å€¼çš„å¤–éƒ¨å˜é‡ï¼š
 
 
 //===============================
-//È«¾Ö±äÁ¿£º
+//å…¨å±€å˜é‡ï¼š
 u8 of_buf_update_flag;
 _of_data_st of_data;
 _of_rdf_st of_rdf;
 float of_rot_d_degs[2];
 
 float of_fus_err[2], of_fus_err_i[2];
-//²ÎÊýÉè¶¨£º
-#define UPOF_PIXELPDEG_X    160.0f       //Ã¿1½Ç¶È¶ÔÓ¦µÄÏñËØ¸öÊý£¬Óë·Ö±æÂÊºÍ½¹¾àÓÐ¹Ø£¬ÐèÒªµ÷ÊÔ±ê¶¨¡£//
-#define UPOF_PIXELPDEG_Y    160.0f       //Ã¿1½Ç¶È¶ÔÓ¦µÄÏñËØ¸öÊý£¬Óë·Ö±æÂÊºÍ½¹¾àÓÐ¹Ø£¬ÐèÒªµ÷ÊÔ±ê¶¨¡£
-#define UPOF_CMPPIXEL_X     0.00012f     //Ã¿ÏñËØ¶ÔÓ¦µÄµØÃæ¾àÀë£¬Óë½¹¾àºÍ¸ß¶ÈÓÐ¹Ø£¬ÐèÒªµ÷ÊÔ±ê¶¨¡£//Ä¿Ç°´ÖÂÔ±ê¶¨
-#define UPOF_CMPPIXEL_Y     0.00012f     //Ã¿ÏñËØ¶ÔÓ¦µÄµØÃæ¾àÀë£¬Óë½¹¾àºÍ¸ß¶ÈÓÐ¹Ø£¬ÐèÒªµ÷ÊÔ±ê¶¨¡£
+//å‚æ•°è®¾å®šï¼š
+#define UPOF_PIXELPDEG_X    160.0f       //æ¯1è§’åº¦å¯¹åº”çš„åƒç´ ä¸ªæ•°ï¼Œä¸Žåˆ†è¾¨çŽ‡å’Œç„¦è·æœ‰å…³ï¼Œéœ€è¦è°ƒè¯•æ ‡å®šã€‚//
+#define UPOF_PIXELPDEG_Y    160.0f       //æ¯1è§’åº¦å¯¹åº”çš„åƒç´ ä¸ªæ•°ï¼Œä¸Žåˆ†è¾¨çŽ‡å’Œç„¦è·æœ‰å…³ï¼Œéœ€è¦è°ƒè¯•æ ‡å®šã€‚
+#define UPOF_CMPPIXEL_X     0.00012f     //æ¯åƒç´ å¯¹åº”çš„åœ°é¢è·ç¦»ï¼Œä¸Žç„¦è·å’Œé«˜åº¦æœ‰å…³ï¼Œéœ€è¦è°ƒè¯•æ ‡å®šã€‚//ç›®å‰ç²—ç•¥æ ‡å®š
+#define UPOF_CMPPIXEL_Y     0.00012f     //æ¯åƒç´ å¯¹åº”çš„åœ°é¢è·ç¦»ï¼Œä¸Žç„¦è·å’Œé«˜åº¦æœ‰å…³ï¼Œéœ€è¦è°ƒè¯•æ ‡å®šã€‚
 #define FUS_KP              5.0f
 #define FUS_KI              1.0f
 //
-#define UPOF_UP_DW          0             //0:³¯ÏÂ£»1£º³¯ÉÏ
-#define OBJREF_HEIGHT_CM    280           //²ÎÕÕÎï¸ß¶È£¬ÀåÃ×;¹âÁ÷³¯ÉÏ²ÅÓÐÓÃ¡£
+#define UPOF_UP_DW          0             //0:æœä¸‹ï¼›1ï¼šæœä¸Š
+#define OBJREF_HEIGHT_CM    280           //å‚ç…§ç‰©é«˜åº¦ï¼ŒåŽ˜ç±³;å…‰æµæœä¸Šæ‰æœ‰ç”¨ã€‚
 /**********************************************************************************************************
-*º¯ Êý Ãû: ANO_OF_Data_Check_Task
-*¹¦ÄÜËµÃ÷: ÄäÃû¿Æ´´¹âÁ÷×¼±¸Êý¾ÝÈÎÎñ
-*²Î    Êý: ÖÜÆÚÊ±¼ä(s)
-*·µ »Ø Öµ: ÎÞ
+*å‡½ æ•° å: ANO_OF_Data_Check_Task
+*åŠŸèƒ½è¯´æ˜Ž: åŒ¿åç§‘åˆ›å…‰æµå‡†å¤‡æ•°æ®ä»»åŠ¡
+*å‚    æ•°: å‘¨æœŸæ—¶é—´(s)
+*è¿” å›ž å€¼: æ— 
 **********************************************************************************************************/
 void ANO_OF_Data_Prepare_Task(float dT_s)
 {
@@ -90,10 +90,10 @@ void ANO_OF_Data_Prepare_Task(float dT_s)
 }
 
 /**********************************************************************************************************
-*º¯ Êý Ãû: ANO_OFDF_Task
-*¹¦ÄÜËµÃ÷: ÄäÃû¿Æ´´¹âÁ÷½âñîºÏÓëÈÚºÏÈÎÎñ
-*²Î    Êý: ÖÜÆÚÊ±¼ä(ms)
-*·µ »Ø Öµ: ÎÞ
+*å‡½ æ•° å: ANO_OFDF_Task
+*åŠŸèƒ½è¯´æ˜Ž: åŒ¿åç§‘åˆ›å…‰æµè§£è€¦åˆä¸Žèžåˆä»»åŠ¡
+*å‚    æ•°: å‘¨æœŸæ—¶é—´(ms)
+*è¿” å›ž å€¼: æ— 
 **********************************************************************************************************/
 void ANO_OFDF_Task(u8 dT_ms)
 {
@@ -109,17 +109,17 @@ void ANO_OFDF_Task(u8 dT_ms)
 
 
 /**********************************************************************************************************
-*º¯ Êý Ãû: OF_INS_Get
-*¹¦ÄÜËµÃ÷: ÄäÃû¿Æ´´¹âÁ÷¹ßÐÔÊý¾Ý»ñÈ¡
-*²Î    Êý: ÖÜÆÚÊ±¼ä(s£¬ÐÎ²Î)£¬xÖáÃ¿Ãë»¡¶È£¬yÖáÃ¿Ãë»¡¶È£¬µØÀíx¼ÓËÙ¶È(cmpss)£¬µØÀíy¼ÓËÙ¶È(cmpss)
-*·µ »Ø Öµ: ÎÞ
+*å‡½ æ•° å: OF_INS_Get
+*åŠŸèƒ½è¯´æ˜Ž: åŒ¿åç§‘åˆ›å…‰æµæƒ¯æ€§æ•°æ®èŽ·å–
+*å‚    æ•°: å‘¨æœŸæ—¶é—´(sï¼Œå½¢å‚)ï¼Œxè½´æ¯ç§’å¼§åº¦ï¼Œyè½´æ¯ç§’å¼§åº¦ï¼Œåœ°ç†xåŠ é€Ÿåº¦(cmpss)ï¼Œåœ°ç†yåŠ é€Ÿåº¦(cmpss)
+*è¿” å›ž å€¼: æ— 
 **********************************************************************************************************/
 static void OF_INS_Get(float *dT_s, float rad_ps_x, float rad_ps_y, float acc_wx, float acc_wy)
 {
   static float rad_ps_lpf[2];
   //====RD
-  //µÍÍ¨ÂË²¨
-  //¹ÊÒâÖÍºóÎªÁË¶ÔÆëÏàÎ»£¬ÕâÀï»»³ÉÁã½×±£³Ö+FIFOÐ§¹û¸üºÃ¡£
+  //ä½Žé€šæ»¤æ³¢
+  //æ•…æ„æ»žåŽä¸ºäº†å¯¹é½ç›¸ä½ï¼Œè¿™é‡Œæ¢æˆé›¶é˜¶ä¿æŒ+FIFOæ•ˆæžœæ›´å¥½ã€‚
   LPF_1_(5.0f, *dT_s, rad_ps_x, rad_ps_lpf[0]);
   LPF_1_(5.0f, *dT_s, rad_ps_y, rad_ps_lpf[1]);
 //	rad_ps_lpf[0] += 0.2f *(rad_ps_x - rad_ps_lpf[0]);
@@ -130,13 +130,13 @@ static void OF_INS_Get(float *dT_s, float rad_ps_x, float rad_ps_y, float acc_wx
   //
 //	test_calibration[0] += OF_ROT_KA *rad_ps_x *DEG_PER_RAD *dT_s;
   //====INS
-  //µÍÍ¨ÂË²¨
+  //ä½Žé€šæ»¤æ³¢
   LPF_1_(5.0f, *dT_s, acc_wx, of_rdf.gnd_acc_est_w[X]);
   LPF_1_(5.0f, *dT_s, acc_wy, of_rdf.gnd_acc_est_w[Y]);
 
   //
   for(u8 i = 0; i < 2; i++) {
-    //ÈÚºÏ¹À¼Æ²¿·Ö
+    //èžåˆä¼°è®¡éƒ¨åˆ†
     of_rdf.gnd_vel_est_w[i] += of_rdf.gnd_acc_est_w[i] * (*dT_s);
 
 
@@ -145,10 +145,10 @@ static void OF_INS_Get(float *dT_s, float rad_ps_x, float rad_ps_y, float acc_wx
 }
 
 /**********************************************************************************************************
-*º¯ Êý Ãû: ANO_OF_Data_Get
-*¹¦ÄÜËµÃ÷: ÄäÃû¿Æ´´¹âÁ÷Êý¾Ý»ñÈ¡
-*²Î    Êý: ÖÜÆÚÊ±¼ä(s£¬ÐÎ²Î),¹âÁ÷Êý¾Ý»º´æ£¨ÐÎ²Î£©
-*·µ »Ø Öµ: ÎÞ
+*å‡½ æ•° å: ANO_OF_Data_Get
+*åŠŸèƒ½è¯´æ˜Ž: åŒ¿åç§‘åˆ›å…‰æµæ•°æ®èŽ·å–
+*å‚    æ•°: å‘¨æœŸæ—¶é—´(sï¼Œå½¢å‚),å…‰æµæ•°æ®ç¼“å­˜ï¼ˆå½¢å‚ï¼‰
+*è¿” å›ž å€¼: æ— 
 **********************************************************************************************************/
 static void ANO_OF_Data_Get(float *dT_s, u8 *of_data_buf)
 {
@@ -195,7 +195,7 @@ static void ANO_OF_Data_Get(float *dT_s, u8 *of_data_buf)
     //null
     if(offline_delay_time_s < 1.0f) {
       offline_delay_time_s += *dT_s;
-    } else { //µôÏß
+    } else { //æŽ‰çº¿
       of_data.online = 0;
     }
   }
@@ -203,11 +203,11 @@ static void ANO_OF_Data_Get(float *dT_s, u8 *of_data_buf)
 
 
 /**********************************************************************************************************
-*º¯ Êý Ãû: ANO_OF_Decouple
-*¹¦ÄÜËµÃ÷: ÄäÃû¿Æ´´¹âÁ÷½âñîºÏ
-*²Î    Êý: ÖÜÆÚÊ±¼ä(ÐÎ²Îms)
-*·µ »Ø Öµ: ÎÞ
-*±¸    ×¢: ½¨Òé20msµ÷ÓÃÒ»´Î
+*å‡½ æ•° å: ANO_OF_Decouple
+*åŠŸèƒ½è¯´æ˜Ž: åŒ¿åç§‘åˆ›å…‰æµè§£è€¦åˆ
+*å‚    æ•°: å‘¨æœŸæ—¶é—´(å½¢å‚ms)
+*è¿” å›ž å€¼: æ— 
+*å¤‡    æ³¨: å»ºè®®20msè°ƒç”¨ä¸€æ¬¡
 **********************************************************************************************************/
 static void ANO_OF_Decouple(u8 *dT_ms)
 {
@@ -239,10 +239,10 @@ static void ANO_OF_Decouple(u8 *dT_ms)
 }
 
 /**********************************************************************************************************
-*º¯ Êý Ãû: ANO_OF_Decoupling
-*¹¦ÄÜËµÃ÷: ÄäÃû¿Æ´´¹âÁ÷½âñîºÏ
-*²Î    Êý: ÖÜÆÚÊ±¼ä(ÐÎ²Îms),²Î¿¼¸ß¶È(cm)
-*·µ »Ø Öµ: ÎÞ
+*å‡½ æ•° å: ANO_OF_Decoupling
+*åŠŸèƒ½è¯´æ˜Ž: åŒ¿åç§‘åˆ›å…‰æµè§£è€¦åˆ
+*å‚    æ•°: å‘¨æœŸæ—¶é—´(å½¢å‚ms),å‚è€ƒé«˜åº¦(cm)
+*è¿” å›ž å€¼: æ— 
 **********************************************************************************************************/
 static void ANO_OF_Fusion(u8 *dT_ms, s32 ref_height_cm)
 {
@@ -251,9 +251,9 @@ static void ANO_OF_Fusion(u8 *dT_ms, s32 ref_height_cm)
 
   //
   if(UPOF_UP_DW == 0) {
-    of_rdf.of_ref_height = LIMIT(ref_height_cm, 20, 500); //ÏÞÖÆµ½20cm-500cm
+    of_rdf.of_ref_height = LIMIT(ref_height_cm, 20, 500); //é™åˆ¶åˆ°20cm-500cm
   } else {
-    of_rdf.of_ref_height = LIMIT((OBJREF_HEIGHT_CM - ref_height_cm), 20, 500); //ÏÞÖÆµ½20cm-500cm
+    of_rdf.of_ref_height = LIMIT((OBJREF_HEIGHT_CM - ref_height_cm), 20, 500); //é™åˆ¶åˆ°20cm-500cm
   }
 
   //
@@ -282,11 +282,11 @@ static void ANO_OF_Fusion(u8 *dT_ms, s32 ref_height_cm)
   break;
 
   case 1: {
-    //ÈÚºÏÐÞÕý²¿·Ö
-    //(ÕâÀï¿ªÔ´×î¼òµ¥²¢ÇÒºÃÓÃµÄPI»¥²¹ÈÚºÏ£¬×¢ÒâÕâÀïÐÞÕý¼´È¡µÍÆµ£¬È¡¸ßÆµµÄ¹À¼ÆµÄ²¿·Ö²»ÔÚ´Ë´¦)
+    //èžåˆä¿®æ­£éƒ¨åˆ†
+    //(è¿™é‡Œå¼€æºæœ€ç®€å•å¹¶ä¸”å¥½ç”¨çš„PIäº’è¡¥èžåˆï¼Œæ³¨æ„è¿™é‡Œä¿®æ­£å³å–ä½Žé¢‘ï¼Œå–é«˜é¢‘çš„ä¼°è®¡çš„éƒ¨åˆ†ä¸åœ¨æ­¤å¤„)
 
     //==
-    //Ô­Ê¼ÖµÎÞÐ§Ê±²»ÐÞÕý
+    //åŽŸå§‹å€¼æ— æ•ˆæ—¶ä¸ä¿®æ­£
     if(of_data.valid == 0xf5) {
       //
       for(u8 i = 0; i < 2; i++) {
@@ -322,10 +322,10 @@ static void ANO_OF_Fusion(u8 *dT_ms, s32 ref_height_cm)
 }
 
 /**********************************************************************************************************
-*º¯ Êý Ãû: OF_INS_Reset
-*¹¦ÄÜËµÃ÷: ¹âÁ÷ÈÚºÏ¸´Î»
-*²Î    Êý: ÎÞ
-*·µ »Ø Öµ: ÎÞ
+*å‡½ æ•° å: OF_INS_Reset
+*åŠŸèƒ½è¯´æ˜Ž: å…‰æµèžåˆå¤ä½
+*å‚    æ•°: æ— 
+*è¿” å›ž å€¼: æ— 
 **********************************************************************************************************/
 static void OF_INS_Reset()
 {
@@ -339,10 +339,10 @@ static void OF_INS_Reset()
 }
 
 /**********************************************************************************************************
-*º¯ Êý Ãû: OF_State
-*¹¦ÄÜËµÃ÷: ¹âÁ÷×´Ì¬´¦Àí
-*²Î    Êý: ÎÞ
-*·µ »Ø Öµ: ÎÞ
+*å‡½ æ•° å: OF_State
+*åŠŸèƒ½è¯´æ˜Ž: å…‰æµçŠ¶æ€å¤„ç†
+*å‚    æ•°: æ— 
+*è¿” å›ž å€¼: æ— 
 **********************************************************************************************************/
 static void OF_State()
 {

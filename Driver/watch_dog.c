@@ -10,53 +10,54 @@
 #include "sysctl.h" 
 #include "pin_map.h" 
 #include "hw_ints.h"
- 
-/* ¿´ÃÅ¹·½ø³Ì ¸ÃÈÎÎñÎª¾«×¼½øĞĞµÄÈÎÎñ Ö´ĞĞÆµÂÊ¾«×¼2Hz */
+
+#include "Drv_Uart.h"
+#include "ano_usb.h"
+
+
+/* çœ‹é—¨ç‹—è¿›ç¨‹ è¯¥ä»»åŠ¡ä¸ºç²¾å‡†è¿›è¡Œçš„ä»»åŠ¡ æ‰§è¡Œé¢‘ç‡ç²¾å‡†2Hz */
 void wdt0_loop(void *pvParameters)
 {
 	// Enable the peripherals used by this example.
-	ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_WDOG0);
+	MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_WDOG0);
 	
 	// Enable the watchdog interrupt.
-	ROM_IntEnable(INT_WATCHDOG);
+	MAP_IntEnable(INT_WATCHDOG);
 
 	// Set the period of the watchdog timer.
-	ROM_WatchdogReloadSet(WATCHDOG0_BASE, MAP_SysCtlClockGet()); /* 1s´¥·¢ÖĞ¶Ï */
+	MAP_WatchdogReloadSet(WATCHDOG0_BASE, MAP_SysCtlClockGet()/10); /* 100msè§¦å‘ä¸­æ–­ */
 
 	// Enable reset generation from the watchdog timer.
-	ROM_WatchdogResetEnable(WATCHDOG0_BASE);
+	MAP_WatchdogResetEnable(WATCHDOG0_BASE);
 
 	// Enable the watchdog timer.
-	ROM_WatchdogEnable(WATCHDOG0_BASE);
+	MAP_WatchdogEnable(WATCHDOG0_BASE);
 	
-	static TickType_t xLastWakeTime;         //ÓÃÓÚ¾«×¼¶¨Ê±µÄ±äÁ¿
+	static TickType_t xLastWakeTime;         //ç”¨äºç²¾å‡†å®šæ—¶çš„å˜é‡
 	
-	xLastWakeTime = xTaskGetTickCount(); //»ñÈ¡µ±Ç°Tick´ÎÊı,ÒÔ¸³¸øÑÓÊ±º¯Êı³õÖµ
+	xLastWakeTime = xTaskGetTickCount(); //è·å–å½“å‰Tickæ¬¡æ•°,ä»¥èµ‹ç»™å»¶æ—¶å‡½æ•°åˆå€¼
 	
 	while(1)
 	{
-		ROM_WatchdogIntClear(WATCHDOG0_BASE);	/* Î¹¹· */ 
-		vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 2);
+		MAP_WatchdogIntClear(WATCHDOG0_BASE);	/* å–‚ç‹— */ 
+		vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 20);
 	}
 }
 
 void WDT0_Handler(void)
 {
-	//½øÈëÖĞ¶Ï³ÌĞòÒÑÅÜ·É 
-	ROM_WatchdogIntClear(WATCHDOG0_BASE);	 
-//	MAP_IntDisable(INT_WATCHDOG);
-//	MAP_WatchdogResetDisable(WATCHDOG0_BASE);
+	MAP_WatchdogIntClear(WATCHDOG0_BASE);	 
+	MAP_IntDisable(INT_WATCHDOG);
+	MAP_WatchdogResetDisable(WATCHDOG0_BASE);
 	
-	//ÒÅÑÔ
-	#include "ano_usb.h"
-	unsigned char theDogWantsToSay[] = "Hello World";
-	AnoUsbCdcSend(theDogWantsToSay, sizeof(theDogWantsToSay));
-	   
-	for(unsigned int i = 0; i<10000; i++){ 
-			__nop(); 
-	}
-	//¸´Î»
-	ROM_SysCtlReset();   
+	//é—è¨€
+	unsigned char theDogWantsToSay[] = "hello world"; 
+	Drv_Uart3SendBuf(theDogWantsToSay,sizeof(theDogWantsToSay));
+  
+  AnoUsbCdcSend(theDogWantsToSay,sizeof(theDogWantsToSay));
+	int i=0;
+	for( ;i!=100000;i++);
+	//å¤ä½
+	if(i == 100000)
+		ROM_SysCtlReset();   
 }
-
-

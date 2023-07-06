@@ -55,7 +55,7 @@ void Drv_BspInit(void)
   /*开启浮点运算单元*/
   ROM_FPULazyStackingEnable();
   ROM_FPUEnable();
-
+	
   //板载USB虚拟串口初始化
   AnoUsbCdcInit();
 	
@@ -93,7 +93,7 @@ void Drv_BspInit(void)
   SysTick_Init();
 
   //串口初始化
-  Drv_Uart1Init(3000000);	//接UWB
+  Drv_Uart1Init(1500000);	//接UWB
 
   Drv_Uart3Init(115200);  //接数传
 	

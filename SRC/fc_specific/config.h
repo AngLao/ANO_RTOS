@@ -3,50 +3,50 @@
  
 #include "sysconfig.h" 
 
-/***************»»Ëã******************/
-#define ANGLE_TO_RADIAN 0.01745329f //*0.01745 = /57.3	½Ç¶È×ª»¡¶È  
+/***************æ¢ç®—******************/
+#define ANGLE_TO_RADIAN 0.01745329f //*0.01745 = /57.3	è§’åº¦è½¬å¼§åº¦  
 
-//GYR_ACC_FILTER ²ÎÊý´óÖÂ·¶Î§²Î¿¼
-//500KVÒÔÏÂ 0.15f~0.2f
+//GYR_ACC_FILTER å‚æ•°å¤§è‡´èŒƒå›´å‚è€ƒ
+//500KVä»¥ä¸‹ 0.15f~0.2f
 //500~2000KV 0.2f~0.3f
-//2000kvÒÔÉÏ 0.3f-0.5f 
+//2000kvä»¥ä¸Š 0.3f-0.5f 
 
-#define GYR_ACC_FILTER 0.22f //ÍÓÂÝÒÇ¼ÓËÙ¶È¼ÆÂË²¨ÏµÊý
+#define GYR_ACC_FILTER 0.22f //é™€èžºä»ªåŠ é€Ÿåº¦è®¡æ»¤æ³¢ç³»æ•°
 
-//FINAL_P ²ÎÊý´óÖÂ·¶Î§²Î¿¼
-//500KVÒÔÏÂ 0.4fÒÔÉÏ
+//FINAL_P å‚æ•°å¤§è‡´èŒƒå›´å‚è€ƒ
+//500KVä»¥ä¸‹ 0.4fä»¥ä¸Š
 //500~2000KV 0.4f~0.3f
-//2000kvÒÔÉÏ 0.3f-0.2f
+//2000kvä»¥ä¸Š 0.3f-0.2f
+ 
+#define FINAL_P 			 0.32f  //ç”µæœºè¾“å‡ºé‡æ¯”ä¾‹ç³»æ•° 
 
-#define FINAL_P 			 0.33f  //µç»úÊä³öÁ¿±ÈÀýÏµÊý
-
-#define MOTOR_ESC_TYPE 1  //2£ºÎÞË¢µç»ú´øÉ²³µµÄµçµ÷£¬1£ºÎÞË¢µç»ú²»´øÉ²³µµÄµçµ÷£¬
+#define MOTOR_ESC_TYPE 1  //2ï¼šæ— åˆ·ç”µæœºå¸¦åˆ¹è½¦çš„ç”µè°ƒï¼Œ1ï¼šæ— åˆ·ç”µæœºä¸å¸¦åˆ¹è½¦çš„ç”µè°ƒï¼Œ
 #define MOTORSNUM 4
 
 
 
 #define MAX_ANGLE     25.0f 
  
-#define MAX_ROLLING_SPEED 1600  //½Ç¶ÈÃ¿Ãë
+#define MAX_ROLLING_SPEED 1600  //è§’åº¦æ¯ç§’
 
-#define MAX_SPEED 500 //×î´óË®Æ½ËÙ¶È£¬ÀåÃ×Ã¿Ãë cm/s
+#define MAX_SPEED 500 //æœ€å¤§æ°´å¹³é€Ÿåº¦ï¼ŒåŽ˜ç±³æ¯ç§’ cm/s
 
-#define MAX_Z_SPEED_UP 350 //ÀåÃ×Ã¿Ãë cm/s
-#define MAX_Z_SPEED_DW 250 //ÀåÃ×Ã¿Ãë cm/s
+#define MAX_Z_SPEED_UP 350 //åŽ˜ç±³æ¯ç§’ cm/s
+#define MAX_Z_SPEED_DW 250 //åŽ˜ç±³æ¯ç§’ cm/s
  
 
-#define CTRL_1_INTE_LIM 250 //½ÇËÙ¶È»·»ý·ÖÏÞ·ù £ºÊä³ö
+#define CTRL_1_INTE_LIM 250 //è§’é€Ÿåº¦çŽ¯ç§¯åˆ†é™å¹… ï¼šè¾“å‡º
    
 
-#define MAX_THR_SET    90  //×î´óÓÍÃÅ°Ù·Ö±È %
-#define THR_INTE_LIM_SET   70  //ÓÍÃÅ»ý·Ö°Ù·Ö±È % 
+#define MAX_THR_SET    90  //æœ€å¤§æ²¹é—¨ç™¾åˆ†æ¯” %
+#define THR_INTE_LIM_SET   70  //æ²¹é—¨ç§¯åˆ†ç™¾åˆ†æ¯” % 
  
 #define THR_INTE_LIM   THR_INTE_LIM_SET/FINAL_P
 
-#define THR_START      35  //ÓÍÃÅÆðµ÷Á¿°Ù·Ö±È % 
+#define THR_START      35  //æ²¹é—¨èµ·è°ƒé‡ç™¾åˆ†æ¯” % 
 
 
-#define BARO_FIX -0                          //ÆøÑ¹ËÙ¶È»ý·ÖÐÞÕýÆðµ÷Öµ/CMÀåÃ×  
+#define BARO_FIX -0                          //æ°”åŽ‹é€Ÿåº¦ç§¯åˆ†ä¿®æ­£èµ·è°ƒå€¼/CMåŽ˜ç±³  
 
 
 #endif

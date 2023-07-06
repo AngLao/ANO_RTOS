@@ -2,10 +2,10 @@
 #include "task.h"
   
 #include "Drv_Bsp.h"	
-#include "Drv_Uart.h"
+#include "Drv_Uart.h" 
 #include "Drv_laser.h"
 #include "Drv_Timer.h" 
-#include "Drv_UP_flow.h"
+#include "Drv_UP_flow.h" 
 #include "Drv_heating.h"
 
 #include "Ano_Imu.h"
@@ -26,36 +26,34 @@
 #include "rc_update.h" 
 #include "power_management.h" 
   
-/* »ù±¾´«¸ĞÆ÷Êı¾İ×¼±¸½ø³Ì ¸ÃÈÎÎñÎª¾«×¼½øĞĞµÄÈÎÎñ Ö´ĞĞÆµÂÊ¾«×¼1000Hz ÓÅÏÈ¼¶È«¾Ö×î¸ß*/
+/* åŸºæœ¬ä¼ æ„Ÿå™¨æ•°æ®å‡†å¤‡è¿›ç¨‹ è¯¥ä»»åŠ¡ä¸ºç²¾å‡†è¿›è¡Œçš„ä»»åŠ¡ æ‰§è¡Œé¢‘ç‡ç²¾å‡†1000Hz ä¼˜å…ˆçº§å…¨å±€æœ€é«˜*/
 void basic_data_read(void *pvParameters)
 {
-  TickType_t xLastWakeTime;         //ÓÃÓÚ¾«×¼¶¨Ê±µÄ±äÁ¿
+  TickType_t xLastWakeTime = xTaskGetTickCount(); //è·å–å½“å‰Tickæ¬¡æ•°,ä»¥èµ‹ç»™å»¶æ—¶å‡½æ•°åˆå€¼
 
-  while (1) {
-    xLastWakeTime = xTaskGetTickCount(); //»ñÈ¡µ±Ç°Tick´ÎÊı,ÒÔ¸³¸øÑÓÊ±º¯Êı³õÖµ
-
-    /*¶ÁÈ¡ÍÓÂİÒÇ¼ÓËÙ¶È¼ÆÊı¾İ*/
+  while (1) { 
+    /*è¯»å–é™€èºä»ªåŠ é€Ÿåº¦è®¡æ•°æ®*/
     Drv_Icm20602_Read();
 
-    /*¹ßĞÔ´«¸ĞÆ÷Êı¾İ×¼±¸*/
+    /*æƒ¯æ€§ä¼ æ„Ÿå™¨æ•°æ®å‡†å¤‡*/
     Sensor_Data_Prepare(1);
 
-    /*×ËÌ¬½âËã¸üĞÂ*/
+    /*å§¿æ€è§£ç®—æ›´æ–°*/
     IMU_Update_Task(1);
 
-    /*»ñÈ¡WC_Z¼ÓËÙ¶È*/
+    /*è·å–WC_ZåŠ é€Ÿåº¦*/
     WCZ_Acc_Get_Task();
 
-    /*·ÉĞĞ×´Ì¬ÈÎÎñ*/
+    /*é£è¡ŒçŠ¶æ€ä»»åŠ¡*/
     Flight_State_Task(1, CH_N);
 
-    /*¿ª¹Ø×´Ì¬ÈÎÎñ*/
+    /*å¼€å…³çŠ¶æ€ä»»åŠ¡*/
     Swtich_State_Task(1);
 
-    /*¹âÁ÷ÈÚºÏÊı¾İ×¼±¸ÈÎÎñ*/
+    /*å…‰æµèåˆæ•°æ®å‡†å¤‡ä»»åŠ¡*/
     ANO_OF_Data_Prepare_Task(0.001f);
  
-    //µÆ¹âÇı¶¯
+    //ç¯å…‰é©±åŠ¨
     LED_1ms_DRV();
 
     vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 1000);
@@ -63,18 +61,16 @@ void basic_data_read(void *pvParameters)
 }
 
 
-/* ×ËÌ¬½ÇËÙ¶È»·¿ØÖÆ½ø³Ì ¸ÃÈÎÎñÎª¾«×¼½øĞĞµÄÈÎÎñ Ö´ĞĞÆµÂÊ¾«×¼500Hz ÓÅÏÈ¼¶µÚ¶ş*/
+/* å§¿æ€è§’é€Ÿåº¦ç¯æ§åˆ¶è¿›ç¨‹ è¯¥ä»»åŠ¡ä¸ºç²¾å‡†è¿›è¡Œçš„ä»»åŠ¡ æ‰§è¡Œé¢‘ç‡ç²¾å‡†500Hz ä¼˜å…ˆçº§ç¬¬äºŒ*/
 void inner_loop(void *pvParameters)
 {
-  TickType_t xLastWakeTime;         //ÓÃÓÚ¾«×¼¶¨Ê±µÄ±äÁ¿
+  TickType_t xLastWakeTime = xTaskGetTickCount(); //è·å–å½“å‰Tickæ¬¡æ•°,ä»¥èµ‹ç»™å»¶æ—¶å‡½æ•°åˆå€¼
 
-  while (1) {
-    xLastWakeTime = xTaskGetTickCount(); //»ñÈ¡µ±Ç°Tick´ÎÊı,ÒÔ¸³¸øÑÓÊ±º¯Êı³õÖµ
-
-    /*×ËÌ¬½ÇËÙ¶È»·¿ØÖÆ*/
+  while (1) {  
+    /*å§¿æ€è§’é€Ÿåº¦ç¯æ§åˆ¶*/
     Att_1level_Ctrl(2 * 1e-3f);
 
-    /*µç»úÊä³ö¿ØÖÆ*/
+    /*ç”µæœºè¾“å‡ºæ§åˆ¶*/
     Motor_Ctrl_Task(2);
 
 
@@ -82,18 +78,16 @@ void inner_loop(void *pvParameters)
   }
 }
 
-/* ×ËÌ¬½Ç¶È»·¿ØÖÆ½ø³Ì ¸ÃÈÎÎñÎª¾«×¼½øĞĞµÄÈÎÎñ Ö´ĞĞÆµÂÊ¾«×¼200Hz ÓÅÏÈ¼¶µÚ¶ş*/
+/* å§¿æ€è§’åº¦ç¯æ§åˆ¶è¿›ç¨‹ è¯¥ä»»åŠ¡ä¸ºç²¾å‡†è¿›è¡Œçš„ä»»åŠ¡ æ‰§è¡Œé¢‘ç‡ç²¾å‡†200Hz ä¼˜å…ˆçº§ç¬¬äºŒ*/
 void outer_loop(void *pvParameters)
 {
-  TickType_t xLastWakeTime;         //ÓÃÓÚ¾«×¼¶¨Ê±µÄ±äÁ¿
+  TickType_t xLastWakeTime = xTaskGetTickCount(); //è·å–å½“å‰Tickæ¬¡æ•°,ä»¥èµ‹ç»™å»¶æ—¶å‡½æ•°åˆå€¼
 
-  while (1) {
-    xLastWakeTime = xTaskGetTickCount(); //»ñÈ¡µ±Ç°Tick´ÎÊı,ÒÔ¸³¸øÑÓÊ±º¯Êı³õÖµ
-
-    /*»ñÈ¡×ËÌ¬½Ç£¨ROLL PITCH YAW£©*/
+  while (1) {  
+    /*è·å–å§¿æ€è§’ï¼ˆROLL PITCH YAWï¼‰*/
     calculate_RPY();
 
-    /*×ËÌ¬½Ç¶È»·¿ØÖÆ*/
+    /*å§¿æ€è§’åº¦ç¯æ§åˆ¶*/
     Att_2level_Ctrl(5e-3f, CH_N);
 
 
@@ -101,54 +95,47 @@ void outer_loop(void *pvParameters)
   }
 }
 
-/* ¸ß¶È»·¿ØÖÆ½ø³Ì ¸ÃÈÎÎñÎª¾«×¼½øĞĞµÄÈÎÎñ Ö´ĞĞÆµÂÊ¾«×¼100Hz ÓÅÏÈ¼¶µÚÈı */
+/* é«˜åº¦ç¯æ§åˆ¶è¿›ç¨‹ è¯¥ä»»åŠ¡ä¸ºç²¾å‡†è¿›è¡Œçš„ä»»åŠ¡ æ‰§è¡Œé¢‘ç‡ç²¾å‡†100Hz ä¼˜å…ˆçº§ç¬¬ä¸‰ */
 void height_loop(void *pvParameters)
 {
-  TickType_t xLastWakeTime;         //ÓÃÓÚ¾«×¼¶¨Ê±µÄ±äÁ¿
+  TickType_t xLastWakeTime = xTaskGetTickCount(); //è·å–å½“å‰Tickæ¬¡æ•°,ä»¥èµ‹ç»™å»¶æ—¶å‡½æ•°åˆå€¼
 
-  while (1) {
-    xLastWakeTime = xTaskGetTickCount(); //»ñÈ¡µ±Ç°Tick´ÎÊı,ÒÔ¸³¸øÑÓÊ±º¯Êı³õÖµ
-
-    /*Ò£¿ØÆ÷Êı¾İ´¦ÀíÈÎÎñ*/
-    receivingTask();
-
-    /*¸ß¶ÈÊı¾İÈÚºÏÈÎÎñ*/
+  while (1) {  
+    /*é«˜åº¦æ•°æ®èåˆä»»åŠ¡*/
     WCZ_Fus_Task(10); 
 
-    /*¸ß¶ÈËÙ¶È»·¿ØÖÆ*/
+    /*é«˜åº¦é€Ÿåº¦ç¯æ§åˆ¶*/
     Alt_1level_Ctrl(10e-3f);
 
-    /*¸ß¶È»·¿ØÖÆ*/
+    /*é«˜åº¦ç¯æ§åˆ¶*/
     Alt_2level_Ctrl(10e-3f);
 
-    /*¹âÁ÷µôÏß¼ì²â*/
+    /*å…‰æµæ‰çº¿æ£€æµ‹*/
     AnoOF_Check(10);
 
-    /*µÆ¹â¿ØÖÆ*/
+    /*ç¯å…‰æ§åˆ¶*/
     LED_Task2(10);
 
     vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 100);
   }
 }
 
-/* Î»ÖÃ»·¿ØÖÆ½ø³Ì ¸ÃÈÎÎñÎª¾«×¼½øĞĞµÄÈÎÎñ Ö´ĞĞÆµÂÊ¾«×¼50Hz ÓÅÏÈ¼¶µÚËÄ*/
+/* ä½ç½®ç¯æ§åˆ¶è¿›ç¨‹ è¯¥ä»»åŠ¡ä¸ºç²¾å‡†è¿›è¡Œçš„ä»»åŠ¡ æ‰§è¡Œé¢‘ç‡ç²¾å‡†50Hz ä¼˜å…ˆçº§ç¬¬å››*/
 void position_loop(void *pvParameters)
 {
-  TickType_t xLastWakeTime;         //ÓÃÓÚ¾«×¼¶¨Ê±µÄ±äÁ¿
+  TickType_t xLastWakeTime = xTaskGetTickCount(); //è·å–å½“å‰Tickæ¬¡æ•°,ä»¥èµ‹ç»™å»¶æ—¶å‡½æ•°åˆå€¼
 
-  while (1) {
-    xLastWakeTime = xTaskGetTickCount(); //»ñÈ¡µ±Ç°Tick´ÎÊı,ÒÔ¸³¸øÑÓÊ±º¯Êı³õÖµ
-
-    /*ÂŞÅÌÊı¾İ´¦ÀíÈÎÎñ*/
+  while (1) { 
+    /*ç½—ç›˜æ•°æ®å¤„ç†ä»»åŠ¡*/
     Mag_Update_Task(20); 
 
-    /*Î»ÖÃËÙ¶È»·¿ØÖÆ*/
+    /*ä½ç½®é€Ÿåº¦ç¯æ§åˆ¶*/
     Loc_1level_Ctrl(20);
 		
-		/* ÄäÃû¿Æ´´¹âÁ÷½âñîºÏÓëÈÚºÏÈÎÎñ */
+		/* åŒ¿åç§‘åˆ›å…‰æµè§£è€¦åˆä¸èåˆä»»åŠ¡ */
 		ANO_OFDF_Task(20);
 		
-    /*Êı´«Êı¾İ½»»»*/
+    /*æ•°ä¼ æ•°æ®äº¤æ¢*/
     dtTask();
  
     vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 50);
@@ -156,25 +143,26 @@ void position_loop(void *pvParameters)
 }
 
 
-/* ¸¨ÖúÈÎÎñ½ø³Ì ¸ÃÈÎÎñÎª¾«×¼½øĞĞµÄÈÎÎñ Ö´ĞĞÆµÂÊ¾«×¼20Hz */
+/* è¾…åŠ©ä»»åŠ¡è¿›ç¨‹ è¯¥ä»»åŠ¡ä¸ºç²¾å‡†è¿›è¡Œçš„ä»»åŠ¡ æ‰§è¡Œé¢‘ç‡ç²¾å‡†20Hz */
 void auxiliary_loop(void *pvParameters)
 {
-  TickType_t xLastWakeTime;         //ÓÃÓÚ¾«×¼¶¨Ê±µÄ±äÁ¿
-
-  while (1) {
-    xLastWakeTime = xTaskGetTickCount(); //»ñÈ¡µ±Ç°Tick´ÎÊı,ÒÔ¸³¸øÑÓÊ±º¯Êı³õÖµ
-
-    /*¸üĞÂµçÑ¹Öµ*/
+  TickType_t xLastWakeTime = xTaskGetTickCount(); //è·å–å½“å‰Tickæ¬¡æ•°,ä»¥èµ‹ç»™å»¶æ—¶å‡½æ•°åˆå€¼    
+	
+  while (1) {  
+    /*æ›´æ–°ç”µå‹å€¼*/
     batteryUpdate(); 
 
-    /*ÑÓÊ±´æ´¢ÈÎÎñ*/
-    Ano_Parame_Write_task(50);
+    /*å»¶æ—¶å­˜å‚¨ä»»åŠ¡*/
+    Ano_Parame_Write_task(50); //å‚¨å­˜æ“ä½œè€—æ—¶è¾ƒé•¿ æ³¨æ„çœ‹é—¨ç‹—å¤ä½
 		
-		//²»Ê¹ÓÃºãÎÂ¹¦ÄÜ
+		//ä¸ä½¿ç”¨æ’æ¸©åŠŸèƒ½
+    flag.mems_temperature_ok = 1;
+		
+		//ä¸ä½¿ç”¨æ’æ¸©åŠŸèƒ½
     flag.mems_temperature_ok = 1;
 		
 		#if defined(USE_KS103)
-		//³¬Éù²¨ÈÎÎñ
+		//è¶…å£°æ³¢ä»»åŠ¡
 		Ultra_Duty();
 		#endif
 		
@@ -183,72 +171,79 @@ void auxiliary_loop(void *pvParameters)
 }
 
 
-/* ×Ô¶¨Òå½ø³Ì */
+/* è‡ªå®šä¹‰è¿›ç¨‹ */
 void user_loop(void *pvParameters)
 {
-  TickType_t xLastWakeTime;         //ÓÃÓÚ¾«×¼¶¨Ê±µÄ±äÁ¿
+  TickType_t xLastWakeTime = xTaskGetTickCount(); //è·å–å½“å‰Tickæ¬¡æ•°,ä»¥èµ‹ç»™å»¶æ—¶å‡½æ•°åˆå€¼
 
 	static unsigned char pFrame[128];
 	
-  while (1) {
-    xLastWakeTime = xTaskGetTickCount(); //»ñÈ¡µ±Ç°Tick´ÎÊı,ÒÔ¸³¸øÑÓÊ±º¯Êı³õÖµ
-
-		//¶Á»·ĞÎ»º³åÇø  
+  while (1) {  
+		//è¯»ç¯å½¢ç¼“å†²åŒº  
 		if(RingBuffer_GetCount(&U1rxring) > 128) { 
 			
+			memset(pFrame,0,128);
 			RingBuffer_PopMult(&U1rxring, pFrame, 128);
 			
-			//½âÎöuwbÊı¾İ
+			//è§£æuwbæ•°æ®
 			uint8_t res = g_nlt_tagframe0.UnpackData(pFrame, 128);
-			//½ÓÊÕÓĞÎóË¢ĞÂ»º³åÇø
+      
+			switchs.uwb_on = res;
+      
+			//æ¥æ”¶æœ‰è¯¯åˆ·æ–°ç¼“å†²åŒº
 			if (res == 0) { 
 				RingBuffer_Flush(&U1rxring);
 			}
 		}
-		vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 10);
+		vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 50);
 	}
 }
  
 int main(void)
 {
-	//¼Ä´æÆ÷Öµ·ÇÄ¬ÈÏÖµ¾Í½øĞĞÈí¼ş¸´Î»
+	//å¯„å­˜å™¨å€¼éé»˜è®¤å€¼å°±è¿›è¡Œè½¯ä»¶å¤ä½
 	if(ROM_SysCtlClockGet() != 16000000 ) 
 		ROM_SysCtlReset(); 
 	
   Drv_BspInit(); 
 
-  /* »ù±¾´«¸ĞÆ÷Êı¾İ×¼±¸½ø³Ì 1000Hz*/
-  xTaskCreate(basic_data_read, "basic_data_read", 152, NULL, 4, NULL);
+  /* åŸºæœ¬ä¼ æ„Ÿå™¨æ•°æ®å‡†å¤‡è¿›ç¨‹ */
+  xTaskCreate(basic_data_read, "basic_data_read", 120, NULL, 4, NULL);
 
-  /* ×ËÌ¬½ÇËÙ¶È»·¿ØÖÆ½ø³Ì 500Hz*/
-  xTaskCreate(inner_loop, "inner_loop", 104, NULL, 3, NULL);
+  /* å§¿æ€è§’é€Ÿåº¦ç¯æ§åˆ¶è¿›ç¨‹ */
+  xTaskCreate(inner_loop, "inner_loop", 120, NULL, 3, NULL);
 
-  /* ×ËÌ¬½Ç¶È»·¿ØÖÆ½ø³Ì 200Hz*/
-  xTaskCreate(outer_loop, "outer_loop", 104, NULL, 3, NULL);
+  /* å§¿æ€è§’åº¦ç¯æ§åˆ¶è¿›ç¨‹ */
+  xTaskCreate(outer_loop, "outer_loop", 120, NULL, 3, NULL);
 
-  /* ¸ß¶È»·¿ØÖÆ½ø³Ì 100Hz*/
-  xTaskCreate(height_loop, "height_loop", 248, NULL, 3, NULL);
-
-  /* Î»ÖÃ»·¿ØÖÆ½ø³Ì 50Hz*/
-  xTaskCreate(position_loop, "position_loop", 160+32, NULL, 2, NULL);
-
-  /* ¸¨ÖúÈÎÎñ½ø³Ì 20Hz*/
-  xTaskCreate(auxiliary_loop, "auxiliary_loop", 104+32, NULL, 2, NULL);
+  /* é«˜åº¦ç¯æ§åˆ¶è¿›ç¨‹ */
+  xTaskCreate(height_loop, "height_loop", 120, NULL, 3, NULL);
+ 
 	
-  
-  /* ×Ô¶¨Òå½ø³Ì 50Hz*/
-//  xTaskCreate(user_loop, "user_loop", 128, NULL, 3, NULL); 
-  
-  xTaskCreate(wdt0_loop, "wdt0_loop", 96 + 32, NULL, 1, NULL);  
+	xTaskCreate(up_flow_loop, "up_flow_loop", 112 + 32, NULL, 1, NULL);	 
+  /* ä½ç½®ç¯æ§åˆ¶è¿›ç¨‹ */
+  xTaskCreate(position_loop, "position_loop", 180, NULL, 2, NULL);
+
+  /* è¾…åŠ©ä»»åŠ¡è¿›ç¨‹ */
+  xTaskCreate(auxiliary_loop, "auxiliary_loop", 120, NULL, 1, NULL);
 	
-	xTaskCreate(up_flow_loop, "up_flow_loop", 112 + 32, NULL, 1, NULL);	
-  //ÆôÓÃÈÎÎñµ÷¶ÈÆ÷
+   
+  /* å¯åŠ¨é¥æ§å™¨æ•°æ®å¤„ç†ä»»åŠ¡ */ 
+  xTaskCreate(receivingTask, "receivingTask", 120, NULL, 3, NULL);  
+		
+  /* å¯åŠ¨ç¡¬ä»¶çœ‹é—¨ç‹— */
+  xTaskCreate(wdt0_loop, "wdt0_loop", 120, NULL, 1, NULL);  
+	
+  /* è‡ªå®šä¹‰è¿›ç¨‹ */
+//  xTaskCreate(user_loop, "user_loop", 120, NULL, 3, NULL); 
+	 
+  //å¯ç”¨ä»»åŠ¡è°ƒåº¦å™¨
   vTaskStartScheduler(); 
 	
 	//printf("Free_Heap_Size = %d \n",xPortGetFreeHeapSize());   
 	//printf("MinimumEverFreeHeapSize = %d \n",xPortGetMinimumEverFreeHeapSize());   
 	
-  //Òç³ö´¦Àí
+  //æº¢å‡ºå¤„ç†
   //fun();
 	
 }

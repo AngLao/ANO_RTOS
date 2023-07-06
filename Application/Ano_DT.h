@@ -13,7 +13,7 @@
 #define USB_CDC 0
 #define UART 	1 
 //数传输出硬件选择
-#define DEBUG_CONFIG USB_CDC 
+#define DEBUG_CONFIG UART 
 
 typedef enum {
   CSID_X20,

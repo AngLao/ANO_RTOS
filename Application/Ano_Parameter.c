@@ -23,6 +23,12 @@ _parameter_state_st para_sta;
 //注意这些仅仅是初始化存储区的默认参数，直接修改代码后，若没有触发写入对应存储区，参数不会生效！
 void PID_Rest()
 {
+#define KV1500 1
+#define KV1900 2
+#define pid_default KV1900
+	
+#if (pid_default == KV1500)
+	
 //---	姿态控制角速度环PID参数
   Ano_Parame.set.pid_att_1level[ROL][KP] = 4.1f; //姿态控制角速度环PID参数
   Ano_Parame.set.pid_att_1level[ROL][KI] = 3.0f; //姿态控制角速度环PID参数
@@ -72,7 +78,58 @@ void PID_Rest()
   Ano_Parame.set.pid_gps_loc_2level[KI] = 0;           //位置控制位置环PID参数(NULL)
   Ano_Parame.set.pid_gps_loc_2level[KD] = 0;           //位置控制位置环PID参数(NULL)
 
+#elif (pid_default == KV1900)
 
+//---	姿态控制角速度环PID参数
+  Ano_Parame.set.pid_att_1level[ROL][KP] = 3.1f; //姿态控制角速度环PID参数
+  Ano_Parame.set.pid_att_1level[ROL][KI] = 1.9f; //姿态控制角速度环PID参数
+  Ano_Parame.set.pid_att_1level[ROL][KD] = 0.10f; //姿态控制角速度环PID参数
+
+  Ano_Parame.set.pid_att_1level[PIT][KP] = 3.1f; //姿态控制角速度环PID参数
+  Ano_Parame.set.pid_att_1level[PIT][KI] = 1.9f; //姿态控制角速度环PID参数
+  Ano_Parame.set.pid_att_1level[PIT][KD] = 0.10f; //姿态控制角速度环PID参数
+
+  Ano_Parame.set.pid_att_1level[YAW][KP] = 4.5f; //姿态控制角速度环PID参数
+  Ano_Parame.set.pid_att_1level[YAW][KI] = 0.4f; //姿态控制角速度环PID参数
+  Ano_Parame.set.pid_att_1level[YAW][KD] = 0.0f; //姿态控制角速度环PID参数
+//---	姿态控制角度环PID参数
+  Ano_Parame.set.pid_att_2level[ROL][KP] = 5.8f; //姿态控制角度环PID参数
+  Ano_Parame.set.pid_att_2level[ROL][KI] = 0.0f; //姿态控制角度环PID参数
+  Ano_Parame.set.pid_att_2level[ROL][KD] = 0.00f; //姿态控制角度环PID参数
+
+  Ano_Parame.set.pid_att_2level[PIT][KP] = 5.8f; //姿态控制角度环PID参数
+  Ano_Parame.set.pid_att_2level[PIT][KI] = 0.0f; //姿态控制角度环PID参数
+  Ano_Parame.set.pid_att_2level[PIT][KD] = 0.00f; //姿态控制角度环PID参数
+
+  Ano_Parame.set.pid_att_2level[YAW][KP] = 5.8f; //姿态控制角度环PID参数
+  Ano_Parame.set.pid_att_2level[YAW][KI] = 0.0f; //姿态控制角度环PID参数
+  Ano_Parame.set.pid_att_2level[YAW][KD] = 0.5; //姿态控制角度环PID参数
+//---	高度控制高度速度环PID参数
+  Ano_Parame.set.pid_alt_1level[KP] = 2.0f;          //高度控制高度速度环PID参数
+  Ano_Parame.set.pid_alt_1level[KI] = 0.9f;          //高度控制高度速度环PID参数
+  Ano_Parame.set.pid_alt_1level[KD] = 0.05f;          //高度控制高度速度环PID参数
+//---	高度控制高度环PID参数
+  Ano_Parame.set.pid_alt_2level[KP] = 2.0f;           //高度控制高度环PID参数
+  Ano_Parame.set.pid_alt_2level[KI] = 0;           //高度控制高度环PID参数(NULL)
+  Ano_Parame.set.pid_alt_2level[KD] = 0;           //高度控制高度环PID参数(NULL)
+//---	位置控制位置速度环PID参数
+  Ano_Parame.set.pid_loc_1level[KP] = 0.20f;          //位置控制位置速度环PID参数
+  Ano_Parame.set.pid_loc_1level[KI] = 0.10f;          //位置控制位置速度环PID参数
+  Ano_Parame.set.pid_loc_1level[KD] = 0.00f;          //位置控制位置速度环PID参数
+//---	位置控制位置环PID参数
+  Ano_Parame.set.pid_loc_2level[KP] = 0;           //位置控制位置环PID参数(NULL)
+  Ano_Parame.set.pid_loc_2level[KI] = 0;           //位置控制位置环PID参数(NULL)
+  Ano_Parame.set.pid_loc_2level[KD] = 0;           //位置控制位置环PID参数(NULL)
+//---	GPS位置控制位置速度环PID参数
+  Ano_Parame.set.pid_gps_loc_1level[KP] = 0.15f;          //位置控制位置速度环PID参数
+  Ano_Parame.set.pid_gps_loc_1level[KI] = 0.10f;          //位置控制位置速度环PID参数
+  Ano_Parame.set.pid_gps_loc_1level[KD] = 0.00f;          //位置控制位置速度环PID参数
+//---	GPS位置控制位置环PID参数
+  Ano_Parame.set.pid_gps_loc_2level[KP] = 0.3f;           //位置控制位置环PID参数
+  Ano_Parame.set.pid_gps_loc_2level[KI] = 0;           //位置控制位置环PID参数(NULL)
+  Ano_Parame.set.pid_gps_loc_2level[KD] = 0;           //位置控制位置环PID参数(NULL)
+
+#endif
   debugOutput("PID reset!");
 }
 
@@ -115,9 +172,9 @@ void Parame_Reset(u8 mode)
     Ano_Parame.set.warn_power_voltage = 3.70f;
     Ano_Parame.set.lowest_power_voltage = 3.50f;
 
-    Ano_Parame.set.auto_take_off_height = 150;//cm
-    Ano_Parame.set.auto_take_off_speed = 50;
-    Ano_Parame.set.auto_landing_speed = 50;
+    Ano_Parame.set.auto_take_off_height = 100;//cm
+    Ano_Parame.set.auto_take_off_speed = 25;
+    Ano_Parame.set.auto_landing_speed = 25;
 
     Ano_Parame.set.idle_speed_pwm = 20;//20%
   }
