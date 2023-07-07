@@ -222,6 +222,7 @@ void Drv_Uart3TxCheck(void)
 #if(USER_SERIAL_4 == 1)
 
 #include "Ano_OF.h"
+#include "Drv_UP_Flow.h"
 u8 U4TxDataTemp[256];
 u8 U4TxInCnt = 0;
 u8 U4TxOutCnt = 0;
@@ -238,9 +239,17 @@ void UART4_IRQHandler(void)
     com_data = ROM_UARTCharGet(UART7_BASE);
 
     //匿名光流解析
-    if(of_init_type != 2) {
+    if(of_init_type != 2) 
+		{
       AnoOF_GetOneByte(com_data);
     }
+		
+		//优像光流解析
+		if(of_init_type!=1)
+		{
+			OFGetByte(com_data);
+		}
+		
   }
 
   if(flag & UART_INT_TX) {
@@ -303,6 +312,8 @@ void UART5_IRQHandler(void)
   while(ROM_UARTCharsAvail(UART2_BASE)) {
     com_data = ROM_UARTCharGet(UART2_BASE);
     openMV_res = com_data;
+		
+		Ultra_Get(com_data);
 //    Drv_Uart3SendBuf( &com_data, 1 );
 //		//ANO_DT_Data_Receive_Prepare(com_data);
 //		#if defined(USE_LASER)

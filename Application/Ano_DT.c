@@ -110,8 +110,8 @@ u8 otherDataTmp[64];	//非循环发送数据临时缓冲
 #define QUA3_10K       (imu_att.qua.z *1e4f)
 //0X05
 #define ALT_FU	       (wcz_hei_fus.out)
-#define ALT_ADD	       (jsdata.of_alt*100)
-#define ALT_STA        (1)
+#define ALT_ADD	       (ref_tof_height)
+#define ALT_STA        (switchs.of_flow_on)
 //0X06
 #define FC_MODE	       (flag.flight_mode)
 #define FC_LOCKED	   	 (flag.unlock_sta)

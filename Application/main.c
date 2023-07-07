@@ -3,7 +3,9 @@
   
 #include "Drv_Bsp.h"	
 #include "Drv_Uart.h"
+#include "Drv_laser.h"
 #include "Drv_Timer.h" 
+#include "Drv_UP_flow.h"
 #include "Drv_heating.h"
 
 #include "Ano_Imu.h"
@@ -129,7 +131,10 @@ void position_loop(void *pvParameters)
 
     /*位置速度环控制*/
     Loc_1level_Ctrl(20);
- 
+		
+		/* 匿名科创光流解耦合与融合任务 */
+		ANO_OFDF_Task(20);
+		
     /*数传数据交换*/
     dtTask();
  
@@ -153,6 +158,14 @@ void auxiliary_loop(void *pvParameters)
 		//不使用恒温功能
     flag.mems_temperature_ok = 1;
 		
+		//不使用恒温功能
+    flag.mems_temperature_ok = 1;
+		
+		#if defined(USE_KS103)
+		//超声波任务
+		Ultra_Duty();
+		#endif
+		
     vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 20);
   }
 }
@@ -164,25 +177,23 @@ void user_loop(void *pvParameters)
   TickType_t xLastWakeTime = xTaskGetTickCount(); //获取当前Tick次数,以赋给延时函数初值
 
 	static unsigned char pFrame[128];
-	
+	 
   while (1) {  
 		//读环形缓冲区  
 		if(RingBuffer_GetCount(&U1rxring) > 128) { 
 			
-			memset(pFrame,0,128);
+			memset(pFrame,0,128); 
 			RingBuffer_PopMult(&U1rxring, pFrame, 128);
 			
 			//解析uwb数据
-			uint8_t res = g_nlt_tagframe0.UnpackData(pFrame, 128);
-			switchs.uwb_on = res;
+			uint8_t res = g_nlt_tagframe0.UnpackData(pFrame, 128); 
+			switchs.uwb_on = res; 
 			//接收有误刷新缓冲区
 			if (res == 0) { 
 				RingBuffer_Flush(&U1rxring);
 			}
-		}
-		   
-		
-		vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 50);
+		} 
+		vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 50); 
 	}
 }
  
@@ -190,7 +201,7 @@ int main(void)
 {
 	//寄存器值非默认值就进行软件复位
 	if(ROM_SysCtlClockGet() != 16000000 ) 
-		ROM_SysCtlReset(); 
+		ROM_SysCtlReset();  
 	
   Drv_BspInit(); 
 
@@ -220,8 +231,9 @@ int main(void)
   xTaskCreate(wdt0_loop, "wdt0_loop", 120, NULL, 1, NULL);  
 	
   /* 自定义进程 */
-//  xTaskCreate(user_loop, "user_loop", 120, NULL, 3, NULL); 
+//  xTaskCreate(user_loop, "user_loop", 120, NULL, 3, NULL);  
 	
+	xTaskCreate(up_flow_loop, "up_flow_loop", 112 + 32, NULL, 1, NULL);	 
   //启用任务调度器
   vTaskStartScheduler(); 
 	

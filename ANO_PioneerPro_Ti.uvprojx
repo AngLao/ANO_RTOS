@@ -134,10 +134,10 @@
             <RunIndependent>0</RunIndependent>
             <UpdateFlashBeforeDebugging>1</UpdateFlashBeforeDebugging>
             <Capability>1</Capability>
-            <DriverSelection>4099</DriverSelection>
+            <DriverSelection>4100</DriverSelection>
           </Flash1>
           <bUseTDR>0</bUseTDR>
-          <Flash2>BIN\CMSIS_AGDI.dll</Flash2>
+          <Flash2>Segger\JL2CM3.dll</Flash2>
           <Flash3>"" ()</Flash3>
           <Flash4></Flash4>
           <pFcarmOut></pFcarmOut>
@@ -412,6 +412,11 @@
               <FileName>Drv_icm20602.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Driver\SenserDriver\Drv_icm20602.c</FilePath>
+            </File>
+            <File>
+              <FileName>Drv_UP_Flow.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Driver\SenserDriver\Drv_UP_Flow.c</FilePath>
             </File>
             <File>
               <FileName>Drv_ak8975.c</FileName>
