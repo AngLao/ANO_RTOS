@@ -38,21 +38,25 @@
 #include "Ano_Sensor_Basic.h"
 #include "Drv_UP_Flow.h"
 #include "Drv_laser.h"
+#include "Ano_OF.h"
+ 
 
-
-//#define CIRCLE_P(n,a,b) ((a) + ((n)-(a))%((b)-(a)))
-//#define OF_BUFFER_NUM 14
-
-//uint8_t of_init_cnt;
-//uint8_t of_buf_update_cnt;
-//uint8_t OF_DATA[OF_BUFFER_NUM];
-
-//需要调用引用的外部变量：
-#define LASER_ONLINE              (1)//LASER_LINKOK
+//需要调用引用的外部变量： 
 #define BUF_UPDATE_CNT            (of_buf_update_cnt)
 #define OF_DATA_BUF               (OF_DATA)
-#define RADPS_X                   (sensor.Gyro_rad[0])
-#define RADPS_Y                   (sensor.Gyro_rad[1])
+
+//使用机体惯性数据
+//#define RADPS_X                   (sensor.Gyro_rad[X])
+//#define RADPS_Y                   (sensor.Gyro_rad[Y])
+//#define ACC_X                   	(imu_data.w_acc[X])
+//#define ACC_Y                   	(imu_data.w_acc[Y])
+
+//使用光流模块惯性数据
+#define RADPS_X                   (OF_GYR_X)
+#define RADPS_Y                   (OF_GYR_Y)
+#define ACC_X                   	(OF_ACC_X)
+#define ACC_Y                   	(OF_GYR_Y)
+
 #define RELATIVE_HEIGHT_CM        (Laser_height_cm)  //相对高度
 //需要操作赋值的外部变量：
 
@@ -75,19 +79,6 @@ float of_fus_err[2], of_fus_err_i[2];
 //
 #define UPOF_UP_DW          0             //0:朝下；1：朝上
 #define OBJREF_HEIGHT_CM    280           //参照物高度，厘米;光流朝上才有用。
-/**********************************************************************************************************
-*函 数 名: ANO_OF_Data_Check_Task
-*功能说明: 匿名科创光流准备数据任务
-*参    数: 周期时间(s)
-*返 回 值: 无
-**********************************************************************************************************/
-void ANO_OF_Data_Prepare_Task(float dT_s)
-{
-  //
-  ANO_OF_Data_Get(&dT_s, OF_DATA_BUF);
-  //
-  OF_INS_Get(&dT_s, RADPS_X, RADPS_Y, imu_data.w_acc[0], imu_data.w_acc[1]);
-}
 
 /**********************************************************************************************************
 *函 数 名: ANO_OFDF_Task
@@ -96,52 +87,48 @@ void ANO_OF_Data_Prepare_Task(float dT_s)
 *返 回 值: 无
 **********************************************************************************************************/
 void ANO_OFDF_Task(u8 dT_ms)
-{
-  //
-  OF_State();
-  //
-  ANO_OF_Decouple(&dT_ms);
-  //
+{ 
+  OF_State(); 
+	
+  ANO_OF_Decouple();
+	
   ANO_OF_Fusion(&dT_ms, (s32)RELATIVE_HEIGHT_CM);
 
 
 }
 
 
-/**********************************************************************************************************
-*函 数 名: OF_INS_Get
-*功能说明: 匿名科创光流惯性数据获取
-*参    数: 周期时间(s，形参)，x轴每秒弧度，y轴每秒弧度，地理x加速度(cmpss)，地理y加速度(cmpss)
-*返 回 值: 无
-**********************************************************************************************************/
-static void OF_INS_Get(float *dT_s, float rad_ps_x, float rad_ps_y, float acc_wx, float acc_wy)
-{
+
+
+/*根据飞机陀螺仪数据解算出相应姿态以解耦光流数据*/
+void OF_INS_Get(float dT_s)
+{ 
   static float rad_ps_lpf[2];
-  //====RD
+	
   //低通滤波
   //故意滞后为了对齐相位，这里换成零阶保持+FIFO效果更好。
-  LPF_1_(5.0f, *dT_s, rad_ps_x, rad_ps_lpf[0]);
-  LPF_1_(5.0f, *dT_s, rad_ps_y, rad_ps_lpf[1]);
+  LPF_1_(5.0f, dT_s, RADPS_X, rad_ps_lpf[0]);
+  LPF_1_(5.0f, dT_s, RADPS_Y, rad_ps_lpf[1]);
 //	rad_ps_lpf[0] += 0.2f *(rad_ps_x - rad_ps_lpf[0]);
 //	rad_ps_lpf[1] += 0.2f *(rad_ps_y - rad_ps_lpf[1]);
-  //
-  of_rot_d_degs[0] = rad_ps_lpf[0] * DEG_PER_RAD ;
-  of_rot_d_degs[1] = rad_ps_lpf[1] * DEG_PER_RAD ;
-  //
-//	test_calibration[0] += OF_ROT_KA *rad_ps_x *DEG_PER_RAD *dT_s;
-  //====INS
+	
+	//匿名光流直接输出角度
+  of_rot_d_degs[0] = rad_ps_lpf[0] ;
+  of_rot_d_degs[1] = rad_ps_lpf[1];
+
+	
+//  of_rot_d_degs[0] = rad_ps_lpf[0] * DEG_PER_RAD ;
+//  of_rot_d_degs[1] = rad_ps_lpf[1] * DEG_PER_RAD ;
+	
   //低通滤波
-  LPF_1_(5.0f, *dT_s, acc_wx, of_rdf.gnd_acc_est_w[X]);
-  LPF_1_(5.0f, *dT_s, acc_wy, of_rdf.gnd_acc_est_w[Y]);
+  LPF_1_(5.0f, dT_s, ACC_X , of_rdf.gnd_acc_est_w[X]);
+  LPF_1_(5.0f, dT_s, ACC_Y , of_rdf.gnd_acc_est_w[Y]);
 
-  //
-  for(u8 i = 0; i < 2; i++) {
-    //融合估计部分
-    of_rdf.gnd_vel_est_w[i] += of_rdf.gnd_acc_est_w[i] * (*dT_s);
-
-
-  }
-
+ 
+	//融合估计部分（此处对加速度直接积分获取地速）
+	of_rdf.gnd_vel_est_w[X] += of_rdf.gnd_acc_est_w[X] * (dT_s);
+	of_rdf.gnd_vel_est_w[Y] += of_rdf.gnd_acc_est_w[Y] * (dT_s);
+  
 }
 
 /**********************************************************************************************************
@@ -150,7 +137,7 @@ static void OF_INS_Get(float *dT_s, float rad_ps_x, float rad_ps_y, float acc_wx
 *参    数: 周期时间(s，形参),光流数据缓存（形参）
 *返 回 值: 无
 **********************************************************************************************************/
-static void ANO_OF_Data_Get(float *dT_s, u8 *of_data_buf)
+void ANO_OF_Data_Get(u8 dT_ms, u8 *of_data_buf)
 {
   static float offline_delay_time_s;
   u8 XOR = 0;
@@ -193,8 +180,8 @@ static void ANO_OF_Data_Get(float *dT_s, u8 *of_data_buf)
     of_data.online = 1;
   } else {
     //null
-    if(offline_delay_time_s < 1.0f) {
-      offline_delay_time_s += *dT_s;
+    if(offline_delay_time_s < 1000) {
+      offline_delay_time_s += dT_ms;
     } else { //掉线
       of_data.online = 0;
     }
@@ -209,7 +196,7 @@ static void ANO_OF_Data_Get(float *dT_s, u8 *of_data_buf)
 *返 回 值: 无
 *备    注: 建议20ms调用一次
 **********************************************************************************************************/
-static void ANO_OF_Decouple(u8 *dT_ms)
+static void ANO_OF_Decouple(void)
 {
 
   if(of_data.valid != 0xf5) {
@@ -246,78 +233,51 @@ static void ANO_OF_Decouple(u8 *dT_ms)
 **********************************************************************************************************/
 static void ANO_OF_Fusion(u8 *dT_ms, s32 ref_height_cm)
 {
-  static float F_KP, F_KI;
   float dT_s = (*dT_ms) * 1e-3f;
 
-  //
   if(UPOF_UP_DW == 0) {
     of_rdf.of_ref_height = LIMIT(ref_height_cm, 20, 500); //限制到20cm-500cm
   } else {
     of_rdf.of_ref_height = LIMIT((OBJREF_HEIGHT_CM - ref_height_cm), 20, 500); //限制到20cm-500cm
   }
 
-  //
   of_rdf.gnd_vel_obs_h[X] = UPOF_CMPPIXEL_X * of_rdf.of_vel[X] * of_rdf.of_ref_height;
-  //of_rdf.gnd_vel_obs_h[X] = 0;
 
   of_rdf.gnd_vel_obs_h[Y] = UPOF_CMPPIXEL_Y * of_rdf.of_vel[Y] * of_rdf.of_ref_height;
-  //of_rdf.gnd_vel_obs_h[Y] = 0;
-  //
+
   h2w_2d_trans(of_rdf.gnd_vel_obs_h, imu_data.hx_vec, of_rdf.gnd_vel_obs_w);
-
-
-  //
+ 
   switch(of_rdf.state) {
-  case 0: {
-    //
-    of_rdf.state = 1;
-    //
-    F_KP = FUS_KP;
-    //
-    F_KI = FUS_KI;
-    //
-    OF_INS_Reset();
-    //
-  }
-  break;
+  case 0:
+    of_rdf.state = 1; 
+    OF_INS_Reset(); 
+    break;
 
-  case 1: {
-    //融合修正部分
+  case 1: 
     //(这里开源最简单并且好用的PI互补融合，注意这里修正即取低频，取高频的估计的部分不在此处)
 
-    //==
-    //原始值无效时不修正
+    //融合修正部分 原始值无效时不修正
     if(of_data.valid == 0xf5) {
       //
       for(u8 i = 0; i < 2; i++) {
         //
         of_fus_err[i] = of_rdf.gnd_vel_obs_w[i] - of_rdf.gnd_vel_est_w[i];
         //
-        of_fus_err_i[i] += F_KI * of_fus_err[i] * dT_s;
+        of_fus_err_i[i] += FUS_KI * of_fus_err[i] * dT_s;
         of_fus_err_i[i] = LIMIT(of_fus_err_i[i], -100, 100);
         //
-        of_rdf.gnd_vel_est_w[i] += (of_fus_err[i] * F_KP + of_fus_err_i[i]) * dT_s;
+        of_rdf.gnd_vel_est_w[i] += (of_fus_err[i] * FUS_KP + of_fus_err_i[i]) * dT_s;
 
-        //of_rdf.gnd_vel_est_w[i] = 0;
       }
     }
 
-    //
     w2h_2d_trans(of_rdf.gnd_vel_est_w, imu_data.hx_vec, of_rdf.gnd_vel_est_h);
+ 
+    break;
 
-    //of_rdf.gnd_vel_est_h[X] = of_rdf.gnd_vel_est_h[Y] = 0;
-
-    //
-  }
-  break;
-
-  default: { //case 2:
-    //
-//			of_rdf.state = 1;
-    OF_INS_Reset();
-  }
-  break;
-//		default:break;
+  default: 
+    OF_INS_Reset(); 
+    break;
   }
 }
 
@@ -346,22 +306,16 @@ static void OF_INS_Reset()
 **********************************************************************************************************/
 static void OF_State()
 {
-  //====sta
-  if(imu_state.G_reset ) { //
-    //
-    if(of_rdf.state == 1) {
-      of_rdf.state = 0;
-    }
-  } else {
-    if(of_rdf.quality < 100) {
-      of_rdf.state = 0;
-    } else if(of_rdf.quality > 200) {
-      of_rdf.state = 1;
-    }
+  if(imu_state.G_reset && of_rdf.state == 1 )
+      of_rdf.state = 0; 
+	else { 
+		if(of_rdf.quality > 200)  
+      of_rdf.state = 1; 
+		else  
+      of_rdf.state = 0; 
   }
 
-  //
-  if(of_data.online && ultra.measure_ok ) { //LASER_ONLINE
+  if(of_data.online && ultra.measure_ok ) {  
     sens_hd_check.of_df_ok = 1;
   } else {
     sens_hd_check.of_df_ok = 0;

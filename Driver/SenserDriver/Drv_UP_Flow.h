@@ -20,7 +20,7 @@ extern uint8_t OF_DATA[];
 u8 Drv_OFInit(void);
 void OFGetByte(uint8_t data);
 
-void up_flow_loop(void *pvParameters);
+void light_flow_init(void);
 	
 
 #endif

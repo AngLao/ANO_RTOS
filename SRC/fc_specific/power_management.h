@@ -9,9 +9,9 @@
 #include "Ano_LED.h"
  
 
-void batteryUpdate(void); 
+void battery_update(void); 
 
-float getBatteryVoltage(void);
+float get_battery_voltage(void);
 
 
 #endif

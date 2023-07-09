@@ -4,9 +4,9 @@
 
 //选择定高模块，三选一，其余注释
 
-#define USE_KS103
+//#define USE_KS103
 //#define USE_US100
-//#define USE_LASER
+#define USE_LASER
 
 typedef struct {
   //s32 height;//cm

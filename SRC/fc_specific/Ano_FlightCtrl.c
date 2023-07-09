@@ -198,7 +198,7 @@ void Flight_State_Task(u8 dT_ms,const s16 *CH_N)
 
   max_speed_lim = MAX_SPEED;
 
-  if(switchs.of_flow_on && !switchs.gps_on ) {
+  if(switchs.of_flow_on) {
     max_speed_lim = 1.5f *wcz_hei_fus.out;
     max_speed_lim = LIMIT(max_speed_lim,50,150);
   }
@@ -272,8 +272,7 @@ static u8 of_tof_on_tmp;
 
 _judge_sync_data_st jsdata;
 void Swtich_State_Task(u8 dT_ms)
-{
-  switchs.baro_on = 1;
+{ 
 
   //¹âÁ÷Ä£¿é
   if(sens_hd_check.of_ok || sens_hd_check.of_df_ok) {

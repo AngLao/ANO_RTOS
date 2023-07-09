@@ -43,12 +43,7 @@ void AnoOF_GetOneByte(uint8_t data)
   if(state == 0 && data == 0xAA) {
     state = 1;
     _datatemp[0] = data;
-  }
-//	else if(state==1&&data==0xFF)	//源地址
-//	{
-//		state=2;
-//		_datatemp[1]=data;
-//	}
+  } 
   else if(state == 1 && data == 0xFF) {		//目的地址
     state = 3;
     _datatemp[1] = data;
@@ -110,7 +105,8 @@ void AnoOF_DataAnl(uint8_t *data_buf, uint8_t num)
   for(u8 i = 0; i < (num - 1); i++)
     sum += *(data_buf + i);
 
-  if(!(sum == *(data_buf + num - 1)))		return;
+  if(!(sum == *(data_buf + num - 1)))		
+		return;
 
   if(*(data_buf + 2) == 0X51) { //光流信息
     if(*(data_buf + 4) == 0) { //原始光流信息
@@ -134,9 +130,9 @@ void AnoOF_DataAnl(uint8_t *data_buf, uint8_t num)
   if(*(data_buf + 2) == 0X34) { //高度信息
     if(*(data_buf + 4) == 0) { //原始高度信息
       OF_ALT = (uint32_t)(*(data_buf + 10) << 24) | *(data_buf + 9) << 16 | *(data_buf + 8) << 16 | *(data_buf + 7);
-      OF_ALT += 10;
+      OF_ALT += 4;
       of_check_f[1] = 1;
-    } else if(*(data_buf + 5) == 1) { //融合后高度信息
+    } else if(*(data_buf + 4) == 1) { //融合后高度信息
       OF_ALT2 = (uint16_t)(*(data_buf + 6) << 8) | *(data_buf + 7) ;
     }
   }

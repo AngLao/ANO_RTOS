@@ -298,7 +298,7 @@ u8 U5TxOutCnt = 0;
 
 #endif
 
-#if(USER_SERIAL_5 == 1)
+#if(USER_SERIAL_5 == 1) 
 u8 openMV_res = 0;
 void UART5_IRQHandler(void)
 {
@@ -310,17 +310,9 @@ void UART5_IRQHandler(void)
 
   /*判断FIFO是否还有数据*/
   while(ROM_UARTCharsAvail(UART2_BASE)) {
-    com_data = ROM_UARTCharGet(UART2_BASE);
-    openMV_res = com_data;
+    com_data = ROM_UARTCharGet(UART2_BASE); 
 		
-		Ultra_Get(com_data);
-//    Drv_Uart3SendBuf( &com_data, 1 );
-//		//ANO_DT_Data_Receive_Prepare(com_data);
-//		#if defined(USE_LASER)
-//		Drv_Laser_GetOneByte(com_data);
-//		#else
-//		Ultra_Get(com_data);
-//		#endif
+		Ultra_Get(com_data); 
   }
 
   if(flag & UART_INT_TX) {

@@ -14,7 +14,7 @@ typedef	int8_t 		s8;
 #include "rom_map.h"
 #include "sysctl.h"
 #include "gpio.h"
-#include "pin_map.h" 
+#include "pin_map.h"
 
 #define HW_ALL		 0xFF
 #define HW_TYPE		 0x05

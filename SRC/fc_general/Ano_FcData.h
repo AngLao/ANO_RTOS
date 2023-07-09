@@ -154,9 +154,7 @@ extern _fc_sta_var_st fc_stv;
 typedef struct {
   u8 tof_on;
   u8 of_flow_on;
-  u8 of_tof_on;
-  u8 baro_on;
-  u8 gps_on;
+  u8 of_tof_on;  
   u8 uwb_on;
   u8 opmv_on;
 
@@ -168,8 +166,8 @@ typedef struct {
   u8 acc_ok;
   u8 mag_ok;
   u8 baro_ok;
-  u8 gps_ok;
-  u8 tof_ok;
+  u8 gps_ok ;
+  u8 tof_ok ;
   u8 of_ok;
   u8 of_df_ok;
 

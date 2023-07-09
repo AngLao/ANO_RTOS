@@ -3,7 +3,7 @@
 
 float singleBatteryVoltage = 0;
 
-void batteryUpdate()
+void battery_update(void)
 {
 	static float voltage_f = 0;  
 	
@@ -33,7 +33,7 @@ void batteryUpdate()
 }
 
 //返回电池总电压
-float getBatteryVoltage(void){
+float get_battery_voltage(void){
 	
 	return singleBatteryVoltage*Ano_Parame.set.bat_cell ;
 }

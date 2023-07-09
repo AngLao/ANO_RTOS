@@ -52,12 +52,14 @@ void WDT0_Handler(void)
 	
 	//“≈—‘
 	unsigned char theDogWantsToSay[] = "hello world"; 
-	Drv_Uart3SendBuf(theDogWantsToSay,sizeof(theDogWantsToSay));
-  
+	
   AnoUsbCdcSend(theDogWantsToSay,sizeof(theDogWantsToSay));
-	int i=0;
-	for( ;i!=100000;i++);
+	Drv_Uart3SendBuf(theDogWantsToSay,sizeof(theDogWantsToSay)); 
+	
 	//∏¥Œª
-	if(i == 100000)
-		ROM_SysCtlReset();   
+	for(int i=0; i!=100000;i++) {
+		if(i == 100000)
+			ROM_SysCtlReset();   
+		
+	}
 }

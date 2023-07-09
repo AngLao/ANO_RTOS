@@ -380,8 +380,7 @@ void spl0601_get_raw_pressure ( void )
     作    者   : WL
     修改内容   : 新生成函数
 
-*****************************************************************************/
-//u8 test_spi[5];
+*****************************************************************************/ 
 u8 Drv_Spl0601Init ( void )
 {
   p_spl0601 = &spl0601; /* read Chip Id */
@@ -391,22 +390,16 @@ u8 Drv_Spl0601Init ( void )
 
   spl0601_get_calib_param();
 
-  spl0601_rateset ( PRESSURE_SENSOR, 128, 16 );
+  spl0601_rateset ( PRESSURE_SENSOR, 32, 50 );
 
   spl0601_rateset ( TEMPERATURE_SENSOR, 8, 8 );
 
   spl0601_start_continuous ( CONTINUOUS_P_AND_T );
 
-  if(p_spl0601->chip_id == 0x10) {
-    return 1;
-  } else {
+  if(p_spl0601->chip_id == 0x10) 
+    return 1; 
+	else 
     return 0;
-  }
-
-//	test_spi[0] = spl0601_read ( 0x06 );
-//	test_spi[1] = spl0601_read ( 0x07 );
-//	test_spi[2] = spl0601_read ( 0x08 );
-//	test_spi[3] = spl0601_read ( 0x09 );
 }
 /*****************************************************************************
  函 数 名  : spl0601_get_temperature
@@ -466,37 +459,20 @@ float spl0601_get_pressure ( void )
 }
 
 
+ 
+ 
 
-float baro_Offset, alt_3, height;
-unsigned char baro_start;
-float temperature, alt_high;
-float baro_pressure;
-
-float Drv_Spl0601_Read ( void )
-{
-
+float barometer_update( void )
+{ 
 
   spl0601_get_raw_temp();
-  temperature = spl0601_get_temperature();
-
   spl0601_get_raw_pressure();
-  baro_pressure = spl0601_get_pressure();
-
-  //alt_high = powf((temp/101325),1/5.255f);
-/////////////////////////////////////////////////////////////
-
-  alt_3 = ( 101400 - baro_pressure ) / 1000.0f;
-  height = 0.82f * alt_3 * alt_3 * alt_3 + 0.09f * ( 101400 - baro_pressure ) * 100.0f ;
-
-
-  alt_high = ( height - baro_Offset ) ; //cm +
-
-
-
-
-/////////////////////////////////////////////////////////////
-
-
-
-  return alt_high;
+	
+//  float temperature = spl0601_get_temperature();
+  float baro_pressure = spl0601_get_pressure();
+ 
+//  float alt_3 = ( 101400 - baro_pressure ) / 1000.0f;
+//  float height = 0.82f * alt_3 * alt_3 * alt_3 + 0.09f * ( 101400 - baro_pressure ) * 100.0f ;
+ 
+  return baro_pressure;
 }

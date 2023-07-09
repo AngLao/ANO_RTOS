@@ -78,7 +78,7 @@ void Loc_1level_Ctrl(u16 dT_ms)
 
 
   //仅有光流和UWB
-  if(switchs.uwb_on && switchs.of_flow_on && (!switchs.gps_on)) {
+  if(switchs.uwb_on && switchs.of_flow_on) {
     mode_f[1] = 4;
     if(mode_f[1] != mode_f[0]) {
       Loc_1level_PID_Init();
@@ -140,7 +140,7 @@ void Loc_1level_Ctrl(u16 dT_ms)
     loc_ctrl_1.out[1] = pos_ctrl_h_out[1];
   }
   //仅有光流
-  else if(switchs.of_flow_on && (!switchs.gps_on)) {
+  else if(switchs.of_flow_on) {
     mode_f[1] = 1;
     if(mode_f[1] != mode_f[0]) {
       Loc_1level_PID_Init();

@@ -28,7 +28,8 @@
 #include "Ano_FlightDataCal.h"
 #include "Ano_OF_DecoFusion.h"
 #include "Ano_LocCtrl.h"
-#include "Ano_FlyCtrl.h"
+#include "Ano_FlyCtrl.h" 
+#include "Ano_OF.h"
 #include "power_management.h"
 #include "nlink_linktrack_tagframe0.h"
 
@@ -51,7 +52,7 @@
 #define DT_SENDPTR_U2	Uart5_Send
 
 //越往前发送优先级越高，如果需要修改，这里和h文件里的枚举需要同时改
-const u8  _cs_idlist[CSID_NUM]	 	= {0x20, 0x21, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0f, 0x30, 0x32, 0x33, 0x34, 0x40, 0x41, 0xFA};
+const u8  _cs_idlist[CSID_NUM]	 	= {0x20, 0x21, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0f, 0x30, 0x32,0x40};
 //循环发送数据结构体
 typedef struct {
   u8 WTS;		 //wait to send等待发送标记
@@ -72,7 +73,7 @@ typedef struct {
 } _dt_otherdata_st;
 _dt_otherdata_st OtherSendData[DT_ODNUM];
 u8 otherDataTmp[64];	//非循环发送数据临时缓冲
- 
+
 
 /*============================================================================
 ******************************************************************************
@@ -82,7 +83,8 @@ u8 otherDataTmp[64];	//非循环发送数据临时缓冲
 ******************************************************************************
 ******************************************************************************
 ============================================================================*/
-//0x01
+//0x01 
+
 #define ACC_RAW_X      (sensor.Acc[X])
 #define ACC_RAW_Y      (sensor.Acc[Y])
 #define ACC_RAW_Z      (sensor.Acc[Z])
@@ -90,10 +92,11 @@ u8 otherDataTmp[64];	//非循环发送数据临时缓冲
 #define GYR_RAW_Y      (sensor.Gyro[Y])
 #define GYR_RAW_Z      (sensor.Gyro[Z])
 #define SHOCK_STA      (flag.unlock_err)
-//0x02
-#define ECP_RAW_X      (mag.val[0])
-#define ECP_RAW_Y      (mag.val[1])
-#define ECP_RAW_Z      (mag.val[2])
+ 
+//0x02 
+#define ECP_RAW_X      (OF_GYR_X)
+#define ECP_RAW_Y      (OF_GYR_Y)
+#define ECP_RAW_Z      (OF_GYR_Z)
 #define BARO_ALT       (baro_height*100)
 #define TEMPERATURE    (sensor.Tempreature_C)
 #define BARO_STA       (sens_hd_check.baro_ok)
@@ -109,88 +112,65 @@ u8 otherDataTmp[64];	//非循环发送数据临时缓冲
 #define QUA2_10K       (imu_att.qua.y *1e4f)
 #define QUA3_10K       (imu_att.qua.z *1e4f)
 //0X05
-#define ALT_FU	       (wcz_hei_fus.out)
-#define ALT_ADD	       (ref_tof_height)
+#define ALT_FU	       (wcz_hei_fus.out*100)
+#define ALT_ADD	       (ref_tof_height*100)
 #define ALT_STA        (switchs.of_flow_on)
 //0X06
 #define FC_MODE	       (flag.flight_mode)
 #define FC_LOCKED	   	 (flag.unlock_sta)
-#define FC_CMD_ID	   	 (0)
-#define FC_CMD_0       (flag.rc_loss)
+#define FC_CMD_ID	   	 (flag.rc_loss)
+#define FC_CMD_0       (0)
 #define FC_CMD_1       (0)
 //0X07
 #define HCA_VEL_X      (loc_ctrl_1.fb[X])
 #define HCA_VEL_Y      (loc_ctrl_1.fb[Y])
 #define HCA_VEL_Z      (loc_ctrl_1.fb[Z])
-//0x08
-#define ULHCA_POS_X      (0)
-#define ULHCA_POS_Y      (0)
-//0X09
-#define HCA_WIND_X      (nowind_est.wind_vel_h[X])
-#define HCA_WIND_Y      (nowind_est.wind_vel_h[Y])
-////0X0A
-//#define TAR_ROL         (0)
-//#define TAR_PIT         (0)
-//#define TAR_YAW         (0)
 //0X0B
 #define HCA_TAR_VEL_X   (fc_in.tar_vel_cmps_h[X])
 #define HCA_TAR_VEL_Y   (fc_in.tar_vel_cmps_h[Y])
 #define HCA_TAR_VEL_Z   (fc_in.tar_vel_cmps_h[Z])
 //0X0D
-#define BAT_VOLTAGE_100 (getBatteryVoltage()*100)
+#define BAT_VOLTAGE_100 (get_battery_voltage()*100)
+ 
 //0x20
 #define PWM_1          (motor[0])
 #define PWM_2          (motor[1])
 #define PWM_3          (motor[2])
 #define PWM_4          (motor[3])
-#define PWM_5 	         (0)//
+#define PWM_5 	       (0) 
 #define PWM_6          (0)
 #define PWM_7          (0)
 #define PWM_8          (0)
-////0x21
-//#define CTRL_ROL	(ctrl_val.rol_ctrl_val)
-//#define CTRL_PIT	(ctrl_val.pit_ctrl_val)
-//#define CTRL_THR	(ctrl_val.thr_ctrl_val)
-//#define CTRL_YAW	(ctrl_val.yaw_ctrl_val)
 
 /*======================================================================================================================
 //数据发送初始化
 ======================================================================================================================*/
 void ANO_DT_Init(void)
 {
-  //串口1发送配置/////////////////////////////////////////////////////////////
-  //PWM
-  dt.txSet_u2[CSID_X20].fre_ms = 10; 
   //ACC-GRO
-  dt.txSet_u2[CSID_X01].fre_ms = 5;   
+  dt.txSet_u2[CSID_X01].fre_ms = 5;
   //ECP-TEM-BARO
-  dt.txSet_u2[CSID_X02].fre_ms = 5;   
+  dt.txSet_u2[CSID_X02].fre_ms = 5;
   //ATT_ANG
-  dt.txSet_u2[CSID_X03].fre_ms = 5;   
-//  //ATT_QUA
-//  dt.txSet_u2[CSID_X04].fre_ms = 5;  
+  dt.txSet_u2[CSID_X03].fre_ms = 5;
   //height
-  dt.txSet_u2[CSID_X05].fre_ms = 5;  
+  dt.txSet_u2[CSID_X05].fre_ms = 5;
   //fc_mode
-  dt.txSet_u2[CSID_X06].fre_ms = 15; 
+  dt.txSet_u2[CSID_X06].fre_ms = 15;
   //velocity
-  dt.txSet_u2[CSID_X07].fre_ms = 5; //
-  //pos
-  dt.txSet_u2[CSID_X08].fre_ms = 5; //
-//  //wind_vel
-//  dt.txSet_u2[CSID_X09].fre_ms = 5;//
+  dt.txSet_u2[CSID_X07].fre_ms = 5;
   //电压
-  dt.txSet_u2[CSID_X0D].fre_ms = 5; //
+  dt.txSet_u2[CSID_X0D].fre_ms = 5;
   //传感器状态
-  dt.txSet_u2[CSID_X0E].fre_ms = 10; //
+  dt.txSet_u2[CSID_X0E].fre_ms = 10;
+  //PWM
+  dt.txSet_u2[CSID_X20].fre_ms = 10;
   //UWB数据
-  dt.txSet_u2[CSID_X32].fre_ms = 5; //
+  dt.txSet_u2[CSID_X32].fre_ms = 5;
   //遥控数据
-  dt.txSet_u2[CSID_X40].fre_ms = 5; //
+  dt.txSet_u2[CSID_X40].fre_ms = 5;
 //  //实时控制数据
-//  dt.txSet_u2[CSID_X41].fre_ms = 5;//
-//  //FC_RGB
-//  dt.txSet_u2[CSID_X0F].fre_ms = 5;//
+//  dt.txSet_u2[CSID_X41].fre_ms = 5;
 
 }
 
@@ -348,25 +328,7 @@ static void DTFrameAddData(u8 frame_num, u8 *_cnt)
   }
   break;
 
-  case 0x08: {
-    //pos
-    temp_data_32 = (s32)(ULHCA_POS_X);
-    CycleSendData[(*_cnt)++] = BYTE0(temp_data_32);
-    CycleSendData[(*_cnt)++] = BYTE1(temp_data_32);
-    CycleSendData[(*_cnt)++] = BYTE2(temp_data_32);
-    CycleSendData[(*_cnt)++] = BYTE3(temp_data_32);
-    temp_data_32 = (s32)(ULHCA_POS_Y);
-    CycleSendData[(*_cnt)++] = BYTE0(temp_data_32);
-    CycleSendData[(*_cnt)++] = BYTE1(temp_data_32);
-    CycleSendData[(*_cnt)++] = BYTE2(temp_data_32);
-    CycleSendData[(*_cnt)++] = BYTE3(temp_data_32);
-  }
-  break;
 
-  case 0x09: {
-
-  }
-  break;
 
   case 0x0D: {
     //电压
@@ -382,7 +344,7 @@ static void DTFrameAddData(u8 frame_num, u8 *_cnt)
     //传感器状态
     CycleSendData[(*_cnt)++] = switchs.of_flow_on;
     CycleSendData[(*_cnt)++] = switchs.uwb_on;
-    CycleSendData[(*_cnt)++] = switchs.gps_on;
+    CycleSendData[(*_cnt)++] = 0;
     CycleSendData[(*_cnt)++] = switchs.of_tof_on;
   }
   break;
@@ -416,15 +378,6 @@ static void DTFrameAddData(u8 frame_num, u8 *_cnt)
   }
   break;
 
-  case 0x41: {
-
-  }
-  break;
-
-  case 0x0f: { //FC_RGB
-
-  }
-  break;
 
   case 0x20: {
     temp_data = (s16)PWM_1;
@@ -439,11 +392,6 @@ static void DTFrameAddData(u8 frame_num, u8 *_cnt)
     temp_data = (s16)PWM_4;
     CycleSendData[(*_cnt)++] = BYTE0(temp_data);
     CycleSendData[(*_cnt)++] = BYTE1(temp_data);
-  }
-  break;
-
-  case 0xfa: {
-
   }
   break;
 
@@ -695,7 +643,7 @@ void AnoDTSendF1(u8 dest_addr, u8 d1)
   otherDataTmp[_cnt++] = check_sum2;
 
   OtherSendDataAdd(otherDataTmp, _cnt);
-} 
+}
 
 /*============================================================================
 ******************************************************************************
@@ -1002,32 +950,32 @@ static void AnoDTDataAnl(u8 *data, u8 len)
 
 
 //===========================================================
-//整体数据通信的调度器 
+//整体数据通信的调度器
 //===========================================================
-void dtTask(void)
+void dt_handle(void)
 {
-	
+
 #if (DEBUG_CONFIG != CLOSE)
 
 #if(DEBUG_CONFIG == UART)
 
-    //数传响应
-    int len = RingBuffer_GetCount(&U3rxring);
-    u8 data = 0;
+  //数传响应
+  int len = RingBuffer_GetCount(&U3rxring);
+  u8 data = 0;
 
-    for (; len != 0 ; len--) {
-      RingBuffer_Pop(&U3rxring, &data);
-      AnoDTRxOneByte(data);
-    }
+  for (; len != 0 ; len--) {
+    RingBuffer_Pop(&U3rxring, &data);
+    AnoDTRxOneByte(data);
+  }
 #elif (DEBUG_CONFIG == USB_CDC)
 
-    static u8 usbdatarxbuf[100];
+  static u8 usbdatarxbuf[100];
 
-    u16 len = AnoUsbCdcRead(usbdatarxbuf,100);
-    if(len) {
-      for(u8 i=0; i<len; i++)
-        AnoDTRxOneByte(usbdatarxbuf[i]);
-    }
+  u16 len = AnoUsbCdcRead(usbdatarxbuf,100);
+  if(len) {
+    for(u8 i=0; i<len; i++)
+      AnoDTRxOneByte(usbdatarxbuf[i]);
+  }
 #endif
 
   //检查有没有非循环发送的数据需要发送
@@ -1044,6 +992,6 @@ void dtTask(void)
   }
 
 #endif
-		
+
 
 }

@@ -1,5 +1,5 @@
 #ifndef _RC_UPDATE_H_
-#define	_RC_UPDATE_H_ 
+#define	_RC_UPDATE_H_
 
 #include "sysconfig.h"
 #include "Ano_Parameter.h"
@@ -39,10 +39,10 @@ enum {
 
 extern int16_t CH_N[] ;
 
- 
+
 void receivingModeInit(void);
 
-void receivingTask(void *pvParameters);
+void receiving_task(void *pvParameters);
 
 
 

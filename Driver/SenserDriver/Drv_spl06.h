@@ -31,6 +31,8 @@ struct spl0601_t {
 
 void Drv_SPL06CSPinInit(void);
 u8 Drv_Spl0601Init(void);
-float Drv_Spl0601_Read(void);
+
+
+float barometer_update( void );
 
 #endif

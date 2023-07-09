@@ -1,8 +1,8 @@
 #include "Drv_UP_flow.h"
-#include "Drv_Uart.h"
 
-#include "FreeRTOS.h"
-#include "task.h"
+#include "Drv_Uart.h"
+#include "Drv_laser.h"
+ 
 
 #define CIRCLE_P(n,a,b) ((a) + ((n)-(a))%((b)-(a)))
 #define OF_BUFFER_NUM 14
@@ -204,15 +204,18 @@ void OFGetByte(uint8_t data)
 }
 
 
-void up_flow_loop(void *pvParameters)
+void light_flow_init(void)
 {
 	Drv_Uart4Init(19200);		//接优象光流
 	
-	Drv_Uart5Init(9600);		//接KS103超声波
 	
 	of_init_type = (Drv_OFInit()==0)?0:2;
 	if(of_init_type==2)//优像光流初始化失败
 	{
+		
+		#if defined(USE_KS103)
+			Drv_Uart5Init(9600);		//接KS103超声波
+		#endif
 		printf("初始化优象光流成功，波特率19200\r\n");
 	}
 	else
@@ -221,6 +224,5 @@ void up_flow_loop(void *pvParameters)
 		Drv_Uart5Init(921600);	//openmv
 		printf("初始化匿名光流，波特率921600\r\n");
 	}
-	
-	vTaskDelete(NULL);
+	 
 }

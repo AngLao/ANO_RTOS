@@ -1,8 +1,8 @@
 #ifndef _FLY_CTRL_H
 #define	_FLY_CTRL_H
 
-#include "sysconfig.h" 
- 
+#include "sysconfig.h"
+
 //public
 void FlyCtrlDataAnl(u8 *data);
 void FlyCtrl_Task(u8 dT_ms);

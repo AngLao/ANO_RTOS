@@ -43,22 +43,19 @@ typedef struct {
 } _of_rdf_st;
 
 
-//==数据声明
-extern float of_rot_d_degs[];
-extern _of_data_st of_data;
+//==数据声明  
 extern _of_rdf_st of_rdf;
-
-//==函数声明
-
-//static
-static void ANO_OF_Data_Get(float *dT_s, u8 *of_data_buf);
-static void OF_INS_Get(float *dT_s, float rad_ps_x, float rad_ps_y, float acc_wx, float acc_wy);
-static void ANO_OF_Decouple(u8 *dT_ms);
+ 
+ 
+static void ANO_OF_Decouple(void);
 static void ANO_OF_Fusion(u8 *dT_ms, s32 ref_height_cm);
 static void OF_State(void);
 static void OF_INS_Reset(void);
 //public
+void OF_INS_Get(float dT_s);
 void ANO_OF_Data_Prepare_Task(float dT_s);
+void ANO_OF_Data_Get(u8 dT_ms, u8 *of_data_buf);
+
 void ANO_OFDF_Task(u8 dT_ms);
 
 

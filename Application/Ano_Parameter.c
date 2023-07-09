@@ -26,9 +26,9 @@ void PID_Rest()
 #define KV1500 1
 #define KV1900 2
 #define pid_default KV1900
-	
+
 #if (pid_default == KV1500)
-	
+
 //---	姿态控制角速度环PID参数
   Ano_Parame.set.pid_att_1level[ROL][KP] = 4.1f; //姿态控制角速度环PID参数
   Ano_Parame.set.pid_att_1level[ROL][KI] = 3.0f; //姿态控制角速度环PID参数
@@ -155,7 +155,7 @@ static void Parame_Copy_Fc2para()
     Ano_Parame.set.gyr_zero_offset[i]	=	save.gyro_offset[i];
     Ano_Parame.set.mag_offset[i]	=	save.mag_offset[i];
     Ano_Parame.set.mag_gain[i]		=	save.mag_gain[i];
- 
+
     //center_pos参数不需要反向赋值
   }
 }
@@ -173,10 +173,10 @@ void Parame_Reset(u8 mode)
     Ano_Parame.set.lowest_power_voltage = 3.50f;
 
     Ano_Parame.set.auto_take_off_height = 100;//cm
-    Ano_Parame.set.auto_take_off_speed = 25;
-    Ano_Parame.set.auto_landing_speed = 25;
+    Ano_Parame.set.auto_take_off_speed = 20;
+    Ano_Parame.set.auto_landing_speed = 20;
 
-    Ano_Parame.set.idle_speed_pwm = 20;//20%
+    Ano_Parame.set.idle_speed_pwm = 10; 
   }
 
   if(mode == 2) {
@@ -206,8 +206,8 @@ void Parame_Reset(u8 mode)
 
       Ano_Parame.set.body_central_pos_cm[i] = 0;
     }
-  } 
-	
+  }
+
   Parame_Copy_Para2fc();
 
   debugOutput("parameter reset!");
@@ -292,11 +292,11 @@ s32 AnoParRead(u16 _id)
   case PAR_SW_VER:
     p_val = SW_VER;
     break;
-	
+
   case PAR_BL_VER:
     p_val = BL_VER;
     break;
-	
+
   //====设置
   case PAR_BAT_CELLS:
     p_val = Ano_Parame.set.bat_cell;

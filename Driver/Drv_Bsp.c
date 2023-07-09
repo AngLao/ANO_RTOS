@@ -46,6 +46,10 @@ void SysTick_Handler(void)
 
 void Drv_BspInit(void)
 { 
+	//寄存器值非默认值就进行软件复位
+  if(ROM_SysCtlClockGet() != 16000000 )
+    ROM_SysCtlReset();
+	
   /*设置系统主频为80M*/
   ROM_SysCtlClockSet(SYSCTL_SYSDIV_2_5 | SYSCTL_USE_PLL | SYSCTL_XTAL_16MHZ | SYSCTL_OSC_MAIN);
 
@@ -82,6 +86,9 @@ void Drv_BspInit(void)
 	
   //标记罗盘OK，否则罗盘不参与解算（注：此处没有做罗盘是否正常的检测程序）
   sens_hd_check.mag_ok = 0;
+ 
+	//不使用恒温功能
+	flag.mems_temperature_ok = 1;
 
   //上位机通讯设置初始化
   ANO_DT_Init();
@@ -105,7 +112,7 @@ void Drv_BspInit(void)
 	
   //电机输出初始化
   Drv_PwmOutInit();
-
+		
   //激光笔IO口初始化
   ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
   ROM_GPIOPinTypeGPIOOutput(GPIOF_BASE, GPIO_PIN_0);

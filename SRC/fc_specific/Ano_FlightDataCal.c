@@ -15,8 +15,6 @@
 #include "task.h"
 
 
-
-
 void Aux_read(void *pvParameters)
 {
   TickType_t xLastWakeTime;         //用于精准定时的变量
@@ -27,7 +25,7 @@ void Aux_read(void *pvParameters)
     /*读取电子罗盘磁力计数据*/
     Drv_AK8975_Read();
     /*读取气压计数据*/
-    baro_height = (s32)Drv_Spl0601_Read();
+//    baro_height = (s32)Drv_Spl0601_Read();
 
     vTaskDelayUntil(&xLastWakeTime,configTICK_RATE_HZ/50);
   }
@@ -38,15 +36,15 @@ void Aux_read(void *pvParameters)
 extern s32 sensor_val_ref[];
 
 static u8 reset_imu_f;
-void IMU_Update_Task(u8 dT_ms)
+void imu_update(u8 dT_ms)
 {
-  /*如果准备飞行，复位重力复位标记和磁力计复位标记*/
+  //如果准备飞行，复位重力复位标记和磁力计复位标记 
   if(flag.unlock_sta ) {
     imu_state.G_reset = imu_state.M_reset = 0;
     reset_imu_f = 0;
   } else { 
 
-    if(reset_imu_f==0 ) { //&& flag.motionless == 1)
+    if(reset_imu_f==0 ) {  
       imu_state.G_reset = 1;//自动复位
       sensor.gyr_CALIBRATE = 2;//校准陀螺仪，不保存
       reset_imu_f = 1;     //已经置位复位标记
@@ -82,101 +80,37 @@ void Mag_Update_Task(u8 dT_ms)
 }
 
 
-s32 baro_height,baro_h_offset,ref_height_get_1,ref_height_get_2,ref_height_used;
-s32 baro2tof_offset,tof2baro_offset;
-
-float baro_fix1,baro_fix2,baro_fix;
-
-static u8 wcz_f_pause;
+ 
 float wcz_acc_use;
 
-void WCZ_Acc_Get_Task()//最小周期
+void wcz_acc_update(void)//最小周期
 {
   wcz_acc_use += 0.03f *(imu_data.w_acc[Z] - wcz_acc_use);
 }
 
 
 
-u16 ref_tof_height;
-static u8 baro_offset_ok,tof_offset_ok;
+s32 baro_height;  
+s16 ref_tof_height;  
+
 void WCZ_Fus_Task(u8 dT_ms)
-{
+{   
+	//TOF或者OF硬件正常
+  if((sens_hd_check.of_df_ok || sens_hd_check.of_ok)) { 
+		//使用光流的激光测距 
+		if(switchs.of_tof_on)  
+			ref_tof_height = jsdata.of_alt ; 
+		//使用激光测距模块 	
+    else if(switchs.tof_on)  
+      ref_tof_height = -1;
+		else
+			ref_tof_height = -1;
+   
+		
+		//世界z方向高度信息融合
+		WCZ_Data_Calc(dT_ms,(s32)wcz_acc_use,(s32)(ref_tof_height));
+  }  
 
-
-  if(flag.taking_off) {
-    baro_offset_ok = 2;
-  } else {
-    if(baro_offset_ok == 2) {
-      baro_offset_ok = 0;
-    }
-    //reset
-    tof2baro_offset = 0;
-  }
-
-  if(baro_offset_ok >= 1) { //(flag.taking_off)
-    ref_height_get_1 = baro_height - baro_h_offset + baro_fix  + tof2baro_offset;//气压计相对高度，切换点跟随TOF
-    //baro_offset_ok = 0;
-  } else {
-    if(baro_offset_ok == 0 ) {
-      baro_h_offset = baro_height;
-      if(flag.sensor_imu_ok) {
-        baro_offset_ok = 1;
-      }
-    }
-  }
-
-  if((flag.flying == 0) && flag.auto_take_off_land == AUTO_TAKE_OFF	) {
-    wcz_f_pause = 1;
-
-    baro_fix = 0;
-  } else {
-    wcz_f_pause = 0;
-
-    if(flag.taking_off == 0) {
-      baro_fix1 = 0;
-      baro_fix2 = 0;
-
-    }
-    baro_fix2 = -BARO_FIX;
-
-
-    baro_fix = baro_fix1 + baro_fix2 - BARO_FIX;//+ baro_fix3;
-  }
-
-  if((sens_hd_check.of_df_ok || sens_hd_check.of_ok) && baro_offset_ok) { //TOF或者OF硬件正常，且气压计记录相对值以后
-    if(switchs.tof_on || switchs.of_tof_on) { //TOF数据有效
-      if(switchs.of_tof_on) { //光流带TOF，光流优先
-        ref_tof_height = jsdata.of_alt ;
-      } else { //switchs.tof_on
-//				ref_tof_height = Laser_height_mm/10;
-      }
-
-
-      //
-      if(tof_offset_ok == 0) {
-        baro2tof_offset = ref_height_get_1 - ref_tof_height ; //记录TOF切换点
-        tof_offset_ok = 1;
-      }
-      //
-      ref_height_get_2 = ref_tof_height + baro2tof_offset;//TOF参考高度，切换点跟随气压计
-      ref_height_used = ref_height_get_2;
-
-      tof2baro_offset += 0.5f *((ref_height_get_2 - ref_height_get_1) - tof2baro_offset);//记录气压计切换点，气压计波动大，稍微滤波一下
-      //tof2baro_offset = ref_height_get_2 - ref_height_get_1;
-
-
-    } else {
-
-      tof_offset_ok = 0;
-
-      ref_height_used = ref_height_get_1 ;
-    }
-  } else {
-    ref_height_used = ref_height_get_1;
-  }
-
-  //世界z方向高度信息融合
-  WCZ_Data_Calc(dT_ms,wcz_f_pause,(s32)wcz_acc_use,(s32)(ref_height_used));
 
 }
 

@@ -135,7 +135,7 @@ void Alt_2level_Ctrl(float dT_s)
 _PID_arg_st alt_arg_1;
 _PID_val_st alt_val_1;
 
-/*高度速度环PID参数初始化*/
+/*垂直速度环PID参数初始化*/
 void Alt_1level_PID_Init()
 {
   alt_arg_1.kp = Ano_Parame.set.pid_alt_1level[KP];
@@ -145,14 +145,12 @@ void Alt_1level_PID_Init()
   alt_arg_1.k_ff = 0.0f;
 
 }
-
-//static u8 thr_start_ok;
+ 
 static float err_i_comp;
 static float w_acc_z_lpf;
 void Alt_1level_Ctrl(float dT_s)
 {
-  u8 out_en;
-  out_en = (flag.taking_off != 0) ? 1 : 0;
+  u8 out_en = (flag.taking_off != 0) ? 1 : 0;
  
 
   loc_ctrl_1.exp[Z] = 0.6f *fs.alt_ctrl_speed_set + alt_val_2.out;//速度前馈0.6f，直接给速度
@@ -172,11 +170,10 @@ void Alt_1level_Ctrl(float dT_s)
                  (THR_INTE_LIM *10 - err_i_comp )*out_en			//integration limit，积分限幅
                );
 
-  if(flag.taking_off == 1) {
+  if(flag.taking_off == 1) 
     LPF_1_(1.0f,dT_s,THR_START *10,err_i_comp);//err_i_comp = THR_START *10;
-  } else {
-    err_i_comp = 0;
-  }
+  else  
+    err_i_comp = 0; 
 
 
 

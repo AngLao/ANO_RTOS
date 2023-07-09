@@ -211,22 +211,9 @@ void LED_Task2(u8 dT_ms)
         statmp = 1;
       }
     } else if(statmp == 1) {	//显示光流、GPS等状态
-      if(modtmp == 0) {	//判断GPS是否正常
-        if(switchs.gps_on) {
-          if(timtmp < 60)
-            ledOnOff(BIT_BLED);
-          else
-            ledOnOff(0);
-
-          timtmp += dT_ms;
-
-          if(timtmp > 200) {
-            timtmp = 0;
-            modtmp++;
-          }
-        } else
+      if(modtmp == 0)//判断GPS是否正常 
           modtmp = 1;
-      } else if(modtmp == 1) {	//判断光流是否正常
+      else if(modtmp == 1) {	//判断光流是否正常
         if(switchs.of_flow_on > 0 && switchs.of_tof_on > 0) {
           if(timtmp < 60)
             ledOnOff(BIT_PLED);
