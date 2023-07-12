@@ -24,6 +24,8 @@
 #define UN_PIT_VALUE  300
 #define UN_ROL_VALUE  300
 
+//电调校准模式
+extern uint8_t escCalibrationMode ;
 
 enum {
   CH1 = 0,

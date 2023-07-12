@@ -2,8 +2,7 @@
 #include "Ano_Imu.h"
 #include "Drv_icm20602.h"
 #include "Ano_MagProcess.h"
-#include "Drv_spl06.h"
-#include "Ano_MotionCal.h"
+#include "Drv_spl06.h" 
 #include "Ano_AttCtrl.h"
 #include "Ano_LocCtrl.h"
 #include "Ano_AltCtrl.h"
@@ -18,6 +17,7 @@
 #include "Ano_DT.h"
 #include "Ano_LED.h"
 #include "Ano_ProgramCtrl_User.h"
+#include "Ano_FlightDataCal.h"
 
 
 /*============================================================================
@@ -128,7 +128,7 @@ void land_discriminat(s16 dT_ms)
         landing_cnt =0;
         flag.unlock_cmd =0;
 
-				debugOutput("Landing lock");
+        debugOutput("Landing lock");
         flag.flying = 0;
 
       }
@@ -146,50 +146,47 @@ void land_discriminat(s16 dT_ms)
 
 /*飞行状态任务*/
 void Flight_State_Task(u8 dT_ms,const s16 *CH_N)
-{ 
+{
   static float max_speed_lim,vel_z_tmp[2];
-  /*设置油门摇杆量*/ 
+
+  //设置油门摇杆量
   fs.speed_set_h_norm[Z] = CH_N[CH_THR] * 0.0023f;
   fs.speed_set_h_norm_lpf[Z] += 0.5f *(fs.speed_set_h_norm[Z] - fs.speed_set_h_norm_lpf[Z]);
 
-  /*推油门起飞*/
-  if(flag.unlock_sta) {
-    if(fs.speed_set_h_norm[Z]>0.01f && flag.motor_preparation == 1) { // 0-1
-      flag.taking_off = 1;
-    }
-  }
-  //
+  //解锁状态下,推油门起飞
+  if(flag.unlock_sta && fs.speed_set_h_norm[Z]>0.01f && flag.motor_preparation == 1)
+    flag.taking_off = 1;
+
   fc_stv.vel_limit_z_p = MAX_Z_SPEED_UP;
   fc_stv.vel_limit_z_n = -MAX_Z_SPEED_DW;
-  //
+
   if( flag.taking_off ) {
-
-    if(flying_cnt<1000) { //800ms
-      flying_cnt += dT_ms;
-    } else {
-      /*起飞后1秒，认为已经在飞行*/
+    //起飞后1秒，认为已经在飞行
+    if(flying_cnt>1000)
       flag.flying = 1;
-    }
+    else
+      flying_cnt += dT_ms;
 
-    if(fs.speed_set_h_norm[Z]>0) {
-      /*设置上升速度*/
+    //遥控设置的垂直方向速度
+    if(fs.speed_set_h_norm[Z]>0)
       vel_z_tmp[0] = (fs.speed_set_h_norm_lpf[Z] *MAX_Z_SPEED_UP);
-    } else {
-      /*设置下降速度*/
+    else
       vel_z_tmp[0] = (fs.speed_set_h_norm_lpf[Z] *MAX_Z_SPEED_DW);
-    }
+
 
     //飞控系统Z速度目标量综合设定
     vel_z_tmp[1] = vel_z_tmp[0] + pc_user.vel_cmps_set_z;
-    //
+    //Z速度目标量限幅
     vel_z_tmp[1] = LIMIT(vel_z_tmp[1],fc_stv.vel_limit_z_n,fc_stv.vel_limit_z_p);
-    //
-    fs.speed_set_h[Z] += LIMIT((vel_z_tmp[1] - fs.speed_set_h[Z]),-0.8f,0.8f);//限制增量幅度
+    //限制增量幅度
+    fs.speed_set_h[Z] += LIMIT((vel_z_tmp[1] - fs.speed_set_h[Z]),-0.8f,0.8f);
   } else {
     fs.speed_set_h[Z] = 0 ;
   }
+
+  //X Y轴速度设置
   float speed_set_tmp[2];
-  /*速度设定量，正负参考ANO坐标参考方向*/
+  //速度设定量，正负参考ANO坐标参考方向
   fs.speed_set_h_norm[X] = (my_deadzone(+CH_N[CH_PIT],0,50) *0.0022f);
   fs.speed_set_h_norm[Y] = (my_deadzone(-CH_N[CH_ROL],0,50) *0.0022f);
 
@@ -214,138 +211,100 @@ void Flight_State_Task(u8 dT_ms,const s16 *CH_N)
   fs.speed_set_h[X] = fs.speed_set_h_cms[X];
   fs.speed_set_h[Y] = fs.speed_set_h_cms[Y];
 
-  /*调用检测着陆的函数*/
+  //着陆检测
   land_discriminat(dT_ms);
 
-  /*倾斜过大上锁*/ 
-	if(imu_data.z_vec[Z]<0.25f && flag.unlock_cmd != 0) {  
-		//
-		if(mag.mag_CALIBRATE==0) {
-			imu_state.G_reset = 1;
-		}
-		flag.unlock_cmd = 0;
-		
-		debugOutput("Rollover locks");
-	} 
-  //////////////////////////////////////////////////////////
-  /*校准中，复位重力方向*/
+  //倾斜过大上锁
+  if(imu_data.z_vec[Z]<0.25f && flag.unlock_cmd != 0) {
+    //
+    if(mag.mag_CALIBRATE==0) {
+      imu_state.G_reset = 1;
+    }
+    flag.unlock_cmd = 0;
+
+    debugOutput("Rollover locks");
+  }
+
+  //校准中，复位重力方向*/
   if(sensor.gyr_CALIBRATE != 0 || sensor.acc_CALIBRATE != 0 ||sensor.acc_z_auto_CALIBRATE) {
     imu_state.G_reset = 1;
   }
 
   /*复位重力方向时，认为传感器失效*/
-  if(imu_state.G_reset == 1) { 
+  if(imu_state.G_reset == 1) {
     flag.sensor_imu_ok = 0;
     LED_STA.rst_imu = 1;
-    WCZ_Data_Reset(); //复位高度数据融合 
-  } else if(imu_state.G_reset == 0) {
-    if(flag.sensor_imu_ok == 0) {
-      flag.sensor_imu_ok = 1;
-      LED_STA.rst_imu = 0;
-      debugOutput("IMU OK");
-    }
+    //复位高度数据融合
+    wcz_fus_reset();
+  } else if(imu_state.G_reset == 0 && flag.sensor_imu_ok == 0) {
+    flag.sensor_imu_ok = 1;
+    LED_STA.rst_imu = 0;
+    debugOutput("IMU OK");
   }
 
-  /*飞行状态复位*/
+  //飞行状态复位
   if(flag.unlock_sta == 0) {
     flag.flying = 0;
     landing_cnt = 0;
     flag.taking_off = 0;
     flying_cnt = 0;
- 
+
     flag.rc_loss_back_home = 0;
- 
   }
-
-
 }
-
-//
-static u8 of_quality_ok;
-static u16 of_quality_delay;
-//
-static u8 of_alt_ok;
-static s16 of_alt_delay;
-//
-static u8 of_tof_on_tmp;
-//
-
+ 
 _judge_sync_data_st jsdata;
-void Swtich_State_Task(u8 dT_ms)
-{ 
 
-  //光流模块
-  if(sens_hd_check.of_ok || sens_hd_check.of_df_ok) {
-    //
-    if(sens_hd_check.of_ok) {
-      jsdata.of_qua = OF_QUALITY;
-      jsdata.of_alt = (u16)OF_ALT;
-    } else if(sens_hd_check.of_df_ok) {
-      jsdata.of_qua = of_rdf.quality;
-      jsdata.of_alt = Laser_height_cm;
-    }
+//光流,激光测距传感器检测
+void sensor_detection(u8 dT_ms)
+{
+  switchs.of_flow_on = 0;
+	switchs.of_tof_on = 0;
+
+  //匿名光流
+  if(sens_hd_check.of_ok) {
+    jsdata.of_qua = OF_QUALITY;
+    jsdata.of_alt = (s32)OF_ALT;
 		
-		//光流质量大于50，认为光流可用，判定可用延迟时间为500ms
-    if(jsdata.of_qua>50 ) {
-      if(of_quality_delay<500) {
-        of_quality_delay += dT_ms;
-      } else {
-        of_quality_ok = 1;
-      }
-    } else {
-      of_quality_delay =0;
-      of_quality_ok = 0;
-    }
-
-    //光流高度600cm内有效
-    if(jsdata.of_alt<600) {
-      //
-      of_tof_on_tmp = 1;
-      jsdata.valid_of_alt_cm = jsdata.of_alt;
-      //延时1.5秒判断激光高度是否有效
-      if(of_alt_delay<1500) {
-        of_alt_delay += dT_ms;
-      } else {
-        //判定高度有效
-        of_alt_ok = 1;
-      }
-    } else {
-      //
-      of_tof_on_tmp = 0;
-      //
-      if(of_alt_delay>0) {
-        of_alt_delay -= dT_ms;
-      } else {
-        //判定高度无效
-        of_alt_ok = 0;
-      }
-    }
-
-
-    if(flag.flight_mode == LOC_HOLD) {
-      if(of_alt_ok && of_quality_ok) {
-        switchs.of_flow_on = 1;
-      } else {
-        switchs.of_flow_on = 0;
-      }
-
-    } else {
-      of_tof_on_tmp = 0;
-      switchs.of_flow_on = 0;
-    }
-    //
-    switchs.of_tof_on = of_tof_on_tmp;
-  } else {
-    switchs.of_flow_on = switchs.of_tof_on = 0;
+		//匿名光流上的激光测距传感器状态
+    if(jsdata.of_alt != -1)
+      //高度数据有效
+      switchs.of_tof_on = 1;
+    else
+      switchs.of_tof_on = 0;
+		
+  //其他光流
+  } else if(sens_hd_check.of_df_ok) {
+    jsdata.of_qua = of_rdf.quality;
+    jsdata.of_alt = Laser_height_cm;
+		
+		
+		//其他测距传感器状态
+    if(jsdata.of_alt < 400)
+      //高度数据有效
+      switchs.of_tof_on = 1;
+    else
+      switchs.of_tof_on = 0;
   }
 
-  //激光模块
-  if(sens_hd_check.tof_ok) {
-    switchs.tof_on = 1;
+	static u8 of_quality_ok , of_quality_delay; 
+  //光流质量大于50，认为光流可用
+  if(jsdata.of_qua>50 ) {
+    if(of_quality_delay>200)
+      of_quality_ok = 1;
+    else
+      of_quality_delay += dT_ms;
   } else {
-    switchs.tof_on = 0;
+    of_quality_delay =0;
+    of_quality_ok = 0;
   }
-
-
+ 
+	//根据光流质量以及飞行模式判定光流传感器状态
+  if(flag.flight_mode == LOC_HOLD && of_quality_ok)
+    switchs.of_flow_on = 1;
+  else
+    switchs.of_flow_on = 0;
+ 
+   
 }
 

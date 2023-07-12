@@ -24,34 +24,38 @@ float PID_calculate( float dT_s,            //周期（单位：秒）
   float differential,hz;
   hz = safe_div(1.0f,dT_s,0);
 
-//	pid_arg->k_inc_d_norm = LIMIT(pid_arg->k_inc_d_norm,0,1);
-
-
-
+	//计算期望值微分
   pid_val->exp_d = (expect - pid_val->exp_old) *hz;
 
+	//计算反馈值微分
   if(pid_arg->fb_d_mode == 0) {
     pid_val->fb_d = (feedback - pid_val->feedback_old) *hz;
   } else {
     pid_val->fb_d = pid_val->fb_d_ex;
   }
+	
+	//计算输出微分项
   differential = (pid_arg->kd_ex *pid_val->exp_d - pid_arg->kd_fb *pid_val->fb_d);
 
+	//计算误差值
   pid_val->err = (expect - feedback);
-
-  pid_val->err_i += pid_arg->ki *LIMIT((pid_val->err ),-inte_d_lim,inte_d_lim )*dT_s;//)*T;//+ differential/pid_arg->kp
-  //pid_val->err_i += pid_arg->ki *(pid_val->err )*T;//)*T;//+ pid_arg->k_pre_d *pid_val->feedback_d
+ 
+	//计算误差积分值
+  pid_val->err_i += pid_arg->ki *LIMIT((pid_val->err ),-inte_d_lim,inte_d_lim )*dT_s;
+	
+	//误差积分限幅
   pid_val->err_i = LIMIT(pid_val->err_i,-inte_lim,inte_lim);
-
 
 
   pid_val->out = pid_arg->k_ff *in_ff
                  + pid_arg->kp *pid_val->err
                  +	differential
-//	    + pid_arg->k_inc_d_norm *pid_val->err_d_lpf + (1.0f-pid_arg->k_inc_d_norm) *differential
                  + pid_val->err_i;
 
+	
+	//保存上次反馈
   pid_val->feedback_old = feedback;
+	//保存上次期望
   pid_val->exp_old = expect;
 
   return (pid_val->out);

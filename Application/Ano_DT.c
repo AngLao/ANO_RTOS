@@ -24,23 +24,16 @@
 #include "Ano_MagProcess.h"
 #include "Ano_MotorCtrl.h"
 #include "Ano_FlightCtrl.h"
-#include "Ano_MotionCal.h"
 #include "Ano_FlightDataCal.h"
 #include "Ano_OF_DecoFusion.h"
 #include "Ano_LocCtrl.h"
-#include "Ano_FlyCtrl.h" 
+#include "Ano_FlyCtrl.h"
 #include "Ano_OF.h"
+#include "Ano_OF_DecoFusion.h"
 #include "power_management.h"
 #include "nlink_linktrack_tagframe0.h"
 
-
-/*============================================================================
-******************************************************************************
-******************************************************************************
-基础定义部分，定义数据传输使用到的基本元素，用户使用及二次开发无需修改本部分。
-******************************************************************************
-******************************************************************************
-============================================================================*/
+ 
 #define BYTE0(dwTemp)       ( *( (char *)(&dwTemp)		) )
 #define BYTE1(dwTemp)       ( *( (char *)(&dwTemp) + 1) )
 #define BYTE2(dwTemp)       ( *( (char *)(&dwTemp) + 2) )
@@ -52,7 +45,8 @@
 #define DT_SENDPTR_U2	Uart5_Send
 
 //越往前发送优先级越高，如果需要修改，这里和h文件里的枚举需要同时改
-const u8  _cs_idlist[CSID_NUM]	 	= {0x20, 0x21, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0f, 0x30, 0x32,0x40};
+const u8  _cs_idlist[CSID_NUM]	 	= {0x20, 0x21, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+																		 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0f, 0x30, 0x32,0x40,0x51};
 //循环发送数据结构体
 typedef struct {
   u8 WTS;		 //wait to send等待发送标记
@@ -63,7 +57,7 @@ typedef struct {
   _dt_frame_st txSet_u2[CSID_NUM];
 } _dt_st;
 _dt_st dt;
-u8 CycleSendData[64];		//循环发送数据临时缓冲
+u8 CycleSendData[100];		//循环发送数据临时缓冲
 //非循环发送数据结构体
 typedef struct {
   u8 WTS;
@@ -72,6 +66,7 @@ typedef struct {
   u8 data[64];
 } _dt_otherdata_st;
 _dt_otherdata_st OtherSendData[DT_ODNUM];
+
 u8 otherDataTmp[64];	//非循环发送数据临时缓冲
 
 
@@ -83,7 +78,7 @@ u8 otherDataTmp[64];	//非循环发送数据临时缓冲
 ******************************************************************************
 ******************************************************************************
 ============================================================================*/
-//0x01 
+//0x01
 
 #define ACC_RAW_X      (sensor.Acc[X])
 #define ACC_RAW_Y      (sensor.Acc[Y])
@@ -92,12 +87,12 @@ u8 otherDataTmp[64];	//非循环发送数据临时缓冲
 #define GYR_RAW_Y      (sensor.Gyro[Y])
 #define GYR_RAW_Z      (sensor.Gyro[Z])
 #define SHOCK_STA      (flag.unlock_err)
- 
-//0x02 
-#define ECP_RAW_X      (OF_GYR_X)
-#define ECP_RAW_Y      (OF_GYR_Y)
-#define ECP_RAW_Z      (OF_GYR_Z)
-#define BARO_ALT       (baro_height*100)
+
+//0x02
+#define ECP_RAW_X      (loc_val_1[X].out*100) 
+#define ECP_RAW_Y      (loc_val_1[Y].out*100)
+#define ECP_RAW_Z      (loc_val_1_fix[X].out*100)
+#define BARO_ALT       (loc_val_1_fix[Y].out*100)
 #define TEMPERATURE    (sensor.Tempreature_C)
 #define BARO_STA       (sens_hd_check.baro_ok)
 #define ECP_STA        (sens_hd_check.mag_ok)
@@ -106,45 +101,55 @@ u8 otherDataTmp[64];	//非循环发送数据临时缓冲
 #define ANGLE_PIT      (imu_data.pit)
 #define ANGLE_YAW      (imu_data.yaw)
 #define ATT_FUSION_STA (1)
+
 //0x04
 #define QUA0_10K       (imu_att.qua.w *1e4f)
 #define QUA1_10K       (imu_att.qua.x *1e4f)
 #define QUA2_10K       (imu_att.qua.y *1e4f)
 #define QUA3_10K       (imu_att.qua.z *1e4f)
+
 //0X05
 #define ALT_FU	       (wcz_hei_fus.out*100)
-#define ALT_ADD	       (ref_tof_height*100)
-#define ALT_STA        (switchs.of_flow_on)
+#define ALT_ADD	       (jsdata.of_alt*100)
+#define ALT_STA        (switchs.of_tof_on)
+
 //0X06
 #define FC_MODE	       (flag.flight_mode)
 #define FC_LOCKED	   	 (flag.unlock_sta)
 #define FC_CMD_ID	   	 (flag.rc_loss)
 #define FC_CMD_0       (0)
 #define FC_CMD_1       (0)
-//0X07
+
+//0X07  反馈速度
 #define HCA_VEL_X      (loc_ctrl_1.fb[X])
 #define HCA_VEL_Y      (loc_ctrl_1.fb[Y])
 #define HCA_VEL_Z      (loc_ctrl_1.fb[Z])
-//0X0B
-#define HCA_TAR_VEL_X   (fc_in.tar_vel_cmps_h[X])
-#define HCA_TAR_VEL_Y   (fc_in.tar_vel_cmps_h[Y])
-#define HCA_TAR_VEL_Z   (fc_in.tar_vel_cmps_h[Z])
+
+//0X0B  期望速度
+#define HCA_TAR_VEL_X   (loc_ctrl_1.exp[X])
+#define HCA_TAR_VEL_Y   (loc_ctrl_1.exp[Y])
+#define HCA_TAR_VEL_Z   (loc_ctrl_1.exp[Z])
+
 //0X0D
 #define BAT_VOLTAGE_100 (get_battery_voltage()*100)
- 
+
 //0x20
 #define PWM_1          (motor[0])
 #define PWM_2          (motor[1])
 #define PWM_3          (motor[2])
 #define PWM_4          (motor[3])
-#define PWM_5 	       (0) 
-#define PWM_6          (0)
-#define PWM_7          (0)
-#define PWM_8          (0)
 
-/*======================================================================================================================
-//数据发送初始化
-======================================================================================================================*/
+//0x51 融合光流数据
+#define MODE          (2)
+#define STATE         (OF_STATE)
+#define DX_2          (OF_DX2)
+#define DY_2          (OF_DY2)
+#define DX_FIX  	   	(OF_DX2FIX)
+#define DY_FIX      	(OF_DY2FIX)
+#define INTEG_X      	(OF_INTEG_X)
+#define INTEG_Y				(OF_INTEG_Y)
+#define QUALITY      	(OF_QUALITY)
+
 void ANO_DT_Init(void)
 {
   //ACC-GRO
@@ -157,8 +162,10 @@ void ANO_DT_Init(void)
   dt.txSet_u2[CSID_X05].fre_ms = 5;
   //fc_mode
   dt.txSet_u2[CSID_X06].fre_ms = 15;
-  //velocity
+  //反馈速度
   dt.txSet_u2[CSID_X07].fre_ms = 5;
+  //期望速度
+  dt.txSet_u2[CSID_X0B].fre_ms = 5;
   //电压
   dt.txSet_u2[CSID_X0D].fre_ms = 5;
   //传感器状态
@@ -169,8 +176,20 @@ void ANO_DT_Init(void)
   dt.txSet_u2[CSID_X32].fre_ms = 5;
   //遥控数据
   dt.txSet_u2[CSID_X40].fre_ms = 5;
-//  //实时控制数据
-//  dt.txSet_u2[CSID_X41].fre_ms = 5;
+  //光流数据
+  dt.txSet_u2[CSID_X51].fre_ms = 5;
+ 
+#if(DEBUG_CONFIG == UART)
+
+  //数传串口初始化
+  Drv_Uart3Init(115200);
+
+#elif (DEBUG_CONFIG == USB_CDC)
+
+  //板载USB虚拟串口初始化
+  AnoUsbCdcInit();
+
+#endif 
 
 }
 
@@ -179,17 +198,10 @@ void ANO_DT_Init(void)
 
 
 
-/*============================================================================
-******************************************************************************
-******************************************************************************
-数据发送相关函数
-******************************************************************************
-******************************************************************************
-============================================================================*/
-//===========================================================
-//此函数是协议中所有发送数据功能使用到的发送函数
-//移植时，用户应根据自身应用的情况，根据使用的通信方式，实现此函数
-//===========================================================
+
+/*----------------------------------------------------------
+							数据发送相关函数
+----------------------------------------------------------*/
 void ANO_DT_Send_Data(u8 *dataToSend, u8 length)
 {
 #if(DEBUG_CONFIG == UART)
@@ -204,17 +216,17 @@ void ANO_DT_Send_Data(u8 *dataToSend, u8 length)
 
 
 }
-//===========================================================
-//根据ID填充数据帧的data区域
-//===========================================================
+/*----------------------------------------------------------
+						根据ID填充数据帧的data区域
+----------------------------------------------------------*/
 static void DTFrameAddData(u8 frame_num, u8 *_cnt)
 {
   s16 temp_data;
   s32 temp_data_32;
 
   switch(frame_num) {
+  //惯性数据
   case 0x01: {
-    //ACC GYR
     temp_data = (s16)(ACC_RAW_X);
     CycleSendData[(*_cnt)++] = BYTE0(temp_data);
     CycleSendData[(*_cnt)++] = BYTE1(temp_data);
@@ -266,8 +278,8 @@ static void DTFrameAddData(u8 frame_num, u8 *_cnt)
   }
   break;
 
+  //欧拉角姿态数据
   case 0x03: {
-    //ATT_angle
     temp_data = (s16)(ANGLE_ROL * 100 );
     CycleSendData[(*_cnt)++] = BYTE0(temp_data);
     CycleSendData[(*_cnt)++] = BYTE1(temp_data);
@@ -282,13 +294,8 @@ static void DTFrameAddData(u8 frame_num, u8 *_cnt)
   }
   break;
 
-  case 0x04: {
-
-  }
-  break;
-
+  //高度数据
   case 0x05: {
-    //HEIGHT
     temp_data_32 = (s32)(ALT_FU);
     CycleSendData[(*_cnt)++] = BYTE0(temp_data_32);
     CycleSendData[(*_cnt)++] = BYTE1(temp_data_32);
@@ -314,8 +321,8 @@ static void DTFrameAddData(u8 frame_num, u8 *_cnt)
   }
   break;
 
-  case 0x07: {
-    //velocity
+  //反馈速度
+  case 0x07:
     temp_data = (s16)(HCA_VEL_X);
     CycleSendData[(*_cnt)++] = BYTE0(temp_data);
     CycleSendData[(*_cnt)++] = BYTE1(temp_data);
@@ -325,10 +332,20 @@ static void DTFrameAddData(u8 frame_num, u8 *_cnt)
     temp_data = (s16)(HCA_VEL_Z);
     CycleSendData[(*_cnt)++] = BYTE0(temp_data);
     CycleSendData[(*_cnt)++] = BYTE1(temp_data);
-  }
-  break;
+    break;
 
-
+  //期望速度
+  case 0x0B:
+    temp_data = (s16)HCA_TAR_VEL_X;
+    CycleSendData[(*_cnt)++] = BYTE0(temp_data);
+    CycleSendData[(*_cnt)++] = BYTE1(temp_data);
+    temp_data = (s16)HCA_TAR_VEL_Y;
+    CycleSendData[(*_cnt)++] = BYTE0(temp_data);
+    CycleSendData[(*_cnt)++] = BYTE1(temp_data);
+    temp_data = (s16)HCA_TAR_VEL_Z;
+    CycleSendData[(*_cnt)++] = BYTE0(temp_data);
+    CycleSendData[(*_cnt)++] = BYTE1(temp_data);
+    break;
 
   case 0x0D: {
     //电压
@@ -343,9 +360,25 @@ static void DTFrameAddData(u8 frame_num, u8 *_cnt)
   case 0x0E: {
     //传感器状态
     CycleSendData[(*_cnt)++] = switchs.of_flow_on;
-    CycleSendData[(*_cnt)++] = switchs.uwb_on;
     CycleSendData[(*_cnt)++] = 0;
+    CycleSendData[(*_cnt)++] = sens_hd_check.of_ok;
     CycleSendData[(*_cnt)++] = switchs.of_tof_on;
+  }
+  break;
+
+  case 0x20: {
+    temp_data = (s16)PWM_1;
+    CycleSendData[(*_cnt)++] = BYTE0(temp_data);
+    CycleSendData[(*_cnt)++] = BYTE1(temp_data);
+    temp_data = (s16)PWM_2;
+    CycleSendData[(*_cnt)++] = BYTE0(temp_data);
+    CycleSendData[(*_cnt)++] = BYTE1(temp_data);
+    temp_data = (s16)PWM_3;
+    CycleSendData[(*_cnt)++] = BYTE0(temp_data);
+    CycleSendData[(*_cnt)++] = BYTE1(temp_data);
+    temp_data = (s16)PWM_4;
+    CycleSendData[(*_cnt)++] = BYTE0(temp_data);
+    CycleSendData[(*_cnt)++] = BYTE1(temp_data);
   }
   break;
 
@@ -378,20 +411,36 @@ static void DTFrameAddData(u8 frame_num, u8 *_cnt)
   }
   break;
 
+  //光流数据
+  case 0X51: {
+    CycleSendData[(*_cnt)++] = MODE;
+    CycleSendData[(*_cnt)++] = STATE;
 
-  case 0x20: {
-    temp_data = (s16)PWM_1;
+    temp_data = (s16)DX_2;
     CycleSendData[(*_cnt)++] = BYTE0(temp_data);
     CycleSendData[(*_cnt)++] = BYTE1(temp_data);
-    temp_data = (s16)PWM_2;
+
+    temp_data = (s16)DY_2;
     CycleSendData[(*_cnt)++] = BYTE0(temp_data);
     CycleSendData[(*_cnt)++] = BYTE1(temp_data);
-    temp_data = (s16)PWM_3;
+
+    temp_data = (s16)DX_FIX;
     CycleSendData[(*_cnt)++] = BYTE0(temp_data);
     CycleSendData[(*_cnt)++] = BYTE1(temp_data);
-    temp_data = (s16)PWM_4;
+
+    temp_data = (s16)DY_FIX;
     CycleSendData[(*_cnt)++] = BYTE0(temp_data);
     CycleSendData[(*_cnt)++] = BYTE1(temp_data);
+
+    temp_data = (s16)INTEG_X;
+    CycleSendData[(*_cnt)++] = BYTE0(temp_data);
+    CycleSendData[(*_cnt)++] = BYTE1(temp_data);
+
+    temp_data = (s16)INTEG_Y;
+    CycleSendData[(*_cnt)++] = BYTE0(temp_data);
+    CycleSendData[(*_cnt)++] = BYTE1(temp_data);
+
+    CycleSendData[(*_cnt)++] = QUALITY;
   }
   break;
 
@@ -599,7 +648,7 @@ void AnoDTSendStr(u8 dest_addr, u8 string_color, char *str)
   while(*(str + i) != '\0') { //单引号字符，双引号字符串
     otherDataTmp[_cnt++] = *(str + i++);
 
-    if(_cnt > 50) {
+    if(_cnt > 84) {
       break;
     }
   }
@@ -952,7 +1001,7 @@ static void AnoDTDataAnl(u8 *data, u8 len)
 //===========================================================
 //整体数据通信的调度器
 //===========================================================
-void dt_handle(void)
+void dt_scheduler(void)
 {
 
 #if (DEBUG_CONFIG != CLOSE)

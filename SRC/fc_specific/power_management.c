@@ -18,7 +18,10 @@ void battery_update(void)
 
  
 
-  if(singleBatteryVoltage<Ano_Parame.set.lowest_power_voltage ) {
+  if(singleBatteryVoltage<2 ) {
+    flag.power_state = 4;  //USB供电
+    LED_STA.lowVt = 1;
+  }else if(singleBatteryVoltage<Ano_Parame.set.lowest_power_voltage ) {
     flag.power_state = 3;//将禁止解锁
     LED_STA.lowVt = 1;
   }else if(singleBatteryVoltage<Ano_Parame.set.warn_power_voltage) { 

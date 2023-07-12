@@ -7,7 +7,7 @@
 
   <Targets>
     <Target>
-      <TargetName>AnoPioneerProTi</TargetName>
+      <TargetName>ANO_RTOS</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>5060960::V5.06 update 7 (build 960)::.\ARMCC</pCCUsed>
@@ -49,7 +49,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\build\</OutputDirectory>
-          <OutputName>test</OutputName>
+          <OutputName>ANO_RTOS</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>0</CreateHexFile>
@@ -597,11 +597,6 @@
               <FileName>Ano_Sensor_Basic.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\SRC\fc_general\Ano_Sensor_Basic.c</FilePath>
-            </File>
-            <File>
-              <FileName>Ano_MotionCal.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\SRC\fc_general\Ano_MotionCal.c</FilePath>
             </File>
           </Files>
         </Group>

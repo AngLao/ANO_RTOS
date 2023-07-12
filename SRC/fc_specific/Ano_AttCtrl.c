@@ -3,7 +3,6 @@
 #include "Drv_icm20602.h"
 #include "Ano_MagProcess.h"
 #include "Drv_spl06.h"
-#include "Ano_MotionCal.h"
 #include "Ano_FlightCtrl.h"
 #include "Ano_LocCtrl.h"
 #include "Ano_MotorCtrl.h"

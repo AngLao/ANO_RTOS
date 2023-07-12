@@ -8,6 +8,10 @@ void uwb_update_task(void *pvParameters)
 
   static unsigned char pFrame[128];
 
+	//uwb串口初始化
+  Drv_Uart1Init(1500000); 
+	debugOutput("uwb串口1初始化，波特率1500000");
+	
   while (1) {
     //读环形缓冲区
     if(RingBuffer_GetCount(&U1rxring) > 128) {
@@ -16,8 +20,7 @@ void uwb_update_task(void *pvParameters)
       RingBuffer_PopMult(&U1rxring, pFrame, 128);
 
       //解析uwb数据
-      uint8_t res = g_nlt_tagframe0.UnpackData(pFrame, 128);
-      switchs.uwb_on = res;
+      uint8_t res = g_nlt_tagframe0.UnpackData(pFrame, 128); 
       //接收有误刷新缓冲区
       if (res == 0) {
         RingBuffer_Flush(&U1rxring);

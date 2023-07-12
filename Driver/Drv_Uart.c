@@ -158,8 +158,7 @@ u8 U3TxOutCnt = 0;
 RINGBUFF_T U3rxring;
 volatile unsigned char UART3Buffer[128];
 void UART3_IRQHandler(void)
-{
-
+{ 
   uint8_t com_data;
   /*获取中断标志 原始中断状态 不屏蔽中断标志*/
   uint32_t flag = ROM_UARTIntStatus(UART5_BASE, 1);
@@ -182,7 +181,7 @@ void UART3_IRQHandler(void)
 void Drv_Uart3Init(uint32_t baudrate)
 {
   //环形缓冲区初始化
-  RingBuffer_Init(&U3rxring, (unsigned char*)UART3Buffer, 1, 128 * 5);
+  RingBuffer_Init(&U3rxring, (unsigned char*)UART3Buffer, 1, 128);
   ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_UART5);
   ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
 

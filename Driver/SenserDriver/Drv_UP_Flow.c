@@ -2,6 +2,7 @@
 
 #include "Drv_Uart.h"
 #include "Drv_laser.h"
+#include "Ano_DT.h"
  
 
 #define CIRCLE_P(n,a,b) ((a) + ((n)-(a))%((b)-(a)))
@@ -210,19 +211,19 @@ void light_flow_init(void)
 	
 	
 	of_init_type = (Drv_OFInit()==0)?0:2;
-	if(of_init_type==2)//优像光流初始化失败
-	{
-		
+	//优像光流初始化成功
+	if(of_init_type==2)
+	{ 
 		#if defined(USE_KS103)
 			Drv_Uart5Init(9600);		//接KS103超声波
-		#endif
-		printf("初始化优象光流成功，波特率19200\r\n");
+			debugOutput("KS103 use uart5，baud rate 9600");
+		#endif 
+		debugOutput("YX OF use uart4 ,rate:19200");
 	}
 	else
 	{
-		Drv_Uart4Init(921600);	//接匿名光流
-		Drv_Uart5Init(921600);	//openmv
-		printf("初始化匿名光流，波特率921600\r\n");
+		Drv_Uart4Init(1500000);	//接匿名光流
+		debugOutput("NM OF use uart4 ,rate:1500000"); 
 	}
 	 
 }

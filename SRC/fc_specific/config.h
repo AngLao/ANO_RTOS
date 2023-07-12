@@ -11,28 +11,28 @@
 //500~2000KV 0.2f~0.3f
 //2000kv以上 0.3f-0.5f 
 
-#define GYR_ACC_FILTER 0.22f //陀螺仪加速度计滤波系数
+#define GYR_ACC_FILTER 0.28f //陀螺仪加速度计滤波系数
 
 //FINAL_P 参数大致范围参考
 //500KV以下 0.4f以上
 //500~2000KV 0.4f~0.3f
 //2000kv以上 0.3f-0.2f
 
-#define FINAL_P 			 0.32f  //电机输出量比例系数
+#define FINAL_P 			 0.31f  //电机输出量比例系数
 
 #define MOTOR_ESC_TYPE 1  //2：无刷电机带刹车的电调，1：无刷电机不带刹车的电调，
 #define MOTORSNUM 4
 
 
 
-#define MAX_ANGLE     25.0f 
+#define MAX_ANGLE     20.0f 
  
-#define MAX_ROLLING_SPEED 1600  //角度每秒
+#define MAX_ROLLING_SPEED 800  //角度每秒
 
-#define MAX_SPEED 500 //最大水平速度，厘米每秒 cm/s
+#define MAX_SPEED 200 //最大水平速度，厘米每秒 cm/s
 
-#define MAX_Z_SPEED_UP 350 //厘米每秒 cm/s
-#define MAX_Z_SPEED_DW 250 //厘米每秒 cm/s
+#define MAX_Z_SPEED_UP 150 //厘米每秒 cm/s
+#define MAX_Z_SPEED_DW 150 //厘米每秒 cm/s
  
 
 #define CTRL_1_INTE_LIM 250 //角速度环积分限幅 ：输出
@@ -43,7 +43,7 @@
  
 #define THR_INTE_LIM   THR_INTE_LIM_SET/FINAL_P
 
-#define THR_START      35  //油门起调量百分比 % 
+#define THR_START      30  //油门起调量百分比 % 
 
 
 #define BARO_FIX -0                          //气压速度积分修正起调值/CM厘米  

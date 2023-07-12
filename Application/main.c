@@ -50,9 +50,6 @@ void basic_data_read(void *pvParameters)
 
     /*飞行状态任务*/
     Flight_State_Task(1, CH_N);
-
-    /*开关状态任务*/
-    Swtich_State_Task(1);
 		
 		/*根据飞机陀螺仪数据解算出相应姿态以解耦光流数据*/
 		OF_INS_Get(0.001f);
@@ -77,7 +74,6 @@ void inner_loop(void *pvParameters)
     /*电机输出控制*/
     Motor_Ctrl_Task(2);
 
-
     vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 500);
   }
 }
@@ -98,44 +94,28 @@ void outer_loop(void *pvParameters)
   }
 }
 
-/* 高度环控制进程 */
-void height_loop(void *pvParameters)
-{
-  TickType_t xLastWakeTime = xTaskGetTickCount(); //获取当前Tick次数,以赋给延时函数初值
-
-  while (1) { 
-    /*垂直速度环控制*/
-    Alt_1level_Ctrl(0.005f);
-
-    /*高度环控制*/
-    Alt_2level_Ctrl(0.005f);
- 
-    vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 200);
-  }
-}
-
-/* 位置环控制进程 */
+/* 位置控制进程 */
 void position_loop(void *pvParameters)
 {
   TickType_t xLastWakeTime = xTaskGetTickCount(); //获取当前Tick次数,以赋给延时函数初值
 
-  while (1) {
-    /*罗盘数据处理任务*/
-//    Mag_Update_Task(20);
-
-    /*位置速度环控制*/
-    Loc_1level_Ctrl(20);
-
-    /*数传数据交换调度*/
-    dt_handle(); 
-		 
-    /*灯光控制*/
-    LED_Task2(20);
+  while (1) {  
+    /*位置传感器状态检测*/
+    sensor_detection(5);
 		
-    vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 50);
+    /*高度环控制*/
+    Alt_2level_Ctrl(0.005f);  
+		
+    /*垂直速度环控制*/
+    Alt_1level_Ctrl(0.005f);
+ 
+    /*位置速度环控制*/
+    Loc_1level_Ctrl(5);
+		
+    vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 200);
   }
 }
-
+ 
 
 /* 辅助任务进程 */
 void auxiliary_loop(void *pvParameters)
@@ -147,14 +127,19 @@ void auxiliary_loop(void *pvParameters)
     battery_update();
 
     /*延时存储任务*/
-    Ano_Parame_Write_task(50); //耗时较长 注意看门狗复位
-  
-    vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 20);
+    Ano_Parame_Write_task(20); //耗时较长 注意看门狗复位
+   
+    /*数传数据交换调度*/
+    dt_scheduler(); 
+		 
+    /*灯光控制*/
+    LED_Task2(20);
+	 
+    vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 50);
   }
 }
 
-
-
+ 
 int main(void)
 { 
   /*--------------------------------------------------------
@@ -167,44 +152,39 @@ int main(void)
   									飞控板基础任务
   --------------------------------------------------------*/
   /* 基本传感器数据准备进程 */
-  xTaskCreate(basic_data_read, "basic_data_read", 116, NULL, 4, NULL);
+  xTaskCreate(basic_data_read, "basic_data_read", 136, NULL, 4, NULL);
 
   /* 姿态角速度环控制进程 */
-  xTaskCreate(inner_loop, "inner_loop", 116, NULL, 3, NULL);
+  xTaskCreate(inner_loop, "inner_loop", 136, NULL, 3, NULL);
 
   /* 姿态角度环控制进程 */
-  xTaskCreate(outer_loop, "outer_loop", 116, NULL, 3, NULL);
+  xTaskCreate(outer_loop, "outer_loop", 136, NULL, 3, NULL); 
 
-  /* 高度环控制进程 */
-  xTaskCreate(height_loop, "height_loop", 116, NULL, 3, NULL);
-
-  /* 位置环控制进程 */
-  xTaskCreate(position_loop, "position_loop", 172, NULL, 2, NULL);
+  /* 位置控制进程 */
+  xTaskCreate(position_loop, "position_loop", 136, NULL, 2, NULL);
 
   /* 辅助任务进程 */
-  xTaskCreate(auxiliary_loop, "auxiliary_loop", 116, NULL, 1, NULL);
+  xTaskCreate(auxiliary_loop, "auxiliary_loop", 156, NULL, 1, NULL);
 
   /* 启动硬件看门狗 */
-  xTaskCreate(wdt0_loop, "wdt0_loop", 112, NULL, 1, NULL);
+  xTaskCreate(wdt0_loop, "wdt0_loop", 136, NULL, 1, NULL);
 
   /*--------------------------------------------------------
   									外设扩展基础任务
   --------------------------------------------------------*/
   /* 启动遥控器数据处理任务 */
-  xTaskCreate(receiving_task, "receiving_task", 116, NULL, 4, NULL);
+  xTaskCreate(receiving_task, "receiving_task", 276, NULL, 4, NULL);
  
   /* 光流解算任务 */
-  xTaskCreate(light_flow_task, "light_flow_task", 116, NULL, 3, NULL);
+  xTaskCreate(light_flow_task, "light_flow_task", 136, NULL, 3, NULL);
 	
   /* uwb数据更新 */
 //  xTaskCreate(uwb_update_task, "uwb_update_task", 116, NULL, 3, NULL);
 
   /*--------------------------------------------------------
   									上层扩展任务
-  --------------------------------------------------------*/
-
-
-
+  --------------------------------------------------------*/ 
+	
   /*--------------------------------------------------------
   									启用任务调度器
   --------------------------------------------------------*/

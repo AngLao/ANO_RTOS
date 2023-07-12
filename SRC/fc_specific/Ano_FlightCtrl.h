@@ -51,17 +51,14 @@ extern _flight_state_st fs;
 
 typedef struct {
   u8 of_qua;
-  u16 of_alt;
+  s32 of_alt;
   u16 valid_of_alt_cm;
 
 } _judge_sync_data_st;
 extern _judge_sync_data_st jsdata;
-
-/* Exported constants --------------------------------------------------------*/
+ 
 extern float wifi_selfie_mode_yaw_vlue;
-
-/* Exported macro ------------------------------------------------------------*/
-/* Exported functions ------------------------------------------------------- */
+ 
 void user_fun(float dT,u8 action_num);
 
 void All_PID_Init(void);
@@ -77,6 +74,6 @@ void one_key_take_off_task(u16 dt_ms);
 void Flight_State_Task(u8,const s16 *CH_N);
 
 
-void Swtich_State_Task(u8 dT_ms);
+void sensor_detection(u8 dT_ms);
 #endif
 

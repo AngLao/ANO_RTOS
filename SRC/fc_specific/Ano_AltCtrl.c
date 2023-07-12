@@ -3,17 +3,19 @@
 #include "Drv_icm20602.h"
 #include "Ano_MagProcess.h"
 #include "Drv_spl06.h"
-#include "Ano_MotionCal.h"
+#include "Ano_FlightDataCal.h"
 #include "Ano_FlightCtrl.h"
 #include "Ano_MotorCtrl.h"
 #include "Ano_AttCtrl.h"
 #include "Ano_LocCtrl.h"
 #include "Ano_Parameter.h"
+#include "Ano_FlightDataCal.h"
+#include "Ano_FlightDataCal.h"
 
 static s16 auto_taking_off_speed;
 
 #define AUTO_TAKE_OFF_KP 2.0f
-////extern _filter_1_st wz_spe_f1;
+
 void Auto_Take_Off_Land_Task(u8 dT_ms)//
 {
   static u16 take_off_ok_cnt;
@@ -62,9 +64,6 @@ void Auto_Take_Off_Land_Task(u8 dT_ms)//
 
   }
 
-
-////////////
-
   if(flag.auto_take_off_land == AUTO_LAND) {
     //设置自动下降速度
     auto_taking_off_speed = -(s16)LIMIT(Ano_Parame.set.auto_landing_speed,20,200);
@@ -99,8 +98,8 @@ void Alt_2level_Ctrl(float dT_s)
   loc_ctrl_2.exp[Z] += fs.alt_ctrl_speed_set *dT_s;
   loc_ctrl_2.exp[Z] = LIMIT(loc_ctrl_2.exp[Z],loc_ctrl_2.fb[Z]-200,loc_ctrl_2.fb[Z]+200);
   //
-  loc_ctrl_2.fb[Z] = (s32)wcz_hei_fus.out;/////////////
-
+  loc_ctrl_2.fb[Z] = (s32)wcz_hei_fus.out;
+	
   if(fs.alt_ctrl_speed_set != 0) {
     flag.ct_alt_hold = 0;
   } else {

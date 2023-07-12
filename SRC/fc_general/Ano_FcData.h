@@ -151,13 +151,9 @@ typedef struct {
 } _fc_sta_var_st; //state variable
 extern _fc_sta_var_st fc_stv;
 
-typedef struct {
-  u8 tof_on;
+typedef struct { 
   u8 of_flow_on;
-  u8 of_tof_on;  
-  u8 uwb_on;
-  u8 opmv_on;
-
+  u8 of_tof_on;   
 } _switch_st;
 extern _switch_st switchs;
 
@@ -172,10 +168,7 @@ typedef struct {
   u8 of_df_ok;
 
 } _sensor_hd_check_st; //Hardware
-extern _sensor_hd_check_st sens_hd_check;
-/* Exported constants --------------------------------------------------------*/
-/* Exported macro ------------------------------------------------------------*/
-/* Exported functions ------------------------------------------------------- */
+extern _sensor_hd_check_st sens_hd_check; 
 
 void data_save(void);
 

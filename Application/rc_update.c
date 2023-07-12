@@ -17,6 +17,8 @@ static void offLineProtection()
 
 }
 
+//电调校准模式
+uint8_t escCalibrationMode = 0;
 //低速状态变化检测回调函数
 static void vSlowDetection( void *pvParameters )
 {
@@ -35,7 +37,6 @@ static void vSlowDetection( void *pvParameters )
       debugOutput("remote connected");
     }
   } else {
-
     if(flag.rc_loss == 0) {
       //丢失遥控信号
       flag.rc_loss = 1;
@@ -61,42 +62,27 @@ static void vSlowDetection( void *pvParameters )
     //开关打到高值
     if(CH_N[AUX2] > 300) {
       channelTwoState = 2;
-      debugOutput("CH_N[AUX2]  = 2");
-
-
-      //////////////////////////////////////////////////////
-
-      while(1);
-      ///////////////////////////////////////////////////////
-
+      debugOutput("CH_N[AUX2]  = 2"); 
     }
     //开关打到中值
     else if(CH_N[AUX2] > -100) {
       channelTwoState = 1;
-      debugOutput("CH_N[AUX2]  = 1");
+      debugOutput("CH_N[AUX2]  = 1"); 
     }
   }
 
   //通道3检测
   static uint8_t channelThreeState = 0;
-  static uint8_t sartCalibration = 0;
   //开关回到零点
-  if(CH_N[AUX3]<-100) {
-    channelThreeState = 0;
-    sartCalibration = 0;
-  }
+  if(CH_N[AUX3]<-100) 
+    channelThreeState = 0;  
+	
   if(channelThreeState == 0) {
     //开关打到高值
     if(CH_N[AUX3] > 300) {
       channelThreeState = 2;
       debugOutput("CH_N[AUX3]  = 2");
 
-      //断开电池供电状态才进入校准模式
-      if(flag.power_state == 3) {
-        sartCalibration = 1;
-
-        debugOutput("sartCalibration");
-      }
     }
     //开关打到中值
     else if(CH_N[AUX3] > -100) {
@@ -105,37 +91,33 @@ static void vSlowDetection( void *pvParameters )
     }
   }
 
-  //通道4检测
-  static uint8_t channelFourState = 0;
-
-  //校准
-#include "Drv_PwmOut.h"
+  //通道4做电调校准模式检测 
+	//USB供电状态下打下通道四摇杆进入校准模式,PWM输出即为油门量 
+  static uint8_t channelFourState = 0; 
   if(channelFourState == 1) {
     //开关回到零点
     if(CH_N[AUX4]<-100) {
-      channelFourState = 0;
-      if(sartCalibration) {
-        for(u8 i =0; i<4; i++) {
-          Drv_MotorPWMSet(i,0);
-        }
-        debugOutput("low");
-      }
+      channelFourState = 0;  
 
+			if(escCalibrationMode){ 
+				escCalibrationMode = 0;
+        debugOutput("Exit electrical alignment mode"); 
+			}
     }
   }
 
   if(channelFourState == 0) {
     //开关打到高值
     if(CH_N[AUX4] > 300) {
-      channelFourState = 1;
-      debugOutput("CH_N[AUX4]  = 2");
-
-      if(sartCalibration) {
-        for(u8 i =0; i<4; i++) {
-          Drv_MotorPWMSet(i,999);
-        }
-        debugOutput("high");
-      }
+      channelFourState = 1; 
+ 
+      //用USB供电状态才进入校准模式
+      if(flag.power_state == 4) {
+        escCalibrationMode = 1; 
+        debugOutput("Enter electrical alignment mode");
+      }else{ 
+        debugOutput("Please disconnect the battery");
+			}
     }
   }
 
@@ -146,9 +128,6 @@ static void vSlowDetection( void *pvParameters )
 //高速状态变化检测回调函数
 static void vFastDetection(void *pvParameters )
 {
-
-  flag.flight_mode = LOC_HOLD;
-
   //通道1检测
   static uint8_t channelOneState = 0;
   //开关回到零点
@@ -184,9 +163,8 @@ static void unlockDetection(void)
   flag.unlock_err = 0;	//允许解锁标志位
 
   //imu传感器异常
-  if(!flag.sensor_imu_ok) {
-    flag.unlock_err = 1;
-  }
+  if(!flag.sensor_imu_ok) 
+    flag.unlock_err = 1; 
 
   //气压计异常
   if(!sens_hd_check.baro_ok) {
@@ -201,21 +179,19 @@ static void unlockDetection(void)
   }
 
   //电池电压异常
-  if(flag.power_state > 2) {
-    flag.unlock_err = 4;
-  }
+  if(flag.power_state > 2) 
+    flag.unlock_err = 4; 
 
   //正在操作flash
-  if( para_sta.save_trig != 0) {
-    flag.unlock_err = 5;
-  }
+  if( para_sta.save_trig != 0) 
+    flag.unlock_err = 5; 
 
-  //飞控上锁、解锁检测要油门在拉低时才进行
-  if(CH_N[CH_THR] > -UN_THR_VALUE  ) {
-    flag.thr_low = 0;//油门非低
-  } else {
-    flag.thr_low = 1;//油门拉低
-  }
+  //检测油门状态
+  if(CH_N[CH_THR] > -UN_THR_VALUE)  
+    flag.thr_low = 0;
+	else 
+		//油门拉低
+    flag.thr_low = 1; 
 
   //飞控上锁、解锁检测
   static TickType_t xFirstWakeTime ;
@@ -247,9 +223,8 @@ static void unlockDetection(void)
   //飞控处于上锁状态 收到解锁命令
   if(flag.unlock_sta == 0 && flag.unlock_cmd == 1 ) {
     //系统存在错误,禁止解锁
-    if(flag.unlock_err != 0) {
-      flag.unlock_cmd = 0;
-    }
+    if(flag.unlock_err != 0) 
+      flag.unlock_cmd = 0; 
 
 
     //打印解锁情况信息
@@ -309,11 +284,14 @@ static void dataStandardization(void)
 void receivingModeInit()
 {
   //根据参数配置接收机解析模式
-  if(Ano_Parame.set.pwmInMode == SBUS) {
+  if(Ano_Parame.set.pwmInMode == SBUS){
     Drv_SbusInit();
-  } else {
-    Drv_PpmInit();
-  }
+		debugOutput("rc use sbus"); 
+	}		
+	else  {
+    Drv_PpmInit();  
+		debugOutput("rc use ppm");
+	}
 
   //创建缓慢检测状态变化定时器（如检测遥控失联，任务启动等功能）
   TimerHandle_t xSlowDetectionTimer = xTimerCreate(
@@ -352,18 +330,19 @@ void receivingModeInit()
 
 void receiving_task(void *pvParameters)
 {
-
+  //遥控接收模式初始化
+  receivingModeInit();
+	
   TickType_t xLastWakeTime = xTaskGetTickCount(); //获取当前Tick次数,以赋给延时函数初值
 
   while (1) {
     //解锁监测(不可阻塞,否则失控无法上锁)
     unlockDetection();
 
-    //遥控器在线是接下来操作的前提
-    if(flag.rc_loss != 1) {
+    //遥控器在线
+    if(flag.rc_loss != 1) 
       //遥控数据标准化
-      dataStandardization();
-    }
+      dataStandardization(); 
 
 
     //高速sbus信号7ms1帧 约150hz

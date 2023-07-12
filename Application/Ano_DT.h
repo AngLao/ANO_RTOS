@@ -8,10 +8,11 @@
 #define LOG_COLOR_RED	  1
 #define LOG_COLOR_GREEN	2
 
+ 
+#define CLOSE 1
+#define USB_CDC 2
+#define UART 3
 
-#define CLOSE -1
-#define USB_CDC 0
-#define UART 	1
 //数传输出硬件选择
 #define DEBUG_CONFIG UART
 
@@ -36,6 +37,7 @@ typedef enum {
   CSID_X30,
   CSID_X32,
   CSID_X40,
+  CSID_X51,
   CSID_NUM
 } _enu_cyclesendid;
 
@@ -46,7 +48,7 @@ void AnoDTRxOneByteUart( u8 data );
 void AnoDTRxOneByteUsb( u8 data );
 void AnoDTSendStr(u8 dest_addr, u8 string_color, char *str);
 void ANO_DT_Init(void);
-void dt_handle(void);
+void dt_scheduler(void);
 
 
 

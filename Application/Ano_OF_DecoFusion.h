@@ -46,6 +46,7 @@ typedef struct {
 //==Êý¾ÝÉùÃ÷  
 extern _of_rdf_st of_rdf;
  
+extern float fusKp ,fusKi ;
  
 static void ANO_OF_Decouple(void);
 static void ANO_OF_Fusion(u8 *dT_ms, s32 ref_height_cm);

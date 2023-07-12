@@ -13,8 +13,9 @@
   
 #include "Drv_Uart.h"
 #include "ano_usb.h"
+#include "Ano_DT.h"
 
-/* 看门狗进程 该任务为精准进行的任务 执行频率精准2Hz */
+/* 看门狗进程 */
 void wdt0_loop(void *pvParameters)
 {
 	// Enable the peripherals used by this example.
@@ -36,9 +37,11 @@ void wdt0_loop(void *pvParameters)
 	
 	xLastWakeTime = xTaskGetTickCount(); //获取当前Tick次数,以赋给延时函数初值
 	
+	debugOutput("Here's the dog");
 	while(1)
 	{
-		MAP_WatchdogIntClear(WATCHDOG0_BASE);	/* 喂狗 */ 
+		/* 喂狗 */ 
+		MAP_WatchdogIntClear(WATCHDOG0_BASE);	
 		vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 20);
 	}
 }
@@ -51,9 +54,8 @@ void WDT0_Handler(void)
 	MAP_WatchdogResetDisable(WATCHDOG0_BASE);
 	
 	//遗言
-	unsigned char theDogWantsToSay[] = "hello world"; 
+	unsigned char theDogWantsToSay[] = "66666666666"; 
 	
-  AnoUsbCdcSend(theDogWantsToSay,sizeof(theDogWantsToSay));
 	Drv_Uart3SendBuf(theDogWantsToSay,sizeof(theDogWantsToSay)); 
 	
 	//复位

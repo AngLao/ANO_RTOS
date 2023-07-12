@@ -60,9 +60,6 @@ void Drv_BspInit(void)
   ROM_FPULazyStackingEnable();
   ROM_FPUEnable();
 	
-  //板载USB虚拟串口初始化
-  AnoUsbCdcInit();
-	
   //数据初始化
   Dvr_ParamterInit();
 	
@@ -70,10 +67,7 @@ void Drv_BspInit(void)
   Ano_Parame_Read();
 	
   //灯光初始化
-  Dvr_LedInit();
-
-  //遥控接收模式初始化
-  receivingModeInit();
+  Dvr_LedInit(); 
 
   //spi通信初始化
   Drv_Spi0Init(); 
@@ -89,20 +83,15 @@ void Drv_BspInit(void)
  
 	//不使用恒温功能
 	flag.mems_temperature_ok = 1;
-
+ 
+	//定点模式
+  flag.flight_mode = LOC_HOLD;
+ 
   //上位机通讯设置初始化
   ANO_DT_Init();
 
   //ADC初始化
-  Drv_AdcInit();
-	
-  //滴答时钟初始化
-  SysTick_Init();
-
-  //串口初始化
-  Drv_Uart1Init(1500000);	//接UWB
-
-  Drv_Uart3Init(115200);  //接数传
+  Drv_AdcInit(); 
 	
   //飞控传感器计算初始化
   Sensor_Basic_Init();
@@ -116,8 +105,11 @@ void Drv_BspInit(void)
   //激光笔IO口初始化
   ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
   ROM_GPIOPinTypeGPIOOutput(GPIOF_BASE, GPIO_PIN_0);
-
   ROM_GPIOPinWrite(GPIOF_BASE, GPIO_PIN_0, 0);
+	
+	
+  //滴答时钟初始化
+  SysTick_Init(); 
 }
 
 

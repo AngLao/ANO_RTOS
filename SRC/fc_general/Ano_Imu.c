@@ -63,7 +63,7 @@ void a2w_3d_trans(float a[VEC_XYZ],float w[VEC_XYZ])
 
 
 
-#define USE_MAG
+#define USE_MAG 1
 #define USE_LENGTH_LIM
 
 
@@ -194,7 +194,7 @@ void IMU_update(float dT,_imu_state_st *state,float gyr[VEC_XYZ], s32 acc[VEC_XY
   vec_err[Z] = -(acc_norm[Y] * imu->z_vec[X] - imu->z_vec[Y] * acc_norm[X]);
 
 
-#ifdef USE_MAG
+#if (USE_MAG == 1)
 
   //电子罗盘赋值为float矢量
   for(u8 i = 0; i<3; i++) {
@@ -245,7 +245,7 @@ void IMU_update(float dT,_imu_state_st *state,float gyr[VEC_XYZ], s32 acc[VEC_XY
     //    d_angle[Z] = (gyr[Z] + (vec_err[Z]  + vec_err_i[Z]) * kp_use - mag_yaw_err *imu->z_vec[Z] *kmp_use *RAD_PER_DEG) * dT / 2 ;
 
 
-#ifdef USE_MAG
+#if (USE_MAG == 1)
     d_angle[i] = (gyr[i] + (vec_err[i]  + vec_err_i[i]) * kp_use + mag_yaw_err *imu->z_vec[i] *mkp_use) * dT / 2 ;
 #else
     d_angle[i] = (gyr[i] + (vec_err[i]  + vec_err_i[i]) * kp_use ) * dT / 2 ;
@@ -267,7 +267,7 @@ void IMU_update(float dT,_imu_state_st *state,float gyr[VEC_XYZ], s32 acc[VEC_XY
 
 
   /////////////////////修正开关///////////////////////////
-#ifdef USE_MAG
+#if (USE_MAG == 1)
   if(state->M_fix_en==0) { //磁力
     mkp_use = 0;//不修正
     state->M_reset = 0;//罗盘修正不复位，清除复位标记

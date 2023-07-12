@@ -12,15 +12,15 @@ void light_flow_task(void *pvParameters)
   while (1) {
 		/* 光流串口缓存有数据更新则组合数据，带掉线检测 */
 		ANO_OF_Data_Get(5, OF_DATA);
+		
+    /* 光流掉线检测 */
+    AnoOF_Check(5); 
  
     /* 匿名科创光流解耦合与融合任务 */
     ANO_OFDF_Task(5);
 		
-    /* 光流掉线检测 */
-    AnoOF_Check(5);
-		
     /*高度数据融合任务*/
-    WCZ_Fus_Task(5);
+    wcz_fus_update(5);
 		
 #if defined(USE_KS103)
     //超声波任务

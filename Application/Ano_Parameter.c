@@ -105,9 +105,13 @@ void PID_Rest()
   Ano_Parame.set.pid_att_2level[YAW][KI] = 0.0f; //姿态控制角度环PID参数
   Ano_Parame.set.pid_att_2level[YAW][KD] = 0.5; //姿态控制角度环PID参数
 //---	高度控制高度速度环PID参数
+
   Ano_Parame.set.pid_alt_1level[KP] = 2.0f;          //高度控制高度速度环PID参数
-  Ano_Parame.set.pid_alt_1level[KI] = 0.9f;          //高度控制高度速度环PID参数
-  Ano_Parame.set.pid_alt_1level[KD] = 0.05f;          //高度控制高度速度环PID参数
+  Ano_Parame.set.pid_alt_1level[KI] = 0.7f;          //高度控制高度速度环PID参数
+  Ano_Parame.set.pid_alt_1level[KD] = 0.03f;          //高度控制高度速度环PID参数
+//  Ano_Parame.set.pid_alt_1level[KP] = 2.0f;          //高度控制高度速度环PID参数
+//  Ano_Parame.set.pid_alt_1level[KI] = 0.9f;          //高度控制高度速度环PID参数
+//  Ano_Parame.set.pid_alt_1level[KD] = 0.05f;          //高度控制高度速度环PID参数
 //---	高度控制高度环PID参数
   Ano_Parame.set.pid_alt_2level[KP] = 2.0f;           //高度控制高度环PID参数
   Ano_Parame.set.pid_alt_2level[KI] = 0;           //高度控制高度环PID参数(NULL)
@@ -116,13 +120,13 @@ void PID_Rest()
   Ano_Parame.set.pid_loc_1level[KP] = 0.20f;          //位置控制位置速度环PID参数
   Ano_Parame.set.pid_loc_1level[KI] = 0.10f;          //位置控制位置速度环PID参数
   Ano_Parame.set.pid_loc_1level[KD] = 0.00f;          //位置控制位置速度环PID参数
-//---	位置控制位置环PID参数
-  Ano_Parame.set.pid_loc_2level[KP] = 0;           //位置控制位置环PID参数(NULL)
-  Ano_Parame.set.pid_loc_2level[KI] = 0;           //位置控制位置环PID参数(NULL)
-  Ano_Parame.set.pid_loc_2level[KD] = 0;           //位置控制位置环PID参数(NULL)
+////---	位置控制位置环PID参数
+//  Ano_Parame.set.pid_loc_2level[KP] = 0;           //位置控制位置环PID参数(NULL)
+//  Ano_Parame.set.pid_loc_2level[KI] = 0;           //位置控制位置环PID参数(NULL)
+//  Ano_Parame.set.pid_loc_2level[KD] = 0;           //位置控制位置环PID参数(NULL)
 //---	GPS位置控制位置速度环PID参数
-  Ano_Parame.set.pid_gps_loc_1level[KP] = 0.15f;          //位置控制位置速度环PID参数
-  Ano_Parame.set.pid_gps_loc_1level[KI] = 0.10f;          //位置控制位置速度环PID参数
+  Ano_Parame.set.pid_gps_loc_1level[KP] = 5.0f;          //位置控制位置速度环PID参数
+  Ano_Parame.set.pid_gps_loc_1level[KI] = 1.0f;          //位置控制位置速度环PID参数
   Ano_Parame.set.pid_gps_loc_1level[KD] = 0.00f;          //位置控制位置速度环PID参数
 //---	GPS位置控制位置环PID参数
   Ano_Parame.set.pid_gps_loc_2level[KP] = 0.3f;           //位置控制位置环PID参数
@@ -176,7 +180,7 @@ void Parame_Reset(u8 mode)
     Ano_Parame.set.auto_take_off_speed = 20;
     Ano_Parame.set.auto_landing_speed = 20;
 
-    Ano_Parame.set.idle_speed_pwm = 10; 
+    Ano_Parame.set.idle_speed_pwm = 10;
   }
 
   if(mode == 2) {
@@ -335,6 +339,9 @@ s32 AnoParRead(u16 _id)
     p_val = Ano_Parame.set.idle_speed_pwm;
     break;
 
+//	case PAR_UNLOCK_OO: 
+//    p_val = 1;
+//    break;
   //====PID
   //角速度
   case PAR_PID_1_P:
@@ -443,28 +450,42 @@ s32 AnoParRead(u16 _id)
     p_val = 1e3f * Ano_Parame.set.pid_loc_1level[1];
     break;
 
-//		case PAR_PID_9_D: p_val = 1e3f *Ano_Parame.set.pid_loc_1level[2];	break;
+  case PAR_PID_9_D:
+    p_val = 1e3f *Ano_Parame.set.pid_loc_1level[2];
+    break;
 //  //水平位置
-//		case PAR_PID_10_P: p_val = 1e3f *Ano_Parame.set.pid_loc_2level[0];	break;
-//		case PAR_PID_10_I: p_val = 1e3f *Ano_Parame.set.pid_loc_2level[1];	break;
-//		case PAR_PID_10_D: p_val = 1e3f *Ano_Parame.set.pid_loc_2level[2];	break;
-//  //GPS速度环
-//  case PAR_PID_11_P:
-//    p_val = 1e3f * Ano_Parame.set.pid_gps_loc_1level[0];
+//  case PAR_PID_10_P:
+//    p_val = 1e3f *Ano_Parame.set.pid_loc_2level[0];
 //    break;
-
-//  case PAR_PID_11_I:
-//    p_val = 1e3f * Ano_Parame.set.pid_gps_loc_1level[1];
+//  case PAR_PID_10_I:
+//    p_val = 1e3f *Ano_Parame.set.pid_loc_2level[1];
 //    break;
+//  case PAR_PID_10_D:
+//    p_val = 1e3f *Ano_Parame.set.pid_loc_2level[2];
+//    break;
+  //GPS速度环
+  case PAR_PID_11_P:
+    p_val = 1e3f * Ano_Parame.set.pid_gps_loc_1level[0];
+    break;
 
-//		case PAR_PID_11_D: p_val = 1e3f *Ano_Parame.set.pid_gps_loc_1level[2];	break;
+  case PAR_PID_11_I:
+    p_val = 1e3f * Ano_Parame.set.pid_gps_loc_1level[1];
+    break;
+
+//  case PAR_PID_11_D:
+//    p_val = 1e3f *Ano_Parame.set.pid_gps_loc_1level[2];
+//    break;
 //  //GPS位置环
 //  case PAR_PID_12_P:
 //    p_val = 1e3f * Ano_Parame.set.pid_gps_loc_2level[0];
 //    break;
 
-//		case PAR_PID_12_I: p_val = 1e3f *Ano_Parame.set.pid_gps_loc_2level[1];	break;
-//		case PAR_PID_12_D: p_val = 1e3f *Ano_Parame.set.pid_gps_loc_2level[2];	break;
+//  case PAR_PID_12_I:
+//    p_val = 1e3f *Ano_Parame.set.pid_gps_loc_2level[1];
+//    break;
+//  case PAR_PID_12_D:
+//    p_val = 1e3f *Ano_Parame.set.pid_gps_loc_2level[2];
+//    break;
   //====sensor_cali
   case CAL_ACC_OFFSET_X:
     p_val = Ano_Parame.set.acc_zero_offset[0] * 1000;

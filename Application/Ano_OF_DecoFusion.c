@@ -25,20 +25,17 @@
 201908012354-Jyoun：增加优像光流朝上的光流解算程序。
 本版备注：优像光流安装方向还是接线方朝左（俯视飞机），需要先设定参照物的高度。
 ===========================================================================*/
-
-//默认引用
+ 
 #include "Ano_OF_DecoFusion.h"
 #include "Ano_IMU.h"
 #include "Ano_Math.h"
 #include "Ano_Filter.h"
-
-//数据接口定义：
-//=========mapping===============
-//需要引用的文件：
+ 
 #include "Ano_Sensor_Basic.h"
 #include "Drv_UP_Flow.h"
 #include "Drv_laser.h"
 #include "Ano_OF.h"
+#include "Ano_FlightCtrl.h"
  
 
 //需要调用引用的外部变量： 
@@ -46,36 +43,33 @@
 #define OF_DATA_BUF               (OF_DATA)
 
 //使用机体惯性数据
-//#define RADPS_X                   (sensor.Gyro_rad[X])
-//#define RADPS_Y                   (sensor.Gyro_rad[Y])
-//#define ACC_X                   	(imu_data.w_acc[X])
-//#define ACC_Y                   	(imu_data.w_acc[Y])
+#define RADPS_X                   (sensor.Gyro_rad[X])
+#define RADPS_Y                   (sensor.Gyro_rad[Y])
+#define ACC_X                   	(imu_data.w_acc[X])
+#define ACC_Y                   	(imu_data.w_acc[Y])
 
-//使用光流模块惯性数据
-#define RADPS_X                   (OF_GYR_X)
-#define RADPS_Y                   (OF_GYR_Y)
-#define ACC_X                   	(OF_ACC_X)
-#define ACC_Y                   	(OF_GYR_Y)
+////使用光流模块惯性数据
+//#define RADPS_X                   (OF_GYR_X)
+//#define RADPS_Y                   (OF_GYR_Y)
+//#define ACC_X                   	(OF_ACC_X)
+//#define ACC_Y                   	(OF_ACC_Y)
 
-#define RELATIVE_HEIGHT_CM        (Laser_height_cm)  //相对高度
-//需要操作赋值的外部变量：
-
-
-//===============================
-//全局变量：
+#define RELATIVE_HEIGHT_CM        (jsdata.of_alt)  //相对高度
+ 
+ 
 u8 of_buf_update_flag;
 _of_data_st of_data;
 _of_rdf_st of_rdf;
 float of_rot_d_degs[2];
 
 float of_fus_err[2], of_fus_err_i[2];
+float fusKp  = 0 ,fusKi = 0;
 //参数设定：
 #define UPOF_PIXELPDEG_X    160.0f       //每1角度对应的像素个数，与分辨率和焦距有关，需要调试标定。//
 #define UPOF_PIXELPDEG_Y    160.0f       //每1角度对应的像素个数，与分辨率和焦距有关，需要调试标定。
 #define UPOF_CMPPIXEL_X     0.00012f     //每像素对应的地面距离，与焦距和高度有关，需要调试标定。//目前粗略标定
 #define UPOF_CMPPIXEL_Y     0.00012f     //每像素对应的地面距离，与焦距和高度有关，需要调试标定。
-#define FUS_KP              5.0f
-#define FUS_KI              1.0f
+
 //
 #define UPOF_UP_DW          0             //0:朝下；1：朝上
 #define OBJREF_HEIGHT_CM    280           //参照物高度，厘米;光流朝上才有用。
@@ -91,14 +85,15 @@ void ANO_OFDF_Task(u8 dT_ms)
   OF_State(); 
 	
   ANO_OF_Decouple();
+
+	#include "Ano_Parameter.h"
+	fusKp = Ano_Parame.set.pid_gps_loc_1level[KP];      
+  fusKi = Ano_Parame.set.pid_gps_loc_1level[KI];
 	
   ANO_OF_Fusion(&dT_ms, (s32)RELATIVE_HEIGHT_CM);
 
 
-}
-
-
-
+} 
 
 /*根据飞机陀螺仪数据解算出相应姿态以解耦光流数据*/
 void OF_INS_Get(float dT_s)
@@ -112,13 +107,14 @@ void OF_INS_Get(float dT_s)
 //	rad_ps_lpf[0] += 0.2f *(rad_ps_x - rad_ps_lpf[0]);
 //	rad_ps_lpf[1] += 0.2f *(rad_ps_y - rad_ps_lpf[1]);
 	
-	//匿名光流直接输出角度
-  of_rot_d_degs[0] = rad_ps_lpf[0] ;
-  of_rot_d_degs[1] = rad_ps_lpf[1];
+//	//使用匿名光流输出的惯性数据单位是角度
+//  of_rot_d_degs[0] = rad_ps_lpf[0] ;
+//  of_rot_d_degs[1] = rad_ps_lpf[1];
 
 	
-//  of_rot_d_degs[0] = rad_ps_lpf[0] * DEG_PER_RAD ;
-//  of_rot_d_degs[1] = rad_ps_lpf[1] * DEG_PER_RAD ;
+	//使用飞控输出的惯性数据单位是弧度
+  of_rot_d_degs[0] = rad_ps_lpf[0] * DEG_PER_RAD ;
+  of_rot_d_degs[1] = rad_ps_lpf[1] * DEG_PER_RAD ;
 	
   //低通滤波
   LPF_1_(5.0f, dT_s, ACC_X , of_rdf.gnd_acc_est_w[X]);
@@ -151,8 +147,7 @@ void ANO_OF_Data_Get(u8 dT_ms, u8 *of_data_buf)
     for(u8 i = 3; i < 12; i++) {
       XOR ^= of_data_buf[i];
     }
-
-    //
+ 
     if(XOR == of_data_buf[12]) {
       //
       of_data.updata ++;
@@ -263,10 +258,10 @@ static void ANO_OF_Fusion(u8 *dT_ms, s32 ref_height_cm)
         //
         of_fus_err[i] = of_rdf.gnd_vel_obs_w[i] - of_rdf.gnd_vel_est_w[i];
         //
-        of_fus_err_i[i] += FUS_KI * of_fus_err[i] * dT_s;
+        of_fus_err_i[i] += fusKp * of_fus_err[i] * dT_s;
         of_fus_err_i[i] = LIMIT(of_fus_err_i[i], -100, 100);
         //
-        of_rdf.gnd_vel_est_w[i] += (of_fus_err[i] * FUS_KP + of_fus_err_i[i]) * dT_s;
+        of_rdf.gnd_vel_est_w[i] += (of_fus_err[i] * fusKi + of_fus_err_i[i]) * dT_s;
 
       }
     }
