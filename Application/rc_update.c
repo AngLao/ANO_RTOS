@@ -62,12 +62,16 @@ static void vSlowDetection( void *pvParameters )
     //开关打到高值
     if(CH_N[AUX2] > 300) {
       channelTwoState = 2;
-      debugOutput("CH_N[AUX2]  = 2"); 
+//      debugOutput("CH_N[AUX2]  = 2"); 
+			one_key_take_off(); 
+      debugOutput("one_key_take_off"); 
     }
     //开关打到中值
     else if(CH_N[AUX2] > -100) {
       channelTwoState = 1;
-      debugOutput("CH_N[AUX2]  = 1"); 
+//      debugOutput("CH_N[AUX2]  = 1"); 
+			one_key_land();
+      debugOutput("one_key_land"); 
     }
   }
 
@@ -148,8 +152,7 @@ static void vFastDetection(void *pvParameters )
       //通道1一键急停
       flag.unlock_sta = 0;
       flag.unlock_cmd = 0;
-      flag.taking_off = 0;
-      flag.flying = 0;
+      flag.taking_off = 0; 
       debugOutput("Emergency stop!");
     }
   }

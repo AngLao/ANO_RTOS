@@ -103,10 +103,7 @@ void IMU_update(float dT,_imu_state_st *state,float gyr[VEC_XYZ], s32 acc[VEC_XY
   float acc_norm[VEC_XYZ];
 
   float d_angle[VEC_XYZ];
-
-
-
-
+ 
 //		q0q0 = imu->w * imu->w;
   q0q1 = imu->w * imu->x;
   q0q2 = imu->w * imu->y;
@@ -145,9 +142,7 @@ void IMU_update(float dT,_imu_state_st *state,float gyr[VEC_XYZ], s32 acc[VEC_XY
     acc_norm[i] = imu->gra_acc[i] *acc_norm_l_recip;
   }
 
-
-
-
+ 
   // 载体坐标下的x方向向量，单位化。
   att_matrix[0][0] = imu->x_vec[X] = 1 - (2*q2q2 + 2*q3q3);
   att_matrix[0][1] = imu->x_vec[Y] = 2*q1q2 - 2*q0q3;

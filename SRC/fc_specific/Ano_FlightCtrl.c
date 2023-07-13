@@ -88,24 +88,18 @@ void one_key_land()
   flag.auto_take_off_land = AUTO_LAND;
 }
 
-//////////////////////////////////////////////////////////////////
 
-
-
-//////////////////////////////////////////////////////////////////
 _flight_state_st fs;
 
-s16 flying_cnt,landing_cnt;
-
-extern s32 ref_height_get;
-
-float stop_baro_hpf;
+static s16 landing_cnt; 
+ 
 
 /*降落检测*/
 
-static s16 ld_delay_cnt ;
 void land_discriminat(s16 dT_ms)
-{
+{ 
+	static s16 ld_delay_cnt ;
+	
   /*油门归一值小于0.1  或者启动自动降落*/
   if((fs.speed_set_h_norm[Z] < 0.1f) || flag.auto_take_off_land == AUTO_LAND) {
     if(ld_delay_cnt>0) {
@@ -121,22 +115,16 @@ void land_discriminat(s16 dT_ms)
     if(mc.ct_val_thr<250 && flag.unlock_sta == 1) { //还应当 与上速度条件，速度小于正20厘米每秒。
       if(landing_cnt<1500) {
         landing_cnt += dT_ms;
-      } else {
-
-        flying_cnt = 0;
+      } else { 
         flag.taking_off = 0;
         landing_cnt =0;
-        flag.unlock_cmd =0;
-
-        debugOutput("Landing lock");
-        flag.flying = 0;
-
+        flag.unlock_cmd =0; 
+				
+        debugOutput("Landing lock");  
       }
     } else {
       landing_cnt = 0;
-    }
-
-
+    } 
   } else {
     landing_cnt  = 0;
   }
@@ -160,13 +148,7 @@ void Flight_State_Task(u8 dT_ms,const s16 *CH_N)
   fc_stv.vel_limit_z_p = MAX_Z_SPEED_UP;
   fc_stv.vel_limit_z_n = -MAX_Z_SPEED_DW;
 
-  if( flag.taking_off ) {
-    //起飞后1秒，认为已经在飞行
-    if(flying_cnt>1000)
-      flag.flying = 1;
-    else
-      flying_cnt += dT_ms;
-
+  if( flag.taking_off ) {  
     //遥控设置的垂直方向速度
     if(fs.speed_set_h_norm[Z]>0)
       vel_z_tmp[0] = (fs.speed_set_h_norm_lpf[Z] *MAX_Z_SPEED_UP);
@@ -211,9 +193,6 @@ void Flight_State_Task(u8 dT_ms,const s16 *CH_N)
   fs.speed_set_h[X] = fs.speed_set_h_cms[X];
   fs.speed_set_h[Y] = fs.speed_set_h_cms[Y];
 
-  //着陆检测
-  land_discriminat(dT_ms);
-
   //倾斜过大上锁
   if(imu_data.z_vec[Z]<0.25f && flag.unlock_cmd != 0) {
     //
@@ -243,11 +222,9 @@ void Flight_State_Task(u8 dT_ms,const s16 *CH_N)
   }
 
   //飞行状态复位
-  if(flag.unlock_sta == 0) {
-    flag.flying = 0;
+  if(flag.unlock_sta == 0) { 
     landing_cnt = 0;
-    flag.taking_off = 0;
-    flying_cnt = 0;
+    flag.taking_off = 0; 
 
     flag.rc_loss_back_home = 0;
   }
@@ -277,8 +254,7 @@ void sensor_detection(u8 dT_ms)
   } else if(sens_hd_check.of_df_ok) {
     jsdata.of_qua = of_rdf.quality;
     jsdata.of_alt = Laser_height_cm;
-		
-		
+		 
 		//其他测距传感器状态
     if(jsdata.of_alt < 400)
       //高度数据有效

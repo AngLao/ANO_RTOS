@@ -81,25 +81,25 @@ void PID_Rest()
 #elif (pid_default == KV1900)
 
 //---	姿态控制角速度环PID参数
-  Ano_Parame.set.pid_att_1level[ROL][KP] = 3.1f; //姿态控制角速度环PID参数
-  Ano_Parame.set.pid_att_1level[ROL][KI] = 1.9f; //姿态控制角速度环PID参数
+  Ano_Parame.set.pid_att_1level[ROL][KP] = 4.2f; //姿态控制角速度环PID参数
+  Ano_Parame.set.pid_att_1level[ROL][KI] = 1.7f; //姿态控制角速度环PID参数
   Ano_Parame.set.pid_att_1level[ROL][KD] = 0.10f; //姿态控制角速度环PID参数
 
-  Ano_Parame.set.pid_att_1level[PIT][KP] = 3.1f; //姿态控制角速度环PID参数
-  Ano_Parame.set.pid_att_1level[PIT][KI] = 1.9f; //姿态控制角速度环PID参数
+  Ano_Parame.set.pid_att_1level[PIT][KP] = 4.0f; //姿态控制角速度环PID参数
+  Ano_Parame.set.pid_att_1level[PIT][KI] = 1.6f; //姿态控制角速度环PID参数
   Ano_Parame.set.pid_att_1level[PIT][KD] = 0.10f; //姿态控制角速度环PID参数
 
   Ano_Parame.set.pid_att_1level[YAW][KP] = 4.5f; //姿态控制角速度环PID参数
   Ano_Parame.set.pid_att_1level[YAW][KI] = 0.4f; //姿态控制角速度环PID参数
   Ano_Parame.set.pid_att_1level[YAW][KD] = 0.0f; //姿态控制角速度环PID参数
 //---	姿态控制角度环PID参数
-  Ano_Parame.set.pid_att_2level[ROL][KP] = 5.8f; //姿态控制角度环PID参数
-  Ano_Parame.set.pid_att_2level[ROL][KI] = 0.0f; //姿态控制角度环PID参数
-  Ano_Parame.set.pid_att_2level[ROL][KD] = 0.00f; //姿态控制角度环PID参数
+  Ano_Parame.set.pid_att_2level[ROL][KP] = 8.0f; //姿态控制角度环PID参数
+  Ano_Parame.set.pid_att_2level[ROL][KI] = 0.35f; //姿态控制角度环PID参数
+  Ano_Parame.set.pid_att_2level[ROL][KD] = 0.01f; //姿态控制角度环PID参数
 
-  Ano_Parame.set.pid_att_2level[PIT][KP] = 5.8f; //姿态控制角度环PID参数
-  Ano_Parame.set.pid_att_2level[PIT][KI] = 0.0f; //姿态控制角度环PID参数
-  Ano_Parame.set.pid_att_2level[PIT][KD] = 0.00f; //姿态控制角度环PID参数
+  Ano_Parame.set.pid_att_2level[PIT][KP] = 7.8f; //姿态控制角度环PID参数
+  Ano_Parame.set.pid_att_2level[PIT][KI] = 0.30f; //姿态控制角度环PID参数
+  Ano_Parame.set.pid_att_2level[PIT][KD] = 0.01f; //姿态控制角度环PID参数
 
   Ano_Parame.set.pid_att_2level[YAW][KP] = 5.8f; //姿态控制角度环PID参数
   Ano_Parame.set.pid_att_2level[YAW][KI] = 0.0f; //姿态控制角度环PID参数
@@ -125,8 +125,8 @@ void PID_Rest()
 //  Ano_Parame.set.pid_loc_2level[KI] = 0;           //位置控制位置环PID参数(NULL)
 //  Ano_Parame.set.pid_loc_2level[KD] = 0;           //位置控制位置环PID参数(NULL)
 //---	GPS位置控制位置速度环PID参数
-  Ano_Parame.set.pid_gps_loc_1level[KP] = 5.0f;          //位置控制位置速度环PID参数
-  Ano_Parame.set.pid_gps_loc_1level[KI] = 1.0f;          //位置控制位置速度环PID参数
+  Ano_Parame.set.pid_gps_loc_1level[KP] = 8.0f;          //位置控制位置速度环PID参数
+  Ano_Parame.set.pid_gps_loc_1level[KI] = 3.0f;          //位置控制位置速度环PID参数
   Ano_Parame.set.pid_gps_loc_1level[KD] = 0.00f;          //位置控制位置速度环PID参数
 //---	GPS位置控制位置环PID参数
   Ano_Parame.set.pid_gps_loc_2level[KP] = 0.3f;           //位置控制位置环PID参数

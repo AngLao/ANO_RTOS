@@ -23,12 +23,9 @@ void Auto_Take_Off_Land_Task(u8 dT_ms)//
   one_key_take_off_task(dT_ms);
 
   if(flag.unlock_sta) {
-    if(flag.taking_off) {
-      if(flag.auto_take_off_land == AUTO_TAKE_OFF_NULL) {
-        flag.auto_take_off_land = AUTO_TAKE_OFF;
-      }
-    }
-
+    if(flag.taking_off && flag.auto_take_off_land == AUTO_TAKE_OFF_NULL) { 
+        flag.auto_take_off_land = AUTO_TAKE_OFF; 
+    } 
   } else {
     auto_taking_off_speed = 0;
     flag.auto_take_off_land = AUTO_TAKE_OFF_NULL;
@@ -50,7 +47,7 @@ void Auto_Take_Off_Land_Task(u8 dT_ms)//
 
     }
     //退出起飞流程条件2，2000毫秒后判断用户正在控制油门。
-    if(take_off_ok_cnt >2000 && ABS(fs.speed_set_h_norm[Z])>0.1f) { // 一定已经taking_off,如果还在推杆，退出起飞流程
+    if(take_off_ok_cnt >2000 && ABS(fs.speed_set_h_norm[Z])>0.1f) {  
       flag.auto_take_off_land = AUTO_TAKE_OFF_FINISH;
     }
 

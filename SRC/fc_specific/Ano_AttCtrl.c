@@ -94,29 +94,7 @@ void Att_1level_PID_Init()
   arg_1[PIT].kd_fb = arg_1[PIT].kd_fb *DIFF_GAIN;
 #endif
 }
-
-void Set_Att_1level_Ki(u8 mode)
-{
-  if(mode == 0) {
-    arg_1[ROL].ki = arg_1[PIT].ki = 0;
-  } else if(mode == 1) {
-    arg_1[ROL].ki = Ano_Parame.set.pid_att_1level[ROL][KI];
-    arg_1[PIT].ki = Ano_Parame.set.pid_att_1level[PIT][KI];
-  } else {
-    arg_1[ROL].ki = arg_1[PIT].ki = CTRL_1_KI_START;
-  }
-}
-
-void Set_Att_2level_Ki(u8 mode)
-{
-  if(mode == 0) {
-    arg_2[ROL].ki = arg_2[PIT].ki = 0;
-  } else {
-    arg_2[ROL].ki = Ano_Parame.set.pid_att_2level[ROL][KI];
-    arg_2[PIT].ki = Ano_Parame.set.pid_att_2level[PIT][KI];
-  }
-}
-
+ 
 
 #define POS_V_DAMPING 0.02f
 static float exp_rol_tmp,exp_pit_tmp;
@@ -131,17 +109,12 @@ static float ct_val[4];
 
 /*角速度环控制*/
 void Att_1level_Ctrl(float dT_s)
-{
-  ////////////////改变控制参数任务（最小控制周期内）//////////////////////// 
-  if(flag.auto_take_off_land ==AUTO_TAKE_OFF) {
+{  
+	arg_1[ROL].ki = Ano_Parame.set.pid_att_1level[ROL][KI];
+	arg_1[PIT].ki = Ano_Parame.set.pid_att_1level[PIT][KI]; 
 
-    Set_Att_1level_Ki(2);
-  } else {
-
-    Set_Att_1level_Ki(1);
-  }
-
-  Set_Att_2level_Ki(1);
+	arg_2[ROL].ki = Ano_Parame.set.pid_att_2level[ROL][KI];
+	arg_2[PIT].ki = Ano_Parame.set.pid_att_2level[PIT][KI];
 
 
   /*目标角速度赋值*/
@@ -206,8 +179,8 @@ void Att_2level_Ctrl(float dT_s,s16 *CH_N)
       att_2l_ct.exp_pit_adj = LIMIT(att_2l_ct.exp_pit_adj,-1,1);
     }
   } else {
-    att_2l_ct.exp_rol_adj =
-      att_2l_ct.exp_pit_adj = 0;
+    att_2l_ct.exp_rol_adj = 0;
+		att_2l_ct.exp_pit_adj = 0;
   }
 
   /*正负参考ANO坐标参考方向*/

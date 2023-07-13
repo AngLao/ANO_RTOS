@@ -131,8 +131,7 @@ typedef struct {
   u8 ct_alt_hold;
 
 
-  //·ÉÐÐ×´Ì¬
-  u8 flying;
+  //·ÉÐÐ×´Ì¬ 
   u8 auto_take_off_land;
   u8 thr_mode;
   u8 flight_mode;

@@ -134,6 +134,9 @@ void auxiliary_loop(void *pvParameters)
 		 
     /*µÆ¹â¿ØÖÆ*/
     LED_Task2(20);
+		
+		/*×ÅÂ½¼ì²â*/
+		land_discriminat(20); 
 	 
     vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 50);
   }

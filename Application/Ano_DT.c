@@ -360,8 +360,8 @@ static void DTFrameAddData(u8 frame_num, u8 *_cnt)
   case 0x0E: {
     //传感器状态
     CycleSendData[(*_cnt)++] = switchs.of_flow_on;
-    CycleSendData[(*_cnt)++] = 0;
     CycleSendData[(*_cnt)++] = sens_hd_check.of_ok;
+    CycleSendData[(*_cnt)++] = 0;
     CycleSendData[(*_cnt)++] = switchs.of_tof_on;
   }
   break;

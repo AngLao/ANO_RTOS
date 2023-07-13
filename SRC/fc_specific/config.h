@@ -25,14 +25,14 @@
 
 
 
-#define MAX_ANGLE     20.0f 
+#define MAX_ANGLE     15.0f 
  
-#define MAX_ROLLING_SPEED 800  //角度每秒
+#define MAX_ROLLING_SPEED 600  //角度每秒
 
 #define MAX_SPEED 200 //最大水平速度，厘米每秒 cm/s
 
-#define MAX_Z_SPEED_UP 150 //厘米每秒 cm/s
-#define MAX_Z_SPEED_DW 150 //厘米每秒 cm/s
+#define MAX_Z_SPEED_UP 120 //厘米每秒 cm/s
+#define MAX_Z_SPEED_DW 120 //厘米每秒 cm/s
  
 
 #define CTRL_1_INTE_LIM 250 //角速度环积分限幅 ：输出
