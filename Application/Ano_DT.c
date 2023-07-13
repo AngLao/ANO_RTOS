@@ -26,12 +26,12 @@
 #include "Ano_FlightCtrl.h"
 #include "Ano_FlightDataCal.h"
 #include "Ano_OF_DecoFusion.h"
-#include "Ano_LocCtrl.h"
-#include "Ano_FlyCtrl.h"
+#include "Ano_LocCtrl.h" 
 #include "Ano_OF.h"
 #include "Ano_OF_DecoFusion.h"
 #include "power_management.h"
 #include "nlink_linktrack_tagframe0.h"
+#include "uwb_task.h"
 
  
 #define BYTE0(dwTemp)       ( *( (char *)(&dwTemp)		) )
@@ -40,24 +40,21 @@
 #define BYTE3(dwTemp)       ( *( (char *)(&dwTemp) + 3) )
 
 #define DT_RX_BUFNUM  64
-#define DT_ODNUM	5	//非循环发送数据缓冲大小
-#define DT_SENDPTR_HID	Usb_Hid_Adddata
-#define DT_SENDPTR_U2	Uart5_Send
+#define DT_ODNUM	5	//非循环发送数据缓冲大小 
 
 //越往前发送优先级越高，如果需要修改，这里和h文件里的枚举需要同时改
-const u8  _cs_idlist[CSID_NUM]	 	= {0x20, 0x21, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
-																		 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0f, 0x30, 0x32,0x40,0x51};
+const u8  _cs_idlist[CSID_NUM]	 	= {0x01, 0x02, 0x03, 0x05, 0x06, 0x07, 0x0B, 0x0D, 0x0E, 0x20, 0x32,0x40,0x51};
+  
 //循环发送数据结构体
 typedef struct {
   u8 WTS;		 //wait to send等待发送标记
   u16 fre_ms; //发送周期
   u16 time_cnt_ms; //计时变量
 } _dt_frame_st;
-typedef struct {
-  _dt_frame_st txSet_u2[CSID_NUM];
-} _dt_st;
-_dt_st dt;
-u8 CycleSendData[100];		//循环发送数据临时缓冲
+
+//循环发送数据临时缓冲
+u8 CycleSendData[100];		
+
 //非循环发送数据结构体
 typedef struct {
   u8 WTS;
@@ -68,16 +65,12 @@ typedef struct {
 _dt_otherdata_st OtherSendData[DT_ODNUM];
 
 u8 otherDataTmp[64];	//非循环发送数据临时缓冲
+  
+typedef struct {
+  _dt_frame_st txSet_u2[CSID_NUM];
+} _dt_st;
+_dt_st dt;
 
-
-/*============================================================================
-******************************************************************************
-******************************************************************************
-数据接口，本部分通过宏定义将各种需要收发的数据进行定义，普通用户只需修改本部分
-定义即可实现不同数据的收发功能
-******************************************************************************
-******************************************************************************
-============================================================================*/
 //0x01
 
 #define ACC_RAW_X      (sensor.Acc[X])
@@ -89,8 +82,8 @@ u8 otherDataTmp[64];	//非循环发送数据临时缓冲
 #define SHOCK_STA      (flag.unlock_err)
 
 //0x02
-#define ECP_RAW_X      (loc_val_1[X].out*100) 
-#define ECP_RAW_Y      (loc_val_1[Y].out*100)
+#define ECP_RAW_X      (totalFrameCount/100) 
+#define ECP_RAW_Y      (errorFrameCount/100) 
 #define ECP_RAW_Z      (loc_val_1_fix[X].out*100)
 #define BARO_ALT       (loc_val_1_fix[Y].out*100)
 #define TEMPERATURE    (sensor.Tempreature_C)
@@ -381,10 +374,11 @@ static void DTFrameAddData(u8 frame_num, u8 *_cnt)
     CycleSendData[(*_cnt)++] = BYTE1(temp_data);
   }
   break;
-
-  case 0x32: { //UWB数据
-    for(char i = 0; i < 3; i++) {
-      s32 temp = (int)g_nlt_tagframe0.result.pos_3d[i];
+	
+	//UWB数据
+  case 0x32: { 
+    for(uint8_t i = 0; i < 3; i++) {
+      s32 temp = (int32_t)g_nlt_tagframe0.result.pos_3d[i];
       CycleSendData[(*_cnt)++] = BYTE0(temp) ;
       CycleSendData[(*_cnt)++] = BYTE1(temp) ;
       CycleSendData[(*_cnt)++] = BYTE2(temp) ;
@@ -393,13 +387,10 @@ static void DTFrameAddData(u8 frame_num, u8 *_cnt)
   }
   break;
 
-  case 0x40: {
-    //遥控器数据
-    //CTR				//AUX
-    static char ch[] = { 0, 1, 2, 3, 4, 5, 6, 7};
-
+  //遥控器数据
+  case 0x40: {   
     for(char i = 0; i < CH_NUM; i++) {
-      u16 temp = CH_N[ch[i]] + 1500;
+      u16 temp = CH_N[i] + 1500;
       CycleSendData[(*_cnt)++] = BYTE0(temp) ;
       CycleSendData[(*_cnt)++] = BYTE1(temp) ;
     }
@@ -545,7 +536,7 @@ static void CheckDotMs( u8 id_addr)
 //===========================================================
 u8 CheckDotWts(u8 id_addr)
 {
-  u8 _addr = 0xaf;//swj
+  u8 _addr = 0xaf; 
   u8  * _dot_WTS  = & dt.txSet_u2[id_addr].WTS;
 
 
@@ -795,7 +786,6 @@ void AnoDTRxOneByte(u8 data)
 u8 test_cali_cnt;
 //===========================================================
 //AnoDTDataAnl函数是协议数据解析函数，函数参数是符合协议格式的一个数据帧，该函数会首先对协议数据进行校验
-//此函数可以不用用户自行调用，由函数Data_Receive_Prepare自动调用
 //===========================================================
 static void AnoDTDataAnl(u8 *data, u8 len)
 {
@@ -814,22 +804,7 @@ static void AnoDTDataAnl(u8 *data, u8 len)
     return;
   }
 
-  //=============================================================================
-  if(*(data + 2) == 0X40) { //摇杆数据
-
-  } else if(*(data + 2) == 0X41) { //实时控制数据
-
-  } else if(*(data + 2) == 0X30) { //GPS数据
-
-  } else if(*(data + 2) == 0X32) { //通用位置
-
-  } else if(*(data + 2) == 0X33) { //通用速度
-
-  } else if(*(data + 2) == 0X34) { //通用测距
-
-  } else if(*(data + 2) == 0X0D) {		//电压
-
-  } else if(*(data + 2) == 0XE0) {		//命令E0
+  if(*(data + 2) == 0XE0) {		//命令E0
     switch(*(data + 4)) {	//CID
     case 0x01: {
       if(*(data + 5) == 0x00) {
@@ -888,99 +863,12 @@ static void AnoDTDataAnl(u8 *data, u8 len)
       }
     }
     break;
-
-    case 0x10: { //指令控制
-      if(*(data + 5) == 0x00) {
-        switch(*(data + 6)) {
-        case 0x01: { //解锁
-
-        }
-        break;
-
-        case 0x02: { //上锁
-
-        }
-        break;
-
-        case 0x03: {
-
-        }
-        break;
-
-        case 0x04: { //立即悬停
-
-        }
-        break;
-
-        case 0x05: { //起飞，带高度参数
-
-        }
-        break;
-
-        case 0x06: { //降落
-
-        }
-        break;
-
-        case 0x07: { //返航
-
-        }
-        break;
-
-        case 0x08: { //翻滚
-
-        }
-        break;
-
-        case 0x09: { //环绕
-
-        }
-        break;
-
-        case 0x0a: { //无头
-
-        }
-        break;
-
-        case 0x60: { //开始航点
-
-        }
-        break;
-
-        case 0x61: { //暂停航点
-
-        }
-        break;
-
-        case 0x62: { //取消航点
-
-        }
-        break;
-
-        default :
-          break;
-        }
-      } else if(*(data + 5) == 0x01) {
-
-      } else if(*(data + 5) == 0x02) {
-
-      } else if(*(data + 5) == 0x03) {
-
-      }
-    }
-    break;
-
-    case 0x11:
-      break;
-
+ 
     default:
       break;
-    }
-
+    } 
     //需返回CHECK帧
     SendCheck(SWJ_ADDR, *(data + 2), check_sum1, check_sum2);
-  } else if(*(data + 2) == 0X00) { //Check
-
   } else if(*(data + 2) == 0XE1) {
     //读取参数
     SendPar(SWJ_ADDR, *(u16*)(data + 4));
@@ -990,11 +878,7 @@ static void AnoDTDataAnl(u8 *data, u8 len)
     AnoParWrite(*(u16*)(data + 4), *(s32*)(data + 6));
     //写入参数后需返回CHECK帧，告诉上位机参数写入成功
     SendCheck( SWJ_ADDR, *(data + 2), check_sum1, check_sum2);
-  } else if(*(data + 2) == 0x60) {
-    //读取航点
-  } else if(*(data + 2) == 0x61) {
-    //写入航点
-  }
+  }  
 }
 
 

@@ -8,8 +8,7 @@
 #include "Drv_RcIn.h"
 #include "Ano_DT.h"
 #include "Ano_LED.h"
-#include "Ano_FcData.h"
-#include "Ano_FlyCtrl.h"
+#include "Ano_FcData.h" 
 #include "Ano_FlightCtrl.h"
 
 #include "FreeRTOS.h"

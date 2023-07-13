@@ -32,12 +32,12 @@ void wdt0_loop(void *pvParameters)
 
 	// Enable the watchdog timer.
 	MAP_WatchdogEnable(WATCHDOG0_BASE);
-	
-	static TickType_t xLastWakeTime;         //用于精准定时的变量
-	
-	xLastWakeTime = xTaskGetTickCount(); //获取当前Tick次数,以赋给延时函数初值
-	
+	 
 	debugOutput("Here's the dog");
+	
+	static TickType_t xLastWakeTime;    	//用于精准定时的变量 
+	xLastWakeTime = xTaskGetTickCount(); 	//获取当前Tick次数,以赋给延时函数初值
+	
 	while(1)
 	{
 		/* 喂狗 */ 

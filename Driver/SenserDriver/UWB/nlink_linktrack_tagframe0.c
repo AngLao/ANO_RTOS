@@ -39,29 +39,29 @@ static uint8_t UnpackData(const uint8_t *data, size_t data_length)
     return 0;
  
   memcpy(&g_frame, data, g_nlt_tagframe0.fixed_part_size);
-  g_nlt_tagframe0.result.role = g_frame.role;
-  g_nlt_tagframe0.result.id = g_frame.id;
-  g_nlt_tagframe0.result.local_time = g_frame.local_time;
-  g_nlt_tagframe0.result.system_time = g_frame.system_time;
-  g_nlt_tagframe0.result.voltage = g_frame.voltage / MULTIPLY_VOLTAGE;
+//  g_nlt_tagframe0.result.role = g_frame.role;
+//  g_nlt_tagframe0.result.id = g_frame.id;
+//  g_nlt_tagframe0.result.local_time = g_frame.local_time;
+//  g_nlt_tagframe0.result.system_time = g_frame.system_time;
+//  g_nlt_tagframe0.result.voltage = g_frame.voltage / MULTIPLY_VOLTAGE;
 
   NLINK_TRANSFORM_ARRAY_INT24(g_nlt_tagframe0.result.pos_3d, g_frame.pos_3d,
                               MULTIPLY_POS)
   NLINK_TRANSFORM_ARRAY_INT24(g_nlt_tagframe0.result.vel_3d, g_frame.vel_3d,
                               MULTIPLY_VEL)
-  NLINK_TRANSFORM_ARRAY_INT24(g_nlt_tagframe0.result.dis_arr, g_frame.dis_arr,
-                              MULTIPLY_DIS)
-  NLINK_TRANSFORM_ARRAY(g_nlt_tagframe0.result.imu_gyro_3d, g_frame.imu_gyro_3d,
-                        1)
-  NLINK_TRANSFORM_ARRAY(g_nlt_tagframe0.result.imu_acc_3d, g_frame.imu_acc_3d,
-                        1)
-  NLINK_TRANSFORM_ARRAY(g_nlt_tagframe0.result.quaternion, g_frame.quaternion,
-                        1)
-  NLINK_TRANSFORM_ARRAY(g_nlt_tagframe0.result.angle_3d, g_frame.angle_3d,
-                        MULTIPLY_ANGLE)
+//  NLINK_TRANSFORM_ARRAY_INT24(g_nlt_tagframe0.result.dis_arr, g_frame.dis_arr,
+//                              MULTIPLY_DIS)
+//  NLINK_TRANSFORM_ARRAY(g_nlt_tagframe0.result.imu_gyro_3d, g_frame.imu_gyro_3d,
+//                        1)
+//  NLINK_TRANSFORM_ARRAY(g_nlt_tagframe0.result.imu_acc_3d, g_frame.imu_acc_3d,
+//                        1)
+//  NLINK_TRANSFORM_ARRAY(g_nlt_tagframe0.result.quaternion, g_frame.quaternion,
+//                        1)
+//  NLINK_TRANSFORM_ARRAY(g_nlt_tagframe0.result.angle_3d, g_frame.angle_3d,
+//                        MULTIPLY_ANGLE)
   NLINK_TRANSFORM_ARRAY(g_nlt_tagframe0.result.eop_3d, g_frame.eop_3d,
                         MULTIPLY_EOP)
-
+	   
   return 1;
 }
 

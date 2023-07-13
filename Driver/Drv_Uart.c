@@ -33,10 +33,8 @@ void UART1_IRQHandler(void)
   /*判断FIFO是否还有数据*/
   while(ROM_UARTCharsAvail(UART0_BASE)) {
     com_data = ROM_UARTCharGet(UART0_BASE);
-
-    if(RingBuffer_GetFree(&U1rxring) > 1) {
-      RingBuffer_Insert(&U1rxring, &com_data);
-    }
+ 
+		RingBuffer_Insert(&U1rxring, &com_data); 
 
   }
 

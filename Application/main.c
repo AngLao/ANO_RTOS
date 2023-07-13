@@ -16,8 +16,7 @@
 #include "Ano_AltCtrl.h"
 #include "Ano_MotorCtrl.h"
 #include "Ano_OF.h"
-#include "Ano_OF_DecoFusion.h"
-#include "Ano_FlyCtrl.h"
+#include "Ano_OF_DecoFusion.h" 
 #include "Ano_FlightDataCal.h"
 #include "Ano_ProgramCtrl_User.h"
 #include "nlink_linktrack_tagframe0.h"
@@ -182,7 +181,7 @@ int main(void)
   xTaskCreate(light_flow_task, "light_flow_task", 136, NULL, 3, NULL);
 	
   /* uwb数据更新 */
-//  xTaskCreate(uwb_update_task, "uwb_update_task", 116, NULL, 3, NULL);
+  xTaskCreate(uwb_update_task, "uwb_update_task", 116, NULL, 3, NULL);
 
   /*--------------------------------------------------------
   									上层扩展任务

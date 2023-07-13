@@ -604,11 +604,6 @@
           <GroupName>FC_Specific</GroupName>
           <Files>
             <File>
-              <FileName>config.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\SRC\fc_specific\config.h</FilePath>
-            </File>
-            <File>
               <FileName>Ano_AltCtrl.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\SRC\fc_specific\Ano_AltCtrl.c</FilePath>
@@ -654,19 +649,9 @@
               <FilePath>.\Application\main.c</FilePath>
             </File>
             <File>
-              <FileName>sysconfig.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\Application\sysconfig.h</FilePath>
-            </File>
-            <File>
               <FileName>Ano_Parameter.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Application\Ano_Parameter.c</FilePath>
-            </File>
-            <File>
-              <FileName>Ano_FlyCtrl.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Application\Ano_FlyCtrl.c</FilePath>
             </File>
             <File>
               <FileName>Ano_DT.c</FileName>
@@ -694,11 +679,6 @@
               <FilePath>.\Application\Ano_OF_DecoFusion.c</FilePath>
             </File>
             <File>
-              <FileName>game_map.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\Application\game_map.h</FilePath>
-            </File>
-            <File>
               <FileName>rc_update.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Application\rc_update.c</FilePath>
@@ -717,6 +697,21 @@
               <FileName>light_flow_task.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Application\light_flow_task.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Config</GroupName>
+          <Files>
+            <File>
+              <FileName>config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\SRC\fc_specific\config.h</FilePath>
+            </File>
+            <File>
+              <FileName>sysconfig.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Application\sysconfig.h</FilePath>
             </File>
           </Files>
         </Group>
