@@ -78,20 +78,25 @@ static void vSlowDetection( void *pvParameters )
   //通道3检测
   static uint8_t channelThreeState = 0;
   //开关回到零点
-  if(CH_N[AUX3]<-100) 
-    channelThreeState = 0;  
+  if(CH_N[AUX3]<-100){ 
+			channelThreeState = 0;  
+			useUwb = 0;
+	}
 	
   if(channelThreeState == 0) {
     //开关打到高值
     if(CH_N[AUX3] > 300) {
       channelThreeState = 2;
-      debugOutput("CH_N[AUX3]  = 2");
-
+//      debugOutput("CH_N[AUX3]  = 2");
+			debugOutput("drawing_circle");
+			useUwb = 1;
     }
     //开关打到中值
     else if(CH_N[AUX3] > -100) {
       channelThreeState = 1;
-      debugOutput("CH_N[AUX3]  = 1");
+//      debugOutput("CH_N[AUX3]  = 1");
+			debugOutput("x=2000,y=2000");
+			useUwb = 2;
     }
   }
 
