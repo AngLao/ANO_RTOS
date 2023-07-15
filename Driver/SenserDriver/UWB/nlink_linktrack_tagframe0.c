@@ -47,8 +47,8 @@ static uint8_t UnpackData(const uint8_t *data, size_t data_length)
 
   NLINK_TRANSFORM_ARRAY_INT24(g_nlt_tagframe0.result.pos_3d, g_frame.pos_3d,
                               MULTIPLY_POS)
-  NLINK_TRANSFORM_ARRAY_INT24(g_nlt_tagframe0.result.vel_3d, g_frame.vel_3d,
-                              MULTIPLY_VEL)
+//  NLINK_TRANSFORM_ARRAY_INT24(g_nlt_tagframe0.result.vel_3d, g_frame.vel_3d,
+//                              MULTIPLY_VEL)
 //  NLINK_TRANSFORM_ARRAY_INT24(g_nlt_tagframe0.result.dis_arr, g_frame.dis_arr,
 //                              MULTIPLY_DIS)
 //  NLINK_TRANSFORM_ARRAY(g_nlt_tagframe0.result.imu_gyro_3d, g_frame.imu_gyro_3d,

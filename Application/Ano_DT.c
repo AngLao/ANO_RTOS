@@ -83,7 +83,7 @@ _dt_st dt;
 
 //0x02
 #define ECP_RAW_X      (totalFrameCount/100) 
-#define ECP_RAW_Y      (errorFrameCount/100) 
+#define ECP_RAW_Y      (errorFrameCount/10) 
 #define ECP_RAW_Z      (loc_val_1_fix[X].out*100)
 #define BARO_ALT       (loc_val_1_fix[Y].out*100)
 #define TEMPERATURE    (sensor.Tempreature_C)
@@ -709,8 +709,7 @@ u8 ano_dt_rec_data = 0;
 void AnoDTRxOneByte(u8 data)
 {
   static _dt_rx_anl_st rx_anl;
-
-
+ 
   switch (rx_anl.rxstate) {
   case 0: {
     if(data == 0xAA) {

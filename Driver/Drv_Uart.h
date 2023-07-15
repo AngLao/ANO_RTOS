@@ -4,15 +4,15 @@
 #include "ring_buffer.h"
 
 
-#define USER_SERIAL_1  1
-#define USER_SERIAL_2  0
+#define USER_SERIAL_1  0
+#define USER_SERIAL_2  1
 #define USER_SERIAL_3  1
 #define USER_SERIAL_4  1
 #define USER_SERIAL_5  1
  
+
 #if(USER_SERIAL_1 == 1)
 
-extern RINGBUFF_T U1rxring;//外部环形缓冲区声明
 
 void Drv_Uart1Init(uint32_t baudrate);
 void Drv_Uart1SendBuf(u8 *data, u8 len);
@@ -22,6 +22,8 @@ void Drv_Uart1TxCheck(void);
 
 
 #if(USER_SERIAL_2 == 1)
+ 
+extern RINGBUFF_T uwbRingBuff;//外部环形缓冲区声明
 
 void Drv_Uart2Init(uint32_t baudrate);
 void Drv_Uart2SendBuf(u8 *data, u8 len);

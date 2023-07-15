@@ -19,9 +19,6 @@
 u8 U1TxDataTemp[256];
 u8 U1TxInCnt = 0;
 u8 U1TxOutCnt = 0;
-//串口收发环形缓冲区定义
-RINGBUFF_T U1rxring;
-volatile unsigned char UART1Buffer[128 * 5];
 void UART1_IRQHandler(void)
 {
   uint8_t com_data;
@@ -45,9 +42,6 @@ void UART1_IRQHandler(void)
 
 void Drv_Uart1Init(uint32_t baudrate)
 {
-  //环形缓冲区初始化
-  RingBuffer_Init(&U1rxring, (unsigned char*)UART1Buffer, 1, 128 * 5);
-
   ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
   ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
 
@@ -91,25 +85,30 @@ void Drv_Uart1TxCheck(void)
 u8 U2TxDataTemp[256] = {0};
 u8 U2TxInCnt = 0;
 u8 U2TxOutCnt = 0;
+//串口收发环形缓冲区定义
+RINGBUFF_T uwbRingBuff;
+volatile unsigned char uwbRingBuffData[128 * 3];
 void UART2_IRQHandler(void)
-{
-  uint8_t com_data;
-  /*获取中断标志 原始中断状态 不屏蔽中断标志*/
-  uint32_t flag = ROM_UARTIntStatus(UART4_BASE, 1);
+{ 
   /*清除中断标志*/
-  ROM_UARTIntClear(UART4_BASE, flag);
+  ROM_UARTIntClear(UART4_BASE, ROM_UARTIntStatus(UART4_BASE, 1));
 
+	unsigned char data ;
   /*判断FIFO是否还有数据*/
-  while(ROM_UARTCharsAvail(UART4_BASE)) {
-    com_data = ROM_UARTCharGet(UART4_BASE);
+  while(ROM_UARTCharsAvail(UART4_BASE)) { 
+		data = ROM_UARTCharGet(UART4_BASE);
+    RingBuffer_Insert(&uwbRingBuff, &data);
   }
 
-  if(flag & UART_INT_TX) {
-    Drv_Uart2TxCheck();
-  }
+//  if(flag & UART_INT_TX) {
+//    Drv_Uart2TxCheck();
+//  }
 }
 void Drv_Uart2Init(uint32_t baudrate)
 { 
+  //环形缓冲区初始化
+  RingBuffer_Init(&uwbRingBuff, (unsigned char*)uwbRingBuffData, 1, 128 * 3);
+
   ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_UART4);
   ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
 
@@ -120,7 +119,7 @@ void Drv_Uart2Init(uint32_t baudrate)
   /*配置串口号波特率和时钟源*/
   ROM_UARTConfigSetExpClk(UART4_BASE, ROM_SysCtlClockGet(), baudrate, (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE | UART_CONFIG_PAR_NONE));
   /*FIFO设置*/
-  ROM_UARTFIFOLevelSet(UART4_BASE, UART_FIFO_TX7_8, UART_FIFO_RX7_8);
+  ROM_UARTFIFOLevelSet(UART4_BASE, UART_FIFO_RX2_8, UART_FIFO_RX2_8);
   ROM_UARTFIFOEnable(UART4_BASE);
   /*使能串口*/
   ROM_UARTEnable( UART4_BASE );

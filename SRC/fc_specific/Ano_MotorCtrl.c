@@ -14,76 +14,75 @@
    m3     m4
       屁股
 */
-s16 motor[MOTORSNUM];
-s16 motor_step[MOTORSNUM];
+int16_t motor[MOTORSNUM]; 
 
-static u16 motor_prepara_cnt;
 _mc_st mc;
-u16 IDLING;
 
-void Motor_Ctrl_Task(u8 dT_ms)
+
+void power_distribution(uint8_t dT_ms)
 {
-  u8 i;
+  //电调校准模式,四路PWM输出即为油门值
+  if(escCalibrationMode) {
+    //遥控器油门响应
+    uint16_t out = CH_N[CH_THR] + 500 ; 
+    out = LIMIT(out,0,999);
 
-  if(flag.unlock_sta) {
-    IDLING = 10*LIMIT(Ano_Parame.set.idle_speed_pwm,0,30);
+		//分配动力 
+    for(uint8_t i =0; i<4; i++)
+      Drv_MotorPWMSet(i,out);
 
-    if(flag.motor_preparation == 0) {
-      motor_prepara_cnt += dT_ms;
+    return;
+  }
 
-      if(flag.motor_preparation == 0) {
-        if(motor_prepara_cnt<300) {
-          motor[m1] = IDLING;
-        } else if(motor_prepara_cnt<600) {
-          motor[m2] = IDLING;
-        } else if(motor_prepara_cnt<900) {
-          motor[m3] = IDLING;
-        } else if(motor_prepara_cnt<1200) {
-          motor[m4] = IDLING;
-        } else {
-          flag.motor_preparation = 1;
-          motor_prepara_cnt = 0;
-        }
-      }
+  //上锁状态一定停转电机
+  if(!flag.unlock_sta) {
+    //电机停转
+    for(uint8_t i =0; i<4; i++)
+      Drv_MotorPWMSet(i,0);
 
-    }
-  } else {
     flag.motor_preparation = 0;
+
+    return;
   }
+ 
+  uint16_t idleOut = 10*LIMIT(Ano_Parame.set.idle_speed_pwm,0,30);
+  
+  //按顺序启动电机后才能起飞
+  if(!flag.motor_preparation) { 
+		static uint16_t timerCount = 0;
+    timerCount += dT_ms;
 
-  if(flag.motor_preparation == 1) {
-    motor_step[m1] = mc.ct_val_thr  +mc.ct_val_yaw -mc.ct_val_rol +mc.ct_val_pit;
-    motor_step[m2] = mc.ct_val_thr  -mc.ct_val_yaw +mc.ct_val_rol +mc.ct_val_pit;
-    motor_step[m3] = mc.ct_val_thr  +mc.ct_val_yaw +mc.ct_val_rol -mc.ct_val_pit;
-    motor_step[m4] = mc.ct_val_thr  -mc.ct_val_yaw -mc.ct_val_rol -mc.ct_val_pit;
-
-
-    for(i=0; i<MOTORSNUM; i++) {
-      motor_step[i] = LIMIT(motor_step[i],IDLING,1000);
-    }
-  }
-
-  for(i=0; i<MOTORSNUM; i++) {
-    if(flag.unlock_sta) {
-      if(flag.motor_preparation == 1) {
-        motor[i] = LIMIT(motor_step[i],IDLING,999);
-      } 
+    if(timerCount<300) {
+      motor[m1] = idleOut;
+    } else if(timerCount<600) {
+      motor[m2] = idleOut;
+    } else if(timerCount<900) {
+      motor[m3] = idleOut;
+    } else if(timerCount<1200) {
+      motor[m4] = idleOut;
     } else {
-      motor[i] = 0;
+      flag.motor_preparation = 1;
+      timerCount = 0;
     } 
-  }
-
-	//电调校准模式,四路PWM输出即为油门值
-	if(escCalibrationMode){
-		uint16_t out = CH_N[CH_THR] + 500 ;
-		for(i=0; i<MOTORSNUM; i++) 
-				motor[i] = LIMIT(out,0,999); 
 	}
 	
-  //配置输出
-  for(u8 i =0; i<4; i++) 
-    Drv_MotorPWMSet(i,motor[i]); 
+	//飞行状态
+	if(flag.taking_off && flag.motor_preparation){
 
+		motor[m1] = mc.ct_val_thr  +mc.ct_val_yaw -mc.ct_val_rol +mc.ct_val_pit;
+		motor[m2] = mc.ct_val_thr  -mc.ct_val_yaw +mc.ct_val_rol +mc.ct_val_pit;
+		motor[m3] = mc.ct_val_thr  +mc.ct_val_yaw +mc.ct_val_rol -mc.ct_val_pit;
+		motor[m4] = mc.ct_val_thr  -mc.ct_val_yaw -mc.ct_val_rol -mc.ct_val_pit;
+		
+		//限幅	
+    for(uint8_t i=0; i<MOTORSNUM; i++) 
+			motor[i] = LIMIT(motor[i],0,999); 
+		
+	} 
+		 
+	//分配动力  
+	for(uint8_t i=0; i<MOTORSNUM; i++) 
+		Drv_MotorPWMSet(i,motor[i]); 
 }
 
 

@@ -11,34 +11,32 @@ void uwb_update_task(void *pvParameters)
   static uint8_t pData[128];
 	static uint16_t RingBufferDataLen;
   //uwb串口初始化
-  Drv_Uart1Init(3000000);
-  debugOutput("uwb use uart1，rate:3000000");
+  Drv_Uart2Init(921600);
+  debugOutput("uwb use uart2，rate:921600");
 
-  while (1) { 
+  while (1) {  
 		
-		RingBufferDataLen = RingBuffer_GetCount(&U1rxring) ;
-		
-		for(uint16_t i=0; ;i++){
+		for(; ;){ 
+			RingBufferDataLen = RingBuffer_GetCount(&uwbRingBuff) ;
 			//缓冲区中数据不够一帧的长度
-			if(RingBufferDataLen-i<128)
+			if(RingBufferDataLen<128)
 				break;
 			 
 			//查找帧头
-			RingBuffer_Pop(&U1rxring, &pData[0]);
+			RingBuffer_Pop(&uwbRingBuff, &pData[0]);
+			//找到帧头
 			if(pData[0] == 0x55) {
-				//找到帧头
 				totalFrameCount++;
 				//弹出剩余数据
-				for(uint16_t cnt = 1; cnt <128 ; cnt++){ 
-					RingBuffer_Pop(&U1rxring, &pData[cnt]);
-				} 
+				for(uint16_t cnt = 1; cnt <128 ; cnt++) 
+					RingBuffer_Pop(&uwbRingBuff, &pData[cnt]); 
 				//解析数据
-				if(!g_nlt_tagframe0.UnpackData(pData, RingBufferDataLen))  
+				if(!g_nlt_tagframe0.UnpackData(pData, 128))  
 					//传输有错
-					errorFrameCount++; 
+					errorFrameCount++;  
 			}
 		} 
 		
-    vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 200);
+    vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 100);
   }
 } 

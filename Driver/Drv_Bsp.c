@@ -28,7 +28,7 @@
 
 static void SysTick_Init(void )
 {
-  ROM_SysTickPeriodSet(ROM_SysCtlClockGet() / 2000);
+  ROM_SysTickPeriodSet(ROM_SysCtlClockGet() / 1000);
   ROM_SysTickIntEnable();
   ROM_SysTickEnable();
 }

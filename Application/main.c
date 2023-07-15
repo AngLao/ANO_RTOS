@@ -70,8 +70,8 @@ void inner_loop(void *pvParameters)
     /*姿态角速度环控制*/
     Att_1level_Ctrl(2 * 1e-3f);
 
-    /*电机输出控制*/
-    Motor_Ctrl_Task(2);
+    /*动力分配*/
+    power_distribution(2);
 
     vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 500);
   }
@@ -181,7 +181,7 @@ int main(void)
   xTaskCreate(light_flow_task, "light_flow_task", 136, NULL, 3, NULL);
 	
   /* uwb数据更新 */
-  xTaskCreate(uwb_update_task, "uwb_update_task", 116, NULL, 3, NULL);
+  xTaskCreate(uwb_update_task, "uwb_update_task", 136, NULL, 3, NULL);
 
   /*--------------------------------------------------------
   									上层扩展任务

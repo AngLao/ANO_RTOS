@@ -180,7 +180,7 @@ void Parame_Reset(u8 mode)
     Ano_Parame.set.auto_take_off_speed = 20;
     Ano_Parame.set.auto_landing_speed = 20;
 
-    Ano_Parame.set.idle_speed_pwm = 10;
+    Ano_Parame.set.idle_speed_pwm = 15;
   }
 
   if(mode == 2) {

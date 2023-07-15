@@ -58,10 +58,8 @@ void WDT0_Handler(void)
 	
 	Drv_Uart3SendBuf(theDogWantsToSay,sizeof(theDogWantsToSay)); 
 	
-	//∏¥Œª
-	for(int i=0; i!=100000;i++) {
+	//—” ±∏¥Œª
+	for(unsigned int i=0; ;i++) 
 		if(i == 100000)
-			ROM_SysCtlReset();   
-		
-	}
+			ROM_SysCtlReset();    
 }
