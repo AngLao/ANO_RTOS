@@ -688,15 +688,20 @@
               <FileType>1</FileType>
               <FilePath>.\SRC\fc_specific\power_management.c</FilePath>
             </File>
-            <File>
-              <FileName>uwb_task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Application\uwb_task.c</FilePath>
-            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Task</GroupName>
+          <Files>
             <File>
               <FileName>light_flow_task.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Application\light_flow_task.c</FilePath>
+            </File>
+            <File>
+              <FileName>uwb_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Application\uwb_task.c</FilePath>
             </File>
           </Files>
         </Group>
