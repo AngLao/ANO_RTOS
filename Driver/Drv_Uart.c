@@ -287,15 +287,19 @@ void Drv_Uart4TxCheck(void)
   while( (U4TxOutCnt != U4TxInCnt) && (ROM_UARTCharPutNonBlocking(UART7_BASE, U4TxDataTemp[U4TxOutCnt])) )
     U4TxOutCnt++;
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////
-u8 U5TxDataTemp[256];
-u8 U5TxInCnt = 0;
-u8 U5TxOutCnt = 0;
 
 #endif
 
 #if(USER_SERIAL_5 == 1) 
-u8 openMV_res = 0;
+ 
+u8 U5TxDataTemp[256];
+u8 U5TxInCnt = 0;
+u8 U5TxOutCnt = 0;
+ 
+
+
+RINGBUFF_T openmvRing;
+volatile unsigned char openmvBuffer[64];
 void UART5_IRQHandler(void)
 {
   uint8_t com_data;
@@ -307,8 +311,8 @@ void UART5_IRQHandler(void)
   /*判断FIFO是否还有数据*/
   while(ROM_UARTCharsAvail(UART2_BASE)) {
     com_data = ROM_UARTCharGet(UART2_BASE); 
-		
-		Ultra_Get(com_data); 
+		 
+		RingBuffer_Insert(&openmvRing, &com_data);
   }
 
   if(flag & UART_INT_TX) {
@@ -317,6 +321,9 @@ void UART5_IRQHandler(void)
 }
 void Drv_Uart5Init(uint32_t baudrate)
 {
+  //环形缓冲区初始化
+  RingBuffer_Init(&openmvRing, (unsigned char*)openmvBuffer, 1, 64);
+	
   ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_UART2);
   ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
 
@@ -331,7 +338,7 @@ void Drv_Uart5Init(uint32_t baudrate)
   /*配置串口号波特率和时钟源*/
   ROM_UARTConfigSetExpClk(UART2_BASE, ROM_SysCtlClockGet(), baudrate, (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE | UART_CONFIG_PAR_NONE));
   /*FIFO设置*/
-  ROM_UARTFIFOLevelSet(UART2_BASE, UART_FIFO_TX7_8, UART_FIFO_RX7_8);
+  ROM_UARTFIFOLevelSet(UART2_BASE, UART_FIFO_RX4_8, UART_FIFO_RX4_8);
   ROM_UARTFIFOEnable(UART2_BASE);
   /*使能串口*/
   ROM_UARTEnable( UART2_BASE );

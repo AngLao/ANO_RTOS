@@ -16,7 +16,7 @@ typedef struct {
 extern _mc_st mc;
 
 extern int16_t motor[MOTORSNUM];
- 
+
 void power_distribution(uint8_t dT_ms);
 
 #endif

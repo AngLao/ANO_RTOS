@@ -45,20 +45,20 @@ _loc_ctrl_st loc_ctrl_1;
 /*位置速度环*/
 void Loc_1level_Ctrl(u16 dT_ms)
 {
-	//积分修正速度反馈值
-	static float fb_speed_fix[2];
-	
-	//加速度计速度反馈
-	static float vel_fb_d_lpf[2];  
-	
+  //积分修正速度反馈值
+  static float fb_speed_fix[2];
+
+  //加速度计速度反馈
+  static float vel_fb_d_lpf[2];
+
   //期望速度赋值
   loc_ctrl_1.exp[X] = fs.speed_set_h[X];
   loc_ctrl_1.exp[Y] = fs.speed_set_h[Y];
- 
-	//加速度计速度反馈低通滤波	
-	LPF_1_(5.0f,dT_ms*1e-3f,imu_data.h_acc[X],vel_fb_d_lpf[X]);
-	LPF_1_(5.0f,dT_ms*1e-3f,imu_data.h_acc[Y],vel_fb_d_lpf[Y]);
-	
+
+  //加速度计速度反馈低通滤波
+  LPF_1_(5.0f,dT_ms*1e-3f,imu_data.h_acc[X],vel_fb_d_lpf[X]);
+  LPF_1_(5.0f,dT_ms*1e-3f,imu_data.h_acc[Y],vel_fb_d_lpf[Y]);
+
   //光流正常
   if(switchs.of_flow_on) {
 
@@ -99,8 +99,8 @@ void Loc_1level_Ctrl(u16 dT_ms)
                    )	;
 
       loc_ctrl_1.out[i] = loc_val_1[i].out + loc_val_1_fix[i].out;	//(PD)+(I)
-    } 
-  } else { 
+    }
+  } else {
     loc_ctrl_1.out[X] = (float)MAX_ANGLE/MAX_SPEED *fs.speed_set_h[X] ;
     loc_ctrl_1.out[Y] = (float)MAX_ANGLE/MAX_SPEED *fs.speed_set_h[Y] ;
   }

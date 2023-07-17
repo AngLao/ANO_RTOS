@@ -2,7 +2,7 @@
 #include "Ano_Imu.h"
 #include "Drv_icm20602.h"
 #include "Ano_MagProcess.h"
-#include "Drv_spl06.h" 
+#include "Drv_spl06.h"
 #include "Ano_AttCtrl.h"
 #include "Ano_LocCtrl.h"
 #include "Ano_AltCtrl.h"
@@ -11,7 +11,7 @@
 #include "rc_update.h"
 #include "Drv_laser.h"
 #include "Ano_OF.h"
-#include "Ano_OF_DecoFusion.h" 
+#include "Ano_OF_DecoFusion.h"
 #include "Ano_Sensor_Basic.h"
 #include "Ano_DT.h"
 #include "Ano_LED.h"
@@ -90,15 +90,15 @@ void one_key_land()
 
 _flight_state_st fs;
 
-static s16 landing_cnt; 
- 
+static s16 landing_cnt;
+
 
 /*降落检测*/
 
 void land_discriminat(s16 dT_ms)
-{ 
-	static s16 ld_delay_cnt ;
-	
+{
+  static s16 ld_delay_cnt ;
+
   /*油门归一值小于0.1  或者启动自动降落*/
   if((fs.speed_set_h_norm[Z] < 0.1f) || flag.auto_take_off_land == AUTO_LAND) {
     if(ld_delay_cnt>0) {
@@ -114,16 +114,16 @@ void land_discriminat(s16 dT_ms)
     if(mc.ct_val_thr<250 && flag.unlock_sta == 1) { //还应当 与上速度条件，速度小于正20厘米每秒。
       if(landing_cnt<1500) {
         landing_cnt += dT_ms;
-      } else { 
+      } else {
         flag.taking_off = 0;
         landing_cnt =0;
-        flag.unlock_cmd =0; 
-				
-        debugOutput("Landing lock");  
+        flag.unlock_cmd =0;
+
+        debugOutput("Landing lock");
       }
     } else {
       landing_cnt = 0;
-    } 
+    }
   } else {
     landing_cnt  = 0;
   }
@@ -147,7 +147,7 @@ void Flight_State_Task(u8 dT_ms,const s16 *CH_N)
   fc_stv.vel_limit_z_p = MAX_Z_SPEED_UP;
   fc_stv.vel_limit_z_n = -MAX_Z_SPEED_DW;
 
-  if( flag.taking_off ) {  
+  if( flag.taking_off ) {
     //遥控设置的垂直方向速度
     if(fs.speed_set_h_norm[Z]>0)
       vel_z_tmp[0] = (fs.speed_set_h_norm_lpf[Z] *MAX_Z_SPEED_UP);
@@ -221,40 +221,40 @@ void Flight_State_Task(u8 dT_ms,const s16 *CH_N)
   }
 
   //飞行状态复位
-  if(flag.unlock_sta == 0) { 
+  if(flag.unlock_sta == 0) {
     landing_cnt = 0;
-    flag.taking_off = 0; 
+    flag.taking_off = 0;
 
     flag.rc_loss_back_home = 0;
   }
 }
- 
+
 _judge_sync_data_st jsdata;
 
 //光流,激光测距传感器检测
 void sensor_detection(u8 dT_ms)
 {
   switchs.of_flow_on = 0;
-	switchs.of_tof_on = 0;
+  switchs.of_tof_on = 0;
 
   //匿名光流
   if(sens_hd_check.of_ok) {
     jsdata.of_qua = OF_QUALITY;
     jsdata.of_alt = (s32)OF_ALT;
-		
-		//匿名光流上的激光测距传感器状态
+
+    //匿名光流上的激光测距传感器状态
     if(jsdata.of_alt != -1)
       //高度数据有效
       switchs.of_tof_on = 1;
     else
       switchs.of_tof_on = 0;
-		
-  //其他光流
+
+    //其他光流
   } else if(sens_hd_check.of_df_ok) {
     jsdata.of_qua = of_rdf.quality;
     jsdata.of_alt = Laser_height_cm;
-		 
-		//其他测距传感器状态
+
+    //其他测距传感器状态
     if(jsdata.of_alt < 400)
       //高度数据有效
       switchs.of_tof_on = 1;
@@ -262,7 +262,7 @@ void sensor_detection(u8 dT_ms)
       switchs.of_tof_on = 0;
   }
 
-	static u8 of_quality_ok , of_quality_delay; 
+  static u8 of_quality_ok, of_quality_delay;
   //光流质量大于50，认为光流可用
   if(jsdata.of_qua>50 ) {
     if(of_quality_delay>200)
@@ -273,13 +273,13 @@ void sensor_detection(u8 dT_ms)
     of_quality_delay =0;
     of_quality_ok = 0;
   }
- 
-	//根据光流质量以及飞行模式判定光流传感器状态
+
+  //根据光流质量以及飞行模式判定光流传感器状态
   if(flag.flight_mode == LOC_HOLD && of_quality_ok)
     switchs.of_flow_on = 1;
   else
     switchs.of_flow_on = 0;
- 
-   
+
+
 }
 

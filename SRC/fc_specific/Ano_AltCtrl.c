@@ -23,9 +23,9 @@ void Auto_Take_Off_Land_Task(u8 dT_ms)//
   one_key_take_off_task(dT_ms);
 
   if(flag.unlock_sta) {
-    if(flag.taking_off && flag.auto_take_off_land == AUTO_TAKE_OFF_NULL) { 
-        flag.auto_take_off_land = AUTO_TAKE_OFF; 
-    } 
+    if(flag.taking_off && flag.auto_take_off_land == AUTO_TAKE_OFF_NULL) {
+      flag.auto_take_off_land = AUTO_TAKE_OFF;
+    }
   } else {
     auto_taking_off_speed = 0;
     flag.auto_take_off_land = AUTO_TAKE_OFF_NULL;
@@ -47,7 +47,7 @@ void Auto_Take_Off_Land_Task(u8 dT_ms)//
 
     }
     //退出起飞流程条件2，2000毫秒后判断用户正在控制油门。
-    if(take_off_ok_cnt >2000 && ABS(fs.speed_set_h_norm[Z])>0.1f) {  
+    if(take_off_ok_cnt >2000 && ABS(fs.speed_set_h_norm[Z])>0.1f) {
       flag.auto_take_off_land = AUTO_TAKE_OFF_FINISH;
     }
 
@@ -96,7 +96,7 @@ void Alt_2level_Ctrl(float dT_s)
   loc_ctrl_2.exp[Z] = LIMIT(loc_ctrl_2.exp[Z],loc_ctrl_2.fb[Z]-200,loc_ctrl_2.fb[Z]+200);
   //
   loc_ctrl_2.fb[Z] = (s32)wcz_hei_fus.out;
-	
+
   if(fs.alt_ctrl_speed_set != 0) {
     flag.ct_alt_hold = 0;
   } else {
@@ -141,13 +141,13 @@ void Alt_1level_PID_Init()
   alt_arg_1.k_ff = 0.0f;
 
 }
- 
+
 static float err_i_comp;
 static float w_acc_z_lpf;
 void Alt_1level_Ctrl(float dT_s)
 {
   u8 out_en = (flag.taking_off != 0) ? 1 : 0;
- 
+
 
   loc_ctrl_1.exp[Z] = 0.6f *fs.alt_ctrl_speed_set + alt_val_2.out;//速度前馈0.6f，直接给速度
 
@@ -166,10 +166,10 @@ void Alt_1level_Ctrl(float dT_s)
                  (THR_INTE_LIM *10 - err_i_comp )*out_en			//integration limit，积分限幅
                );
 
-  if(flag.taking_off == 1) 
+  if(flag.taking_off == 1)
     LPF_1_(1.0f,dT_s,THR_START *10,err_i_comp);//err_i_comp = THR_START *10;
-  else  
-    err_i_comp = 0; 
+  else
+    err_i_comp = 0;
 
 
 

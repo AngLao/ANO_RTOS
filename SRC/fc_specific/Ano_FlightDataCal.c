@@ -74,13 +74,13 @@ void wcz_fus_update(u8 dT_ms)
 {
   static s32 ref_height_old,ref_speed_old;
   static s32 wcz_ref_speed,wcz_ref_acc;
- 
+
   static u8 cyc_xn;
   float hz,ntimes_hz;
   hz = safe_div(1000,dT_ms,0);
   ntimes_hz = hz/N_TIMES;
 
-  s32 ref_height = jsdata.of_alt; 
+  s32 ref_height = jsdata.of_alt;
 
   cyc_xn ++;
   cyc_xn %= N_TIMES;
@@ -93,8 +93,8 @@ void wcz_fus_update(u8 dT_ms)
     ref_height_old = ref_height;
     ref_speed_old = wcz_ref_speed;
 
-  } 
-	
+  }
+
   wcz_acc_fus.fix_ki = 0.3f;
   wcz_acc_fus.in_est = wcz_acc_use;
   wcz_acc_fus.in_obs = wcz_ref_acc;
@@ -109,12 +109,12 @@ void wcz_fus_update(u8 dT_ms)
   fix_inte_filter(dT_ms*1e-3f,&wcz_spe_fus);
 
 
-  wcz_hei_fus.fix_kp = 0.5f;
+  wcz_hei_fus.fix_kp = 0.9f;
   wcz_hei_fus.in_est_d = wcz_spe_fus.out;
   wcz_hei_fus.in_obs = ref_height;
   //wcz_hei_fus.e_limit = 200;
   fix_inte_filter(dT_ms*1e-3f,&wcz_hei_fus);
- 
+
 }
 
 

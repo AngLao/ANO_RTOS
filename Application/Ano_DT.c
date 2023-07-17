@@ -81,11 +81,12 @@ _dt_st dt;
 #define GYR_RAW_Z      (sensor.Gyro[Z])
 #define SHOCK_STA      (flag.unlock_err)
 
+#include "openmv_task.h" 
 //0x02
 #define ECP_RAW_X      (totalFrameCount/100) 
 #define ECP_RAW_Y      (errorFrameCount/10) 
-#define ECP_RAW_Z      (g_nlt_tagframe0.result.eop_3d[0])
-#define BARO_ALT       (g_nlt_tagframe0.result.eop_3d[1]*100)
+#define ECP_RAW_Z      (id)
+#define BARO_ALT       (value*100)
 #define TEMPERATURE    (sensor.Tempreature_C)
 #define BARO_STA       (sens_hd_check.baro_ok)
 #define ECP_STA        (sens_hd_check.mag_ok)

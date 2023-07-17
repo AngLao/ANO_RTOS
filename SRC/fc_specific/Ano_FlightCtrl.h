@@ -56,9 +56,9 @@ typedef struct {
 
 } _judge_sync_data_st;
 extern _judge_sync_data_st jsdata;
- 
+
 extern float wifi_selfie_mode_yaw_vlue;
- 
+
 void user_fun(float dT,u8 action_num);
 
 void All_PID_Init(void);
@@ -69,7 +69,7 @@ void one_key_land(void);
 void app_one_key_roll(void);
 void app_one_key_roll_reset(void);
 void one_key_take_off_task(u16 dt_ms);
- 
+
 void land_discriminat(s16 dT_ms);
 void Flight_State_Task(u8,const s16 *CH_N);
 

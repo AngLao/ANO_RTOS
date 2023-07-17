@@ -703,6 +703,11 @@
               <FileType>1</FileType>
               <FilePath>.\Application\uwb_task.c</FilePath>
             </File>
+            <File>
+              <FileName>openmv_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Application\openmv_task.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

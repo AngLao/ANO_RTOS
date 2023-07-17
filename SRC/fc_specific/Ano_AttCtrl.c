@@ -5,7 +5,7 @@
 #include "Drv_spl06.h"
 #include "Ano_FlightCtrl.h"
 #include "Ano_LocCtrl.h"
-#include "Ano_MotorCtrl.h" 
+#include "Ano_MotorCtrl.h"
 #include "Ano_Parameter.h"
 #include "Ano_Sensor_Basic.h"
 #include "Ano_ProgramCtrl_User.h"
@@ -93,7 +93,7 @@ void Att_1level_PID_Init()
   arg_1[PIT].kd_fb = arg_1[PIT].kd_fb *DIFF_GAIN;
 #endif
 }
- 
+
 
 #define POS_V_DAMPING 0.02f
 static float exp_rol_tmp,exp_pit_tmp;
@@ -108,12 +108,12 @@ static float ct_val[4];
 
 /*角速度环控制*/
 void Att_1level_Ctrl(float dT_s)
-{  
-	arg_1[ROL].ki = Ano_Parame.set.pid_att_1level[ROL][KI];
-	arg_1[PIT].ki = Ano_Parame.set.pid_att_1level[PIT][KI]; 
+{
+  arg_1[ROL].ki = Ano_Parame.set.pid_att_1level[ROL][KI];
+  arg_1[PIT].ki = Ano_Parame.set.pid_att_1level[PIT][KI];
 
-	arg_2[ROL].ki = Ano_Parame.set.pid_att_2level[ROL][KI];
-	arg_2[PIT].ki = Ano_Parame.set.pid_att_2level[PIT][KI];
+  arg_2[ROL].ki = Ano_Parame.set.pid_att_2level[ROL][KI];
+  arg_2[PIT].ki = Ano_Parame.set.pid_att_2level[PIT][KI];
 
 
   /*目标角速度赋值*/
@@ -158,7 +158,7 @@ void Att_1level_Ctrl(float dT_s)
   mc.ct_val_pit = LIMIT(mc.ct_val_pit,-1000,1000);
   mc.ct_val_yaw = LIMIT(mc.ct_val_yaw,-400,400);
 }
- 
+
 
 /*角度环控制*/
 void Att_2level_Ctrl(float dT_s,s16 *CH_N)
@@ -179,7 +179,7 @@ void Att_2level_Ctrl(float dT_s,s16 *CH_N)
     }
   } else {
     att_2l_ct.exp_rol_adj = 0;
-		att_2l_ct.exp_pit_adj = 0;
+    att_2l_ct.exp_pit_adj = 0;
   }
 
   /*正负参考ANO坐标参考方向*/
@@ -191,8 +191,8 @@ void Att_2level_Ctrl(float dT_s,s16 *CH_N)
   att_2l_ct.exp_pit = LIMIT(att_2l_ct.exp_pit,-MAX_ANGLE,MAX_ANGLE);
 
 
- 
-  max_yaw_speed = 200; 
+
+  max_yaw_speed = 200;
   //
   fc_stv.yaw_pal_limit = max_yaw_speed;
   /*摇杆量转换为YAW期望角速度 + 程控期望角速度*/
@@ -202,7 +202,7 @@ void Att_2level_Ctrl(float dT_s,s16 *CH_N)
   set_yaw_av_tmp = LIMIT(set_yaw_av_tmp,-max_yaw_speed,max_yaw_speed);
 
   /*没有起飞，复位*/
-  if(flag.taking_off==0) {  
+  if(flag.taking_off==0) {
     att_2l_ct.exp_rol = att_2l_ct.exp_pit = set_yaw_av_tmp = 0;
     att_2l_ct.exp_yaw = att_2l_ct.fb_yaw;
   }

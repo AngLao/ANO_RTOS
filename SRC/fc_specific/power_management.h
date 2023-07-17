@@ -7,9 +7,9 @@
 #include "Drv_led.h"
 #include "Ano_Math.h"
 #include "Ano_LED.h"
- 
 
-void battery_update(void); 
+
+void battery_update(void);
 
 float get_battery_voltage(void);
 
