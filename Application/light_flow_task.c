@@ -1,5 +1,4 @@
 #include "light_flow_task.h"
-
  
 /* 光流数据更新及高度融合 */
 void light_flow_task(void *pvParameters)
@@ -9,7 +8,10 @@ void light_flow_task(void *pvParameters)
 	//初始化光流
 	light_flow_init();
 	
-  while (1) {
+  while (1) { 
+    /*位置传感器状态检测*/
+    sensor_detection(5);
+		
 		/* 光流串口缓存有数据更新则组合数据，带掉线检测 */
 		ANO_OF_Data_Get(5, OF_DATA);
 		
@@ -21,6 +23,7 @@ void light_flow_task(void *pvParameters)
 		
     /*高度数据融合任务*/
     wcz_fus_update(5);
+		 
 		
 #if defined(USE_KS103)
     //超声波任务
@@ -30,3 +33,4 @@ void light_flow_task(void *pvParameters)
     vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 200);
   }
 }
+ 

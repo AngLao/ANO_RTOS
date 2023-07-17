@@ -22,16 +22,16 @@ _PID_val_st loc_val_1_fix[2] ;
 void Loc_1level_PID_Init()
 {
   //normal
-  loc_arg_1[X].kp = 0.22f ; //Ano_Parame.set.pid_loc_1level[KP];
+  loc_arg_1[X].kp = Ano_Parame.set.pid_loc_1level[KP];
   loc_arg_1[X].ki = 0.0f  ;
   loc_arg_1[X].kd_ex = 0.00f ;
-  loc_arg_1[X].kd_fb = 0.00f ; //Ano_Parame.set.pid_loc_1level[KD];
-  loc_arg_1[X].k_ff =  0.0f;
+  loc_arg_1[X].kd_fb = Ano_Parame.set.pid_loc_1level[KD];
+  loc_arg_1[X].k_ff =  0.05f;
 
   loc_arg_1[Y] = loc_arg_1[X];
   //fix
   loc_arg_1_fix[X].kp = 0.0f  ;
-  loc_arg_1_fix[X].ki = 0.1f ; //Ano_Parame.set.pid_loc_1level[KI] ;
+  loc_arg_1_fix[X].ki = Ano_Parame.set.pid_loc_1level[KI] ;
   loc_arg_1_fix[X].kd_ex = 0.00f;
   loc_arg_1_fix[X].kd_fb = 0.00f;
   loc_arg_1_fix[X].k_ff = 0.0f;

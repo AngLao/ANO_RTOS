@@ -84,8 +84,8 @@ _dt_st dt;
 //0x02
 #define ECP_RAW_X      (totalFrameCount/100) 
 #define ECP_RAW_Y      (errorFrameCount/10) 
-#define ECP_RAW_Z      (loc_val_1_fix[X].out*100)
-#define BARO_ALT       (loc_val_1_fix[Y].out*100)
+#define ECP_RAW_Z      (g_nlt_tagframe0.result.eop_3d[0])
+#define BARO_ALT       (g_nlt_tagframe0.result.eop_3d[1]*100)
 #define TEMPERATURE    (sensor.Tempreature_C)
 #define BARO_STA       (sens_hd_check.baro_ok)
 #define ECP_STA        (sens_hd_check.mag_ok)
