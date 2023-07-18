@@ -83,10 +83,10 @@ _dt_st dt;
 
 #include "openmv_task.h" 
 //0x02
-#define ECP_RAW_X      (totalFrameCount/100) 
-#define ECP_RAW_Y      (errorFrameCount/10) 
-#define ECP_RAW_Z      (id)
-#define BARO_ALT       (value*100)
+#define ECP_RAW_X      (satrtPos[0]) 
+#define ECP_RAW_Y      (satrtPos[1]) 
+#define ECP_RAW_Z      (g_nlt_tagframe0.result.eop_3d[X])
+#define BARO_ALT       (g_nlt_tagframe0.result.eop_3d[Y]*100)
 #define TEMPERATURE    (sensor.Tempreature_C)
 #define BARO_STA       (sens_hd_check.baro_ok)
 #define ECP_STA        (sens_hd_check.mag_ok)
@@ -115,9 +115,12 @@ _dt_st dt;
 #define FC_CMD_1       (0)
 
 //0X07  反馈速度
-#define HCA_VEL_X      (loc_ctrl_1.fb[X])
-#define HCA_VEL_Y      (loc_ctrl_1.fb[Y])
-#define HCA_VEL_Z      (loc_ctrl_1.fb[Z])
+//#define HCA_VEL_X      (loc_ctrl_1.fb[X])
+//#define HCA_VEL_Y      (loc_ctrl_1.fb[Y])
+//#define HCA_VEL_Z      (loc_ctrl_1.fb[Z])
+#define HCA_VEL_X      (g_nlt_tagframe0.result.vel_3d[X])
+#define HCA_VEL_Y      (g_nlt_tagframe0.result.vel_3d[Y])
+#define HCA_VEL_Z      (g_nlt_tagframe0.result.vel_3d[Z])
 
 //0X0B  期望速度
 #define HCA_TAR_VEL_X   (loc_ctrl_1.exp[X])

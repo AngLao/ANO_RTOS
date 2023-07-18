@@ -1,39 +1,57 @@
 #include "uwb_task.h"
- 
- 
-uint8_t useUwb = 0; 
+
+
+uint8_t useUwb = 0;
 uint32_t totalFrameCount = 0, errorFrameCount = 0;
 
 #define X 0
 #define Y 1
+
+int32_t satrtPos[2];
 static int32_t pos[2];
 
 static uint8_t unpack_data(void);
 static uint8_t validate_data(void);
+static uint8_t set_start_point(void); 
 static void position_control(const int tarX,const int tarY);
 static void drawing_circle(void);
 
-/* uwb数据更新 */
 void uwb_update_task(void *pvParameters)
 {
   TickType_t xLastWakeTime = xTaskGetTickCount(); //获取当前Tick次数,以赋给延时函数初值
-
 
   //uwb串口初始化
   Drv_Uart2Init(921600);
   debugOutput("uwb use uart2，rate:921600");
 
-  while (1) {  
+  while (1) {
+
+    //解析成功,校验成功可以使用数据
+    uint8_t dataValidity = unpack_data();
+
+    //记录起飞点
+		static uint8_t setPointOk;
     if(useUwb == 0)
       Program_Ctrl_User_Set_HXYcmps(0, 0);
-    //解析成功,校验成功可以使用数据
-    if(unpack_data() == 1 && validate_data() == 1) {
+    else if(dataValidity==1 && setPointOk==0)
+      setPointOk = set_start_point();
 
-      if(useUwb == 1)
-        drawing_circle();
-      else if(useUwb == 2)
+		if(!flag.taking_off)
+			setPointOk = 0;
+		
+    //按需执行任务
+    if(dataValidity==1 && setPointOk==1) {
+      switch(useUwb) {
+      case 1:
+				//返回起飞点 
+        position_control(satrtPos[X],satrtPos[Y]);
+        break;
+      case 2:
         position_control(2000,2000);
+        break;
+      }
     }
+		
 
     vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 120);
   }
@@ -46,7 +64,7 @@ static uint8_t unpack_data(void)
   static uint16_t RingBufferDataLen;
 
   uint8_t analyticResult = 0;
-  while(1){
+  while(1) {
     RingBufferDataLen = RingBuffer_GetCount(&uwbRingBuff) ;
     //缓冲区中数据不够一帧的长度
     if(RingBufferDataLen<128)
@@ -68,14 +86,17 @@ static uint8_t unpack_data(void)
       //传输有错
       if(analyticResult == 0)
         errorFrameCount++;
-			else{
-				pos[X] = g_nlt_tagframe0.result.pos_3d[X];
-				pos[Y] = g_nlt_tagframe0.result.pos_3d[Y]; 
-			}
-			
+      else {
+        pos[X] = g_nlt_tagframe0.result.pos_3d[X];
+        pos[Y] = g_nlt_tagframe0.result.pos_3d[Y];
+
+				//数据检验
+				analyticResult = validate_data();
+      }
+
     }
   }
-	return analyticResult;
+  return analyticResult;
 }
 
 //判断数据是否有效
@@ -100,32 +121,58 @@ static uint8_t validate_data(void)
   return res;
 }
 
+//起飞完成后根据可信度设置起飞点
+static uint8_t set_start_point(void)
+{
+  if(g_nlt_tagframe0.result.eop_3d[X]<10 &&
+     g_nlt_tagframe0.result.eop_3d[Y]<10 ){
+
+    satrtPos[X] = pos[X];
+    satrtPos[Y] = pos[Y];
+			 
+		return 1;
+  }
+ 
+  return 0;
+}
+
 //位置控制(单位:cm)
 static void position_control(const int tarX,const int tarY)
 {
-  const float kp = 0.05f;
+  const float kp = 0.04f;
   const float ki = 0.0f;
   const float kd = 0.0f;
 
-  static int errorIntegral = 0;
-  static int lastError = 0;
+	//误差不大就不进行控制
+  const uint8_t permitError = 8;
+	if(abs(pos[X]-tarX)<permitError &&
+		 abs(pos[Y]-tarY)<permitError ){
+		Program_Ctrl_User_Set_HXYcmps(0, 0);  
+		return;	 
+  }
 
+	
   float out[2] = {0};
   int exp[2] = {tarX, tarY};
 
   for(uint8_t i=0; i<2; i++) {
+		//P
     int error = exp[i] - pos[i] ;
 
-    if(abs(error) < 10)
-      errorIntegral += error;
-    else
-      errorIntegral = 0;
+		static int errorIntegral = 0;
+//		//I
+//    if(abs(error) < 10)
+//      errorIntegral += error;
+//    else
+//      errorIntegral = 0;
 
-    if(errorIntegral > 100)
-      errorIntegral = 100;
-    if(errorIntegral < -100)
-      errorIntegral = -100;
+//    if(errorIntegral > 100)
+//      errorIntegral = 100;
+//    if(errorIntegral < -100)
+//      errorIntegral = -100;
 
+		//D
+		static int lastError = 0;
     int differential = lastError - error;
     lastError = error;
 
@@ -133,8 +180,7 @@ static void position_control(const int tarX,const int tarY)
 
   }
 
-  Program_Ctrl_User_Set_HXYcmps(out[0], out[1]);
-
+	Program_Ctrl_User_Set_HXYcmps(out[0], out[1]);
 }
 
 
@@ -168,3 +214,4 @@ static void drawing_circle(void)
   if(currentPoint == trackDivNumber)
     direction *= -1;
 }
+

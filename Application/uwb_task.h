@@ -15,6 +15,7 @@
 #include "nlink_linktrack_tagframe0.h"
   
  
+extern int32_t satrtPos[2];
 extern  uint32_t totalFrameCount , errorFrameCount ;
 
 extern uint8_t useUwb ; 

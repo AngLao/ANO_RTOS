@@ -68,20 +68,20 @@ void wcz_acc_update(void)//最小周期
 static _inte_fix_filter_st wcz_acc_fus;
 _fix_inte_filter_st wcz_spe_fus,wcz_hei_fus;
 
-#define N_TIMES 1
+#define N_TIMES 5
 
 void wcz_fus_update(u8 dT_ms)
 {
+  s32 ref_height = jsdata.of_alt;
+
   static s32 ref_height_old,ref_speed_old;
   static s32 wcz_ref_speed,wcz_ref_acc;
-
+	
   static u8 cyc_xn;
   float hz,ntimes_hz;
   hz = safe_div(1000,dT_ms,0);
   ntimes_hz = hz/N_TIMES;
-
-  s32 ref_height = jsdata.of_alt;
-
+	
   cyc_xn ++;
   cyc_xn %= N_TIMES;
 
@@ -91,29 +91,29 @@ void wcz_fus_update(u8 dT_ms)
     wcz_ref_acc = (wcz_ref_speed - ref_speed_old) *ntimes_hz;
 
     ref_height_old = ref_height;
-    ref_speed_old = wcz_ref_speed;
-
+    ref_speed_old = wcz_ref_speed; 
   }
 
-  wcz_acc_fus.fix_ki = 0.3f;
+  wcz_acc_fus.fix_ki = 0.1f;
   wcz_acc_fus.in_est = wcz_acc_use;
   wcz_acc_fus.in_obs = wcz_ref_acc;
   wcz_acc_fus.ei_limit = 100;
   inte_fix_filter(dT_ms*1e-3f,&wcz_acc_fus);
 
 
-  wcz_spe_fus.fix_kp = 0.7f;
+  wcz_spe_fus.fix_kp = 0.6f;
   wcz_spe_fus.in_est_d = wcz_acc_fus.out;
   wcz_spe_fus.in_obs = wcz_ref_speed;
   wcz_spe_fus.e_limit = 100;
   fix_inte_filter(dT_ms*1e-3f,&wcz_spe_fus);
 
 
-  wcz_hei_fus.fix_kp = 0.9f;
+  wcz_hei_fus.fix_kp = 0.3f;
   wcz_hei_fus.in_est_d = wcz_spe_fus.out;
   wcz_hei_fus.in_obs = ref_height;
   //wcz_hei_fus.e_limit = 200;
   fix_inte_filter(dT_ms*1e-3f,&wcz_hei_fus);
+	 
 
 }
 
