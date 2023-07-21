@@ -11,8 +11,7 @@
 #include "Drv_Uart.h"  
    
 	
-extern uint32_t value ;
-extern uint8_t  id  ;
+extern uint32_t angleValue , areaValue , widthValue , posValue , resValue; 
 
 void openmv_update_task(void *pvParameters);
  

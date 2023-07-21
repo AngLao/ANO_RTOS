@@ -172,7 +172,7 @@ void Parame_Reset(u8 mode)
     Ano_Parame.set.warn_power_voltage = 3.70f;
     Ano_Parame.set.lowest_power_voltage = 3.50f;
 
-    Ano_Parame.set.auto_take_off_height = 100;//cm
+    Ano_Parame.set.auto_take_off_height = 150;//cm
     Ano_Parame.set.auto_take_off_speed = 20;
     Ano_Parame.set.auto_landing_speed = 20;
 

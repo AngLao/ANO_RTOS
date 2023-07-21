@@ -58,10 +58,14 @@ void imu_update(u8 dT_ms)
 }
 
 float wcz_acc_use;
+float wcx_acc_use;
+float wcy_acc_use;
 
 void wcz_acc_update(void)//最小周期
 {
   wcz_acc_use += 0.03f *(imu_data.w_acc[Z] - wcz_acc_use);
+  wcx_acc_use += 0.03f *(imu_data.w_acc[X] - wcx_acc_use);
+  wcy_acc_use += 0.03f *(imu_data.w_acc[Y] - wcy_acc_use);
 }
 
 

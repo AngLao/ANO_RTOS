@@ -71,13 +71,20 @@ typedef struct {
 } _dt_st;
 _dt_st dt;
 
-//0x01
+//0x01 
+//#define ACC_RAW_X      (sensor.Acc[X])
+//#define ACC_RAW_Y      (sensor.Acc[Y])
+//#define ACC_RAW_Z      (sensor.Acc[Z])
+//#define GYR_RAW_X      (sensor.Gyro[X])
+//#define GYR_RAW_Y      (sensor.Gyro[Y])
+//#define GYR_RAW_Z      (sensor.Gyro[Z])
+//#define SHOCK_STA      (flag.unlock_err)
 
-#define ACC_RAW_X      (sensor.Acc[X])
-#define ACC_RAW_Y      (sensor.Acc[Y])
-#define ACC_RAW_Z      (sensor.Acc[Z])
-#define GYR_RAW_X      (sensor.Gyro[X])
-#define GYR_RAW_Y      (sensor.Gyro[Y])
+#define ACC_RAW_X      (posFus[X].out)
+#define ACC_RAW_Y      (posFus[Y].out)
+#define ACC_RAW_Z      (widthValue)
+#define GYR_RAW_X      (posValue)
+#define GYR_RAW_Y      (resValue)
 #define GYR_RAW_Z      (sensor.Gyro[Z])
 #define SHOCK_STA      (flag.unlock_err)
 
@@ -159,10 +166,10 @@ void ANO_DT_Init(void)
   dt.txSet_u2[CSID_X05].fre_ms = 5;
   //fc_mode
   dt.txSet_u2[CSID_X06].fre_ms = 15;
-  //反馈速度
-  dt.txSet_u2[CSID_X07].fre_ms = 5;
-  //期望速度
-  dt.txSet_u2[CSID_X0B].fre_ms = 5;
+//  //反馈速度
+//  dt.txSet_u2[CSID_X07].fre_ms = 5;
+//  //期望速度
+//  dt.txSet_u2[CSID_X0B].fre_ms = 5;
   //电压
   dt.txSet_u2[CSID_X0D].fre_ms = 5;
   //传感器状态
@@ -171,10 +178,10 @@ void ANO_DT_Init(void)
   dt.txSet_u2[CSID_X20].fre_ms = 10;
   //UWB数据
   dt.txSet_u2[CSID_X32].fre_ms = 5;
-  //遥控数据
-  dt.txSet_u2[CSID_X40].fre_ms = 5;
-  //光流数据
-  dt.txSet_u2[CSID_X51].fre_ms = 5;
+//  //遥控数据
+//  dt.txSet_u2[CSID_X40].fre_ms = 5;
+//  //光流数据
+//  dt.txSet_u2[CSID_X51].fre_ms = 5;
  
 #if(DEBUG_CONFIG == UART)
 

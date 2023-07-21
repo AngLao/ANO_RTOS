@@ -4,17 +4,14 @@
 uint8_t useUwb = 0;
 uint32_t totalFrameCount = 0, errorFrameCount = 0;
 
-#define X 0
-#define Y 1
-
 int32_t satrtPos[2];
 static int32_t pos[2];
 
 static uint8_t unpack_data(void);
-static uint8_t validate_data(void);
-static uint8_t set_start_point(void); 
+static uint8_t validate_data(void); 
 static void position_control(const int tarX,const int tarY);
-static void drawing_circle(void);
+static void fusion_parameter_init(void);
+static void imu_fus_update(u8 dT_ms);
 
 void uwb_update_task(void *pvParameters)
 {
@@ -24,36 +21,33 @@ void uwb_update_task(void *pvParameters)
   Drv_Uart2Init(921600);
   debugOutput("uwb use uart2，rate:921600");
 
+	fusion_parameter_init();
   while (1) {
 
     //解析成功,校验成功可以使用数据
     uint8_t dataValidity = unpack_data();
+    imu_fus_update(10);
 
-    //记录起飞点
-		static uint8_t setPointOk;
-    if(useUwb == 0)
-      Program_Ctrl_User_Set_HXYcmps(0, 0);
-    else if(dataValidity==1 && setPointOk==0)
-      setPointOk = set_start_point();
-
-		if(!flag.taking_off)
-			setPointOk = 0;
 		
-    //按需执行任务
-    if(dataValidity==1 && setPointOk==1) {
+		if(flag.taking_off)
+			imu_fus_update(10);
+		else
+			fusion_parameter_init();
+		 
+    if(useUwb == 0)
+      Program_Ctrl_User_Set_HXYcmps(0, 0); 
+
+		if(flag.taking_off)
       switch(useUwb) {
       case 1:
-				//返回起飞点 
-        position_control(satrtPos[X],satrtPos[Y]);
+        position_control(300,300);
         break;
       case 2:
-        position_control(2000,2000);
+        position_control(200,200);
         break;
       }
-    }
-		
 
-    vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 120);
+    vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 100);
   }
 }
 
@@ -90,8 +84,8 @@ static uint8_t unpack_data(void)
         pos[X] = g_nlt_tagframe0.result.pos_3d[X];
         pos[Y] = g_nlt_tagframe0.result.pos_3d[Y];
 
-				//数据检验
-				analyticResult = validate_data();
+        //数据检验
+        analyticResult = validate_data();
       }
 
     }
@@ -119,47 +113,32 @@ static uint8_t validate_data(void)
     res = 0;
 
   return res;
-}
-
-//起飞完成后根据可信度设置起飞点
-static uint8_t set_start_point(void)
-{
-  if(g_nlt_tagframe0.result.eop_3d[X]<10 &&
-     g_nlt_tagframe0.result.eop_3d[Y]<10 ){
-
-    satrtPos[X] = pos[X];
-    satrtPos[Y] = pos[Y];
-			 
-		return 1;
-  }
- 
-  return 0;
-}
+} 
 
 //位置控制(单位:cm)
 static void position_control(const int tarX,const int tarY)
 {
-  const float kp = 0.04f;
+  const float kp = 0.5f;
   const float ki = 0.0f;
   const float kd = 0.0f;
 
-	//误差不大就不进行控制
-  const uint8_t permitError = 8;
-	if(abs(pos[X]-tarX)<permitError &&
-		 abs(pos[Y]-tarY)<permitError ){
-		Program_Ctrl_User_Set_HXYcmps(0, 0);  
-		return;	 
-  }
+//  //误差不大就不进行控制
+//  const uint8_t permitError = 3;
+//  if(abs(posFus[X].out-tarX)<permitError &&
+//     abs(posFus[Y].out-tarY)<permitError ) {
+//    Program_Ctrl_User_Set_HXYcmps(0, 0);
+//    return;
+//  }
 
-	
+
   float out[2] = {0};
   int exp[2] = {tarX, tarY};
 
   for(uint8_t i=0; i<2; i++) {
-		//P
-    int error = exp[i] - pos[i] ;
+    //P
+    int error = exp[i] - posFus[i].out ;
 
-		static int errorIntegral = 0;
+    static int errorIntegral = 0;
 //		//I
 //    if(abs(error) < 10)
 //      errorIntegral += error;
@@ -171,8 +150,8 @@ static void position_control(const int tarX,const int tarY)
 //    if(errorIntegral < -100)
 //      errorIntegral = -100;
 
-		//D
-		static int lastError = 0;
+    //D
+    static int lastError = 0;
     int differential = lastError - error;
     lastError = error;
 
@@ -180,38 +159,79 @@ static void position_control(const int tarX,const int tarY)
 
   }
 
-	Program_Ctrl_User_Set_HXYcmps(out[0], out[1]);
-}
+  Program_Ctrl_User_Set_HXYcmps(out[0], out[1]);
+} 
 
 
-static void drawing_circle(void)
+
+
+static _inte_fix_filter_st accFus[2];
+static _fix_inte_filter_st speedFus[2];
+_fix_inte_filter_st posFus[2];
+
+#define N_TIMES 5
+
+//uwb数据融合加速度计
+static void imu_fus_update(u8 dT_ms)
 {
-  //圆的中心坐标(单位:cm)
-  const int16_t centerCoordinates[2] = {2500,2500};
-  //圆的半径(单位:cm)
-  const int16_t radius = 500;
-  //轨迹细分成多少个点
-  const uint16_t trackDivNumber = 40;
-  //步长
-  const uint16_t step = 2*radius/trackDivNumber;
+  s32 rawPos[2];
+  rawPos[X] = pos[X];
+  rawPos[Y] = pos[Y];
 
-  static int8_t currentPoint = 0, direction= 1;
+  static s32 lastRawPos[2],lastRawSpeed[2];
+  static s32 rawSpeed[2],rawAcc[2];
 
-  //x2+y2=r2
-  int16_t targetX = (centerCoordinates[0] - radius)+ (currentPoint * step);
-  int16_t targetY = direction*(int16_t)sqrt((double)abs(radius*radius - targetX*targetX));
+  static u8 cyc_xn; 
+  float hz = safe_div(1000,dT_ms,0);
+  float ntimes_hz = hz/N_TIMES;
 
+  cyc_xn ++;
+  cyc_xn %= N_TIMES;
 
-  position_control(targetX,targetY);
+  for(uint8_t i=X; i<Z ; i++) {
+    if(cyc_xn == 0) {
+      rawSpeed[i] = (rawPos[i] - lastRawPos[i]) *ntimes_hz;
+      rawAcc[i] = (rawSpeed[i] - lastRawSpeed[i]) *ntimes_hz;
 
+      lastRawPos[i] = rawPos[i];
+      lastRawSpeed[i] = rawSpeed[i];
+    }
 
-  int errorX = targetX - pos[X] ;
-  int errorY = targetY - pos[Y] ;
+    accFus[i].in_est = wcx_acc_use;
+    accFus[i].in_obs = rawAcc[i];
+    inte_fix_filter(dT_ms*1e-3f,&accFus[i]);
+ 
+    speedFus[i].in_est_d = accFus[i].out;
+    speedFus[i].in_obs = rawSpeed[i];
+    fix_inte_filter(dT_ms*1e-3f,&speedFus[i]);
+ 
+    posFus[i].in_est_d = speedFus[i].out;
+    posFus[i].in_obs = rawPos[i];
+    fix_inte_filter(dT_ms*1e-3f,&posFus[i]); 
+  }
 
-  if(abs(errorX)<15 && abs(errorY)<15)
-    currentPoint += direction;
-
-  if(currentPoint == trackDivNumber)
-    direction *= -1;
 }
 
+static void fusion_parameter_init(void)
+{ 
+  for(uint8_t i=X; i<Z ; i++) { 
+		accFus[i].fix_ki = 0.1f;
+		accFus[i].ei_limit = 100;
+
+		speedFus[i].fix_kp = 0.6f;
+		speedFus[i].e_limit = 100;
+
+		posFus[i].fix_kp = 0.3f;
+		//posFus[i].e_limit = 200;
+		
+		
+		accFus[i].out = 0;
+		accFus[i].ei = -wcz_acc_use;
+
+		speedFus[i].out = 0;
+		speedFus[i].e = 0;
+
+		posFus[i].out = 0;
+		posFus[i].e = 0;
+  } 
+}
