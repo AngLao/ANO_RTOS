@@ -112,7 +112,7 @@ _dt_st dt;
 //0X05
 #define ALT_FU	       (wcz_hei_fus.out*100)
 #define ALT_ADD	       (jsdata.of_alt*100)
-#define ALT_STA        (switchs.of_tof_on)
+#define ALT_STA        (loc_ctrl_2.exp[Z])
 
 //0X06
 #define FC_MODE	       (flag.flight_mode)

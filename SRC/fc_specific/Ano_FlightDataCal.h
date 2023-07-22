@@ -9,8 +9,7 @@
 extern _fix_inte_filter_st wcz_spe_fus,wcz_hei_fus;
 
 extern float wcz_acc_use;
-extern float wcx_acc_use;
-extern float wcy_acc_use;
+extern float uwb_acc_use[]; 
 
 void imu_update(u8 dT_ms);
 

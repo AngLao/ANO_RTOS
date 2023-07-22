@@ -118,8 +118,8 @@ static uint8_t validate_data(void)
 //位置控制(单位:cm)
 static void position_control(const int tarX,const int tarY)
 {
-  const float kp = 0.5f;
-  const float ki = 0.1f;
+  const float kp = 0.3f;
+  const float ki = 0.0f;
   const float kd = 0.0f;
 
 //  //误差不大就不进行控制
@@ -168,8 +168,7 @@ static void position_control(const int tarX,const int tarY)
 static _inte_fix_filter_st accFus[2];
 static _fix_inte_filter_st speedFus[2];
 _fix_inte_filter_st posFus[2];
-
-#define N_TIMES 5
+ 
 
 //uwb数据融合加速度计
 static void imu_fus_update(u8 dT_ms)
@@ -181,23 +180,15 @@ static void imu_fus_update(u8 dT_ms)
   static s32 lastRawPos[2],lastRawSpeed[2];
   static s32 rawSpeed[2],rawAcc[2];
 
-  static u8 cyc_xn; 
-  float hz = safe_div(1000,dT_ms,0);
-  float ntimes_hz = hz/N_TIMES;
+  for(uint8_t i=X; i<Z ; i++) { 
+//		rawSpeed[i] = (rawPos[i] - lastRawPos[i]) *1000/dT_ms;
+		rawSpeed[i] = g_nlt_tagframe0.result.vel_3d[i];
+		rawAcc[i] = (rawSpeed[i] - lastRawSpeed[i]) *1000/dT_ms;
 
-  cyc_xn ++;
-  cyc_xn %= N_TIMES;
+		lastRawPos[i] = rawPos[i];
+		lastRawSpeed[i] = rawSpeed[i]; 
 
-  for(uint8_t i=X; i<Z ; i++) {
-    if(cyc_xn == 0) {
-      rawSpeed[i] = (rawPos[i] - lastRawPos[i]) *ntimes_hz;
-      rawAcc[i] = (rawSpeed[i] - lastRawSpeed[i]) *ntimes_hz;
-
-      lastRawPos[i] = rawPos[i];
-      lastRawSpeed[i] = rawSpeed[i];
-    }
-
-    accFus[i].in_est = wcx_acc_use;
+    accFus[i].in_est = uwb_acc_use[i];
     accFus[i].in_obs = rawAcc[i];
     inte_fix_filter(dT_ms*1e-3f,&accFus[i]);
  
@@ -226,7 +217,7 @@ static void fusion_parameter_init(void)
 		
 		
 		accFus[i].out = 0;
-		accFus[i].ei = -wcz_acc_use;
+		accFus[i].ei = -uwb_acc_use[i];
 
 		speedFus[i].out = 0;
 		speedFus[i].e = 0;
