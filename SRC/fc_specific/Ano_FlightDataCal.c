@@ -77,6 +77,9 @@ void wcz_fus_update(u8 dT_ms)
 {
   s32 ref_height = jsdata.of_alt;
 
+	//高度数据无效则只融合加速度计
+	if(ref_height<0 || ref_height>400)
+		ref_height = wcz_hei_fus.out;
   static s32 ref_height_old,ref_speed_old;
   static s32 wcz_ref_speed,wcz_ref_acc;
 	
