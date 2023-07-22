@@ -119,7 +119,7 @@ static uint8_t validate_data(void)
 static void position_control(const int tarX,const int tarY)
 {
   const float kp = 0.5f;
-  const float ki = 0.0f;
+  const float ki = 0.1f;
   const float kd = 0.0f;
 
 //  //误差不大就不进行控制
@@ -139,16 +139,16 @@ static void position_control(const int tarX,const int tarY)
     int error = exp[i] - posFus[i].out ;
 
     static int errorIntegral = 0;
-//		//I
-//    if(abs(error) < 10)
-//      errorIntegral += error;
-//    else
-//      errorIntegral = 0;
+		//I
+    if(abs(error) < 4)
+      errorIntegral += error;
+    else
+      errorIntegral = 0;
 
-//    if(errorIntegral > 100)
-//      errorIntegral = 100;
-//    if(errorIntegral < -100)
-//      errorIntegral = -100;
+    if(errorIntegral > 50)
+      errorIntegral = 50;
+    else if(errorIntegral < -50)
+      errorIntegral = -50;
 
     //D
     static int lastError = 0;

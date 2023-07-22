@@ -82,8 +82,8 @@ _dt_st dt;
 
 #define ACC_RAW_X      (posFus[X].out)
 #define ACC_RAW_Y      (posFus[Y].out)
-#define ACC_RAW_Z      (widthValue)
-#define GYR_RAW_X      (posValue)
+#define ACC_RAW_Z      (g_nlt_tagframe0.result.pos_3d[X])
+#define GYR_RAW_X      (g_nlt_tagframe0.result.pos_3d[Y])
 #define GYR_RAW_Y      (resValue)
 #define GYR_RAW_Z      (sensor.Gyro[Z])
 #define SHOCK_STA      (flag.unlock_err)
