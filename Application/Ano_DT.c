@@ -90,8 +90,8 @@ _dt_st dt;
 
 #include "openmv_task.h" 
 //0x02
-#define ECP_RAW_X      (satrtPos[0]) 
-#define ECP_RAW_Y      (satrtPos[1]) 
+#define ECP_RAW_X      (g_nlt_tagframe0.result.vel_3d[X]) 
+#define ECP_RAW_Y      (g_nlt_tagframe0.result.vel_3d[Y]) 
 #define ECP_RAW_Z      (g_nlt_tagframe0.result.eop_3d[X])
 #define BARO_ALT       (g_nlt_tagframe0.result.eop_3d[Y]*100)
 #define TEMPERATURE    (sensor.Tempreature_C)
@@ -180,8 +180,8 @@ void ANO_DT_Init(void)
   dt.txSet_u2[CSID_X32].fre_ms = 5;
 //  //遥控数据
 //  dt.txSet_u2[CSID_X40].fre_ms = 5;
-//  //光流数据
-//  dt.txSet_u2[CSID_X51].fre_ms = 5;
+  //光流数据
+  dt.txSet_u2[CSID_X51].fre_ms = 5;
  
 #if(DEBUG_CONFIG == UART)
 

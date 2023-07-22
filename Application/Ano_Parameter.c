@@ -82,38 +82,38 @@ void PID_Rest()
 
 //---	姿态控制角速度环PID参数
   Ano_Parame.set.pid_att_1level[ROL][KP] = 4.2f; //姿态控制角速度环PID参数
-  Ano_Parame.set.pid_att_1level[ROL][KI] = 1.7f; //姿态控制角速度环PID参数
+  Ano_Parame.set.pid_att_1level[ROL][KI] = 2.5f; //姿态控制角速度环PID参数
   Ano_Parame.set.pid_att_1level[ROL][KD] = 0.10f; //姿态控制角速度环PID参数
 
   Ano_Parame.set.pid_att_1level[PIT][KP] = 4.1f; //姿态控制角速度环PID参数
-  Ano_Parame.set.pid_att_1level[PIT][KI] = 1.7f; //姿态控制角速度环PID参数
+  Ano_Parame.set.pid_att_1level[PIT][KI] = 2.5f; //姿态控制角速度环PID参数
   Ano_Parame.set.pid_att_1level[PIT][KD] = 0.10f; //姿态控制角速度环PID参数
 
   Ano_Parame.set.pid_att_1level[YAW][KP] = 4.5f; //姿态控制角速度环PID参数
-  Ano_Parame.set.pid_att_1level[YAW][KI] = 0.0f; //姿态控制角速度环PID参数
+  Ano_Parame.set.pid_att_1level[YAW][KI] = 0.3f; //姿态控制角速度环PID参数
   Ano_Parame.set.pid_att_1level[YAW][KD] = 0.0f; //姿态控制角速度环PID参数
 //---	姿态控制角度环PID参数
   Ano_Parame.set.pid_att_2level[ROL][KP] = 7.8f; //姿态控制角度环PID参数
-  Ano_Parame.set.pid_att_2level[ROL][KI] = 0.14f; //姿态控制角度环PID参数
-  Ano_Parame.set.pid_att_2level[ROL][KD] = 0.01f; //姿态控制角度环PID参数
+  Ano_Parame.set.pid_att_2level[ROL][KI] = 0.00f; //姿态控制角度环PID参数
+  Ano_Parame.set.pid_att_2level[ROL][KD] = 0.00f; //姿态控制角度环PID参数
 
   Ano_Parame.set.pid_att_2level[PIT][KP] = 7.6f; //姿态控制角度环PID参数
-  Ano_Parame.set.pid_att_2level[PIT][KI] = 0.13f; //姿态控制角度环PID参数
-  Ano_Parame.set.pid_att_2level[PIT][KD] = 0.01f; //姿态控制角度环PID参数
+  Ano_Parame.set.pid_att_2level[PIT][KI] = 0.00f; //姿态控制角度环PID参数
+  Ano_Parame.set.pid_att_2level[PIT][KD] = 0.00f; //姿态控制角度环PID参数
 
-  Ano_Parame.set.pid_att_2level[YAW][KP] = 5.8f; //姿态控制角度环PID参数
+  Ano_Parame.set.pid_att_2level[YAW][KP] = 5.5f; //姿态控制角度环PID参数
   Ano_Parame.set.pid_att_2level[YAW][KI] = 0.0f; //姿态控制角度环PID参数
   Ano_Parame.set.pid_att_2level[YAW][KD] = 0.5; //姿态控制角度环PID参数
 //---	高度控制高度速度环PID参数 
   Ano_Parame.set.pid_alt_1level[KP] = 2.0f;          //高度控制高度速度环PID参数
-  Ano_Parame.set.pid_alt_1level[KI] = 0.7f;          //高度控制高度速度环PID参数
-  Ano_Parame.set.pid_alt_1level[KD] = 0.03f;          //高度控制高度速度环PID参数 
+  Ano_Parame.set.pid_alt_1level[KI] = 1.0f;          //高度控制高度速度环PID参数
+  Ano_Parame.set.pid_alt_1level[KD] = 0.05f;          //高度控制高度速度环PID参数 
 //---	高度控制高度环PID参数
-  Ano_Parame.set.pid_alt_2level[KP] = 2.0f;           //高度控制高度环PID参数
+  Ano_Parame.set.pid_alt_2level[KP] = 1.0f;           //高度控制高度环PID参数
   Ano_Parame.set.pid_alt_2level[KI] = 0;           //高度控制高度环PID参数(NULL)
   Ano_Parame.set.pid_alt_2level[KD] = 0;           //高度控制高度环PID参数(NULL)
 //---	位置控制位置速度环PID参数
-  Ano_Parame.set.pid_loc_1level[KP] = 0.20f;          //位置控制位置速度环PID参数
+  Ano_Parame.set.pid_loc_1level[KP] = 0.15f;          //位置控制位置速度环PID参数
   Ano_Parame.set.pid_loc_1level[KI] = 0.10f;          //位置控制位置速度环PID参数
   Ano_Parame.set.pid_loc_1level[KD] = 0.00f;          //位置控制位置速度环PID参数
 ////---	位置控制位置环PID参数

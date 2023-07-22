@@ -26,7 +26,7 @@ void Loc_1level_PID_Init()
   loc_arg_1[X].ki = 0.0f  ;
   loc_arg_1[X].kd_ex = 0.00f ;
   loc_arg_1[X].kd_fb = Ano_Parame.set.pid_loc_1level[KD];
-  loc_arg_1[X].k_ff =  0.05f;
+  loc_arg_1[X].k_ff =  0.02f;
 
   loc_arg_1[Y] = loc_arg_1[X];
   //fix

@@ -63,7 +63,7 @@ _of_rdf_st of_rdf;
 float of_rot_d_degs[2];
 
 float of_fus_err[2], of_fus_err_i[2];
-float fusKp  = 0 ,fusKi = 0;
+float fusKp  = 2.0f ,fusKi = 1.0f;
 //参数设定：
 #define UPOF_PIXELPDEG_X    160.0f       //每1角度对应的像素个数，与分辨率和焦距有关，需要调试标定。//
 #define UPOF_PIXELPDEG_Y    160.0f       //每1角度对应的像素个数，与分辨率和焦距有关，需要调试标定。
@@ -85,14 +85,8 @@ void ANO_OFDF_Task(u8 dT_ms)
   OF_State(); 
 	
   ANO_OF_Decouple();
-
-	#include "Ano_Parameter.h"
-	fusKp = Ano_Parame.set.pid_gps_loc_1level[KP];      
-  fusKi = Ano_Parame.set.pid_gps_loc_1level[KI];
-	
-  ANO_OF_Fusion(&dT_ms, (s32)RELATIVE_HEIGHT_CM);
-
-
+ 
+  ANO_OF_Fusion(&dT_ms, (s32)RELATIVE_HEIGHT_CM); 
 } 
 
 /*根据飞机陀螺仪数据解算出相应姿态以解耦光流数据*/
