@@ -45,6 +45,7 @@ void Drv_Uart3TxCheck(void);
 
 #if(USER_SERIAL_4 == 1)
 
+extern RINGBUFF_T lightFlowRing;
 void Drv_Uart4Init(uint32_t baudrate);
 void Drv_Uart4SendBuf(u8 *data, u8 len);
 void Drv_Uart4TxCheck(void);

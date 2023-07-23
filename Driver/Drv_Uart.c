@@ -216,12 +216,14 @@ void Drv_Uart3TxCheck(void)
 #endif
 
 #if(USER_SERIAL_4 == 1)
-
-#include "Ano_OF.h"
-#include "Drv_UP_Flow.h"
+ 
 u8 U4TxDataTemp[256];
 u8 U4TxInCnt = 0;
 u8 U4TxOutCnt = 0;
+
+
+RINGBUFF_T lightFlowRing;
+volatile unsigned char lightFlowBuffer[128];
 void UART4_IRQHandler(void)
 {
   uint8_t com_data;
@@ -234,18 +236,7 @@ void UART4_IRQHandler(void)
   while(ROM_UARTCharsAvail(UART7_BASE)) {
     com_data = ROM_UARTCharGet(UART7_BASE);
 
-    //匿名光流解析
-    if(of_init_type != 2) 
-		{
-      AnoOF_GetOneByte(com_data);
-    }
-		
-		//优像光流解析
-		if(of_init_type!=1)
-		{
-			OFGetByte(com_data);
-		}
-		
+		RingBuffer_Insert(&lightFlowRing, &com_data);
   }
 
   if(flag & UART_INT_TX) {
@@ -254,6 +245,8 @@ void UART4_IRQHandler(void)
 }
 void Drv_Uart4Init(uint32_t baudrate)
 {
+  //环形缓冲区初始化
+  RingBuffer_Init(&lightFlowRing, (unsigned char*)lightFlowBuffer, 1, 128);
   ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_UART7);
   ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
 
