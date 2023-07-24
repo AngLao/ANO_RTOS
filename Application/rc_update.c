@@ -29,8 +29,11 @@ static void one_key_take_off()
 }
 //一键降落
 static void one_key_land()
-{
-  flag.auto_take_off_land = AUTO_LAND;
+{ 
+	if(flag.taking_off) 
+		flag.auto_take_off_land = AUTO_LAND;
+	else
+	 debugOutput("take off before land"); 
 }
 
 //电调校准模式
