@@ -11,61 +11,67 @@
 #include "Ano_Parameter.h"
 #include "Ano_FlightDataCal.h"
 #include "Ano_FlightDataCal.h"
-
-static s16 auto_taking_off_speed;
+ 
 
 #define AUTO_TAKE_OFF_KP 2.0f
 
-void Auto_Take_Off_Land_Task(u8 dT_ms)//
+static int16_t auto_fly(u8 dT_ms)
 {
-  static u16 take_off_ok_cnt;
+  static uint16_t take_off_ok_cnt = 0; 
 
-  one_key_take_off_task(dT_ms);
-
-  if(flag.unlock_sta) {
-    if(flag.taking_off && flag.auto_take_off_land == AUTO_TAKE_OFF_NULL) {
-      flag.auto_take_off_land = AUTO_TAKE_OFF;
-    }
-  } else {
-    auto_taking_off_speed = 0;
+	//解锁判断
+  if(!flag.unlock_sta) { 
+    take_off_ok_cnt = 0; 
     flag.auto_take_off_land = AUTO_TAKE_OFF_NULL;
+		return 0;
   }
+	
+	//等待电机就绪
+  if(!flag.motor_preparation)  
+		return 0;
+	
+	int16_t speedOut = 0;
+	//设置最大起飞速度
+	int16_t	max_take_off_vel = LIMIT(Ano_Parame.set.auto_take_off_speed,20,200); 
+	switch (flag.auto_take_off_land) {
+		//自动起飞
+		case (AUTO_TAKE_OFF): 
+			flag.taking_off = 1;
+		
+			//计算起飞速度
+			speedOut = AUTO_TAKE_OFF_KP *(Ano_Parame.set.auto_take_off_height - wcz_hei_fus.out);
+			speedOut = LIMIT(speedOut,0,max_take_off_vel);
 
-  if(flag.auto_take_off_land ==AUTO_TAKE_OFF) {
-    //设置最大起飞速度
-    s16 max_take_off_vel = LIMIT(Ano_Parame.set.auto_take_off_speed,20,200);
-    //
-    take_off_ok_cnt += dT_ms;
-    auto_taking_off_speed = AUTO_TAKE_OFF_KP *(Ano_Parame.set.auto_take_off_height - wcz_hei_fus.out);
-    //计算起飞速度
-    auto_taking_off_speed = LIMIT(auto_taking_off_speed,0,max_take_off_vel);
-
-    //退出起飞流程条件1，满足高度或者流程时间大于5000毫秒。
-    if(take_off_ok_cnt>=5000 || (Ano_Parame.set.auto_take_off_height - loc_ctrl_2.exp[Z] <2)) { //(auto_ref_height>AUTO_TAKE_OFF_HEIGHT)
-      flag.auto_take_off_land = AUTO_TAKE_OFF_FINISH;
-
-
-    }
-    //退出起飞流程条件2，2000毫秒后判断用户正在控制油门。
-    if(take_off_ok_cnt >2000 && ABS(fs.speed_set_h_norm[Z])>0.1f) {
-      flag.auto_take_off_land = AUTO_TAKE_OFF_FINISH;
-    }
-
-  } else {
-    take_off_ok_cnt = 0;
-
-    if(flag.auto_take_off_land ==AUTO_TAKE_OFF_FINISH) {
-      auto_taking_off_speed = 0;
-
-    }
-
-  }
-
-  if(flag.auto_take_off_land == AUTO_LAND) {
-    //设置自动下降速度
-    auto_taking_off_speed = -(s16)LIMIT(Ano_Parame.set.auto_landing_speed,20,200);
-
-  }
+			//到达指定高度时间大于设定值自动起飞完成
+			if(Ano_Parame.set.auto_take_off_height - loc_ctrl_2.exp[Z] <2)
+				take_off_ok_cnt += dT_ms;
+			else 
+				take_off_ok_cnt = 0;
+			
+			//退出起飞流程条件2，2000毫秒后判断用户正在控制油门。
+			if(take_off_ok_cnt >2000 || ABS(fs.speed_set_h_norm[Z])>0.1f) 
+				flag.auto_take_off_land = AUTO_TAKE_OFF_FINISH;
+			break;
+			
+		//自动降落
+		case (AUTO_LAND): 
+			//设置自动下降速度
+			speedOut = -(s16)LIMIT(Ano_Parame.set.auto_landing_speed,20,200);
+			break; 
+		
+		//自动起飞完成
+		case (AUTO_TAKE_OFF_FINISH):
+			//自动控制速度清零
+      speedOut = 0;
+			break; 
+		
+		default:
+			//默认控制速度为零
+      speedOut = 0; 
+			break; 
+	}
+	
+	return speedOut; 
 }
 
 
@@ -88,9 +94,9 @@ void Alt_2level_PID_Init()
 
 void Alt_2level_Ctrl(float dT_s)
 {
-  Auto_Take_Off_Land_Task(1000*dT_s);
+  int16_t autoFlySpeed = auto_fly(1000*dT_s);
 
-  fs.alt_ctrl_speed_set = fs.speed_set_h[Z] + auto_taking_off_speed;
+  fs.alt_ctrl_speed_set = fs.speed_set_h[Z] + autoFlySpeed ;
   //
   loc_ctrl_2.exp[Z] += fs.alt_ctrl_speed_set *dT_s;
   loc_ctrl_2.exp[Z] = LIMIT(loc_ctrl_2.exp[Z],loc_ctrl_2.fb[Z]-200,loc_ctrl_2.fb[Z]+200);

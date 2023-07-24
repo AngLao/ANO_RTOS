@@ -17,6 +17,22 @@ static void offLineProtection()
 
 }
 
+//一键起飞
+static void one_key_take_off()
+{
+  if(flag.unlock_err == 0 && flag.auto_take_off_land == AUTO_TAKE_OFF_NULL) { 
+      flag.unlock_cmd = 1;
+      flag.unlock_sta = 1; 
+			flag.auto_take_off_land = AUTO_TAKE_OFF; 
+  }else
+	 debugOutput("auto take off fail");
+}
+//一键降落
+static void one_key_land()
+{
+  flag.auto_take_off_land = AUTO_LAND;
+}
+
 //电调校准模式
 uint8_t escCalibrationMode = 0;
 //低速状态变化检测回调函数
@@ -207,9 +223,9 @@ static void unlockDetection(void)
   if(CH_N[CH_THR] < -UN_THR_VALUE && CH_N[CH_PIT] < -UN_PIT_VALUE && CH_N[CH_ROL] < -UN_ROL_VALUE && CH_N[CH_YAW] > UN_YAW_VALUE) {
 
     //记录初次时间
-    if(xFirstWakeTime == 0) {
+    if(xFirstWakeTime == 0) 
       xFirstWakeTime = xTaskGetTickCount();
-    }
+			
     //本次摇杆内八状态未执行解锁操作
     if(xFirstWakeTime != 1) {
       TickType_t xThisWakeTime = xTaskGetTickCount(); //获取当前时间
@@ -222,18 +238,16 @@ static void unlockDetection(void)
         debugOutput("rc change lock status");
       }
     }
-  } else {
-
+  } else
     //退出内八状态计数清零
     xFirstWakeTime = 0;
-  }
+		
 
   //飞控处于上锁状态 收到解锁命令
   if(flag.unlock_sta == 0 && flag.unlock_cmd == 1 ) {
     //系统存在错误,禁止解锁
     if(flag.unlock_err != 0) 
       flag.unlock_cmd = 0; 
-
 
     //打印解锁情况信息
     switch(flag.unlock_err) {
@@ -256,11 +270,9 @@ static void unlockDetection(void)
       debugOutput("flash error");
       break;
     }
-  } else if (flag.unlock_sta == 1 && flag.unlock_cmd == 0 ) {
+  } else if (flag.unlock_sta == 1 && flag.unlock_cmd == 0 )
     //飞控处于解锁状态 收到上锁命令
     debugOutput("flight control is locked");
-
-  }
 
   //飞控上锁状态切换
   flag.unlock_sta = flag.unlock_cmd;

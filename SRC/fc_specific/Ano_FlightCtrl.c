@@ -46,47 +46,6 @@ void All_PID_Init(void)
   Loc_1level_PID_Init();
 }
 
-static u16 one_key_taof_start;
-/*一键起飞任务（主要功能为延迟）*/
-void one_key_take_off_task(u16 dt_ms)
-{
-  if(one_key_taof_start != 0) {
-    one_key_taof_start += dt_ms;
-
-
-    if(one_key_taof_start > 1400 && flag.motor_preparation == 1) {
-      one_key_taof_start = 0;
-      if(flag.auto_take_off_land == AUTO_TAKE_OFF_NULL) {
-        flag.auto_take_off_land = AUTO_TAKE_OFF;
-        //解锁、起飞
-
-        flag.taking_off = 1;
-      }
-
-    }
-  }
-  //reset
-  if(flag.unlock_sta == 0) {
-    one_key_taof_start = 0;
-  }
-
-}
-/*一键起飞*/
-void one_key_take_off()
-{
-  if(flag.unlock_err == 0) {
-    if(flag.auto_take_off_land == AUTO_TAKE_OFF_NULL && one_key_taof_start == 0) {
-      one_key_taof_start = 1;
-      flag.unlock_cmd = 1;
-    }
-  }
-}
-/*一键降落*/
-void one_key_land()
-{
-  flag.auto_take_off_land = AUTO_LAND;
-}
-
 
 _flight_state_st fs;
 
