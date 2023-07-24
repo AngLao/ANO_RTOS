@@ -64,7 +64,7 @@ void power_distribution(uint8_t dT_ms)
       motor[m3] = idleOut;
     } else if(timerCount<800) {
       motor[m4] = idleOut;
-    }else{
+    }else if(timerCount>1800){
 			 flag.motor_preparation = 1;
 			 timerCount = 0;
 		}
