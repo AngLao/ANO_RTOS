@@ -101,15 +101,15 @@ void position_loop(void *pvParameters)
 
   while (1) {  
     /*高度环控制*/
-    Alt_2level_Ctrl(0.005f);  
+    Alt_2level_Ctrl(0.010f);  
 		
     /*垂直速度环控制*/
-    Alt_1level_Ctrl(0.005f);
+    Alt_1level_Ctrl(0.010f);
  
     /*位置速度环控制*/
-    Loc_1level_Ctrl(5);
+    Loc_1level_Ctrl(10);
 		
-    vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 200);
+    vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 100);
   }
 }
  
