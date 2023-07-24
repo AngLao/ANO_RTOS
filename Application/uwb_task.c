@@ -25,9 +25,7 @@ void uwb_update_task(void *pvParameters)
   while (1) {
 
     //解析成功,校验成功可以使用数据
-    uint8_t dataValidity = unpack_data();
-    imu_fus_update(10);
-
+    uint8_t dataValidity = unpack_data(); 
 		
 		if(flag.taking_off)
 			imu_fus_update(10);
@@ -40,7 +38,7 @@ void uwb_update_task(void *pvParameters)
 		if(flag.taking_off)
       switch(useUwb) {
       case 1:
-        position_control(300,300);
+        position_control(350,250);
         break;
       case 2:
         position_control(200,200);
@@ -118,18 +116,8 @@ static uint8_t validate_data(void)
 //位置控制(单位:cm)
 static void position_control(const int tarX,const int tarY)
 {
-  const float kp = 0.3f;
-  const float ki = 0.0f;
-  const float kd = 0.0f;
-
-//  //误差不大就不进行控制
-//  const uint8_t permitError = 3;
-//  if(abs(posFus[X].out-tarX)<permitError &&
-//     abs(posFus[Y].out-tarY)<permitError ) {
-//    Program_Ctrl_User_Set_HXYcmps(0, 0);
-//    return;
-//  }
-
+  const float kp = 0.65f;
+  const float ki = -0.02f; 
 
   float out[2] = {0};
   int exp[2] = {tarX, tarY};
@@ -140,22 +128,17 @@ static void position_control(const int tarX,const int tarY)
 
     static int errorIntegral = 0;
 		//I
-    if(abs(error) < 4)
+    if(abs(error) < 5)
       errorIntegral += error;
     else
       errorIntegral = 0;
 
-    if(errorIntegral > 50)
-      errorIntegral = 50;
-    else if(errorIntegral < -50)
-      errorIntegral = -50;
+    if(errorIntegral > 200)
+      errorIntegral = 200;
+    else if(errorIntegral < -200)
+      errorIntegral = -200;
 
-    //D
-    static int lastError = 0;
-    int differential = lastError - error;
-    lastError = error;
-
-    out[i] = error*kp + errorIntegral*ki + differential*kd;
+    out[i] = error*kp + errorIntegral*ki;
 
   }
 
@@ -165,9 +148,8 @@ static void position_control(const int tarX,const int tarY)
 
 
 
-static _inte_fix_filter_st accFus[2];
-static _fix_inte_filter_st speedFus[2];
-_fix_inte_filter_st posFus[2];
+static _inte_fix_filter_st accFus[2]; 
+_fix_inte_filter_st posFus[2], speedFus[2];
  
 
 //uwb数据融合加速度计
@@ -182,8 +164,9 @@ static void imu_fus_update(u8 dT_ms)
 
   for(uint8_t i=X; i<Z ; i++) { 
 //		rawSpeed[i] = (rawPos[i] - lastRawPos[i]) *1000/dT_ms;
+//		rawAcc[i] = (rawSpeed[i] - lastRawSpeed[i]) *1000/dT_ms;
 		rawSpeed[i] = g_nlt_tagframe0.result.vel_3d[i];
-		rawAcc[i] = (rawSpeed[i] - lastRawSpeed[i]) *1000/dT_ms;
+		rawAcc[i] = rawSpeed[i] - lastRawSpeed[i];
 
 		lastRawPos[i] = rawPos[i];
 		lastRawSpeed[i] = rawSpeed[i]; 
@@ -225,4 +208,10 @@ static void fusion_parameter_init(void)
 		posFus[i].out = 0;
 		posFus[i].e = 0;
   } 
+}
+
+void uwb_test_task(void)
+{
+	
+	
 }
