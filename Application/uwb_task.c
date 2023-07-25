@@ -26,11 +26,6 @@ void uwb_update_task(void *pvParameters)
 
     //解析成功,校验成功可以使用数据
     uint8_t dataValidity = unpack_data(); 
-		
-		if(flag.taking_off)
-			imu_fus_update(10);
-		else
-			fusion_parameter_init();
 		 
     if(useUwb == 0)
       Program_Ctrl_User_Set_HXYcmps(0, 0); 
@@ -116,27 +111,25 @@ static uint8_t validate_data(void)
 //位置控制(单位:cm)
 static void position_control(const int tarX,const int tarY)
 {
-  const float kp = 0.65f;
-  const float ki = -0.02f; 
+  const float kp = 1.1f;
+  const float ki = -0.01f; 
 
   float out[2] = {0};
   int exp[2] = {tarX, tarY};
 
   for(uint8_t i=0; i<2; i++) {
     //P
-    int error = exp[i] - posFus[i].out ;
+//    int error = exp[i] - posFus[i].out ;
+    int error = exp[i] - pos[i] ;
 
     static int errorIntegral = 0;
 		//I
-    if(abs(error) < 5)
+    if(abs(error) < 3)
       errorIntegral += error;
     else
       errorIntegral = 0;
 
-    if(errorIntegral > 200)
-      errorIntegral = 200;
-    else if(errorIntegral < -200)
-      errorIntegral = -200;
+		errorIntegral = LIMIT(errorIntegral, -60,60); 
 
     out[i] = error*kp + errorIntegral*ki;
 
@@ -151,7 +144,7 @@ static void position_control(const int tarX,const int tarY)
 static _inte_fix_filter_st accFus[2]; 
 _fix_inte_filter_st posFus[2], speedFus[2];
  
-
+#include "Ano_OF.h"
 //uwb数据融合加速度计
 static void imu_fus_update(u8 dT_ms)
 {
@@ -162,11 +155,11 @@ static void imu_fus_update(u8 dT_ms)
   static s32 lastRawPos[2],lastRawSpeed[2];
   static s32 rawSpeed[2],rawAcc[2];
 
+	rawSpeed[X] = OF_DX2;
+	rawSpeed[Y] = OF_DY2;
   for(uint8_t i=X; i<Z ; i++) { 
-//		rawSpeed[i] = (rawPos[i] - lastRawPos[i]) *1000/dT_ms;
-//		rawAcc[i] = (rawSpeed[i] - lastRawSpeed[i]) *1000/dT_ms;
-		rawSpeed[i] = g_nlt_tagframe0.result.vel_3d[i];
-		rawAcc[i] = rawSpeed[i] - lastRawSpeed[i];
+//		rawSpeed[i] = g_nlt_tagframe0.result.vel_3d[i];
+		rawAcc[i] = (rawSpeed[i] - lastRawSpeed[i]);
 
 		lastRawPos[i] = rawPos[i];
 		lastRawSpeed[i] = rawSpeed[i]; 
