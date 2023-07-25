@@ -107,14 +107,14 @@ static void vSlowDetection( void *pvParameters )
     if(CH_N[AUX3] > 300) {
       channelThreeState = 2;
 //      debugOutput("CH_N[AUX3]  = 2");
-			debugOutput("x=300,y=300");
+			debugOutput("useUwb = 1");
 			useUwb = 1;
     }
     //开关打到中值
     else if(CH_N[AUX3] > -100) {
       channelThreeState = 1;
 //      debugOutput("CH_N[AUX3]  = 1");
-			debugOutput("x=200,y=200");
+			debugOutput("useUwb = 2");
 			useUwb = 2;
     }
   }

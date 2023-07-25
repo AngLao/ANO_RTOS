@@ -1,17 +1,17 @@
 #include "uwb_task.h"
 
-
+float uwbSpeedOut[2];
 uint8_t useUwb = 0;
 uint32_t totalFrameCount = 0, errorFrameCount = 0;
 
-int32_t satrtPos[2];
-static int32_t pos[2];
+static int16_t pos[2];
 
 static uint8_t unpack_data(void);
-static uint8_t validate_data(void); 
-static void position_control(const int tarX,const int tarY);
+static uint8_t validate_data(void);  
+static uint8_t position_control(const int16_t tarX,const int16_t tarY,uint16_t checkTime);
 static void fusion_parameter_init(void);
 static void imu_fus_update(u8 dT_ms);
+static void uwb_test_task(uint8_t direction);
 
 void uwb_update_task(void *pvParameters)
 {
@@ -28,18 +28,20 @@ void uwb_update_task(void *pvParameters)
     uint8_t dataValidity = unpack_data(); 
 		 
     if(useUwb == 0)
-      Program_Ctrl_User_Set_HXYcmps(0, 0); 
-
+			memset(uwbSpeedOut,0,sizeof(uwbSpeedOut)/sizeof(uwbSpeedOut[0]));
+			
 		if(flag.taking_off)
       switch(useUwb) {
       case 1:
-        position_control(350,250);
+				uwb_test_task(0);
         break;
       case 2:
-        position_control(200,200);
+				uwb_test_task(1);
         break;
       }
-
+			
+		Program_Ctrl_User_Set_HXYcmps(uwbSpeedOut[X], uwbSpeedOut[Y]); 
+			
     vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 100);
   }
 }
@@ -99,7 +101,7 @@ static uint8_t validate_data(void)
   lastPos[X] = pos[X];
 
   //围栏外的数据无效(以四个锚点围成的矩形做围栏)
-  const int16_t maxX = 5000, maxY = 4000;  ;
+  const int16_t maxX = 5000, maxY = 4000; 
   if(pos[X] < 0 || pos[Y] < 0)
     res = 0;
   if(pos[X] > maxX || pos[Y] > maxY)
@@ -108,43 +110,9 @@ static uint8_t validate_data(void)
   return res;
 } 
 
-//位置控制(单位:cm)
-static void position_control(const int tarX,const int tarY)
-{
-  const float kp = 1.1f;
-  const float ki = -0.01f; 
-
-  float out[2] = {0};
-  int exp[2] = {tarX, tarY};
-
-  for(uint8_t i=0; i<2; i++) {
-    //P
-//    int error = exp[i] - posFus[i].out ;
-    int error = exp[i] - pos[i] ;
-
-    static int errorIntegral = 0;
-		//I
-    if(abs(error) < 3)
-      errorIntegral += error;
-    else
-      errorIntegral = 0;
-
-		errorIntegral = LIMIT(errorIntegral, -60,60); 
-
-    out[i] = error*kp + errorIntegral*ki;
-
-  }
-
-  Program_Ctrl_User_Set_HXYcmps(out[0], out[1]);
-} 
-
-
-
-
 static _inte_fix_filter_st accFus[2]; 
 _fix_inte_filter_st posFus[2], speedFus[2];
  
-#include "Ano_OF.h"
 //uwb数据融合加速度计
 static void imu_fus_update(u8 dT_ms)
 {
@@ -203,8 +171,61 @@ static void fusion_parameter_init(void)
   } 
 }
 
-void uwb_test_task(void)
+//位置控制(单位:cm)
+static uint8_t position_control(const int16_t tarX,const int16_t tarY,uint16_t checkTime)
 {
+  const float kp = 1.05f;
+  const float ki = -0.01f; 
+ 
+	uint8_t isGetAround = 0;
+	static TickType_t startTime = 0;
 	
+	int16_t exp[2] = {tarX, tarY};
+  for(uint8_t i=0; i<2; i++) {
+    //P
+//    int error = exp[i] - posFus[i].out ;
+    int16_t error = exp[i] - pos[i] ;
+
+    static int16_t errorIntegral = 0;
+		//I
+    if(abs(error) < 3)
+      errorIntegral += error;
+    else
+      errorIntegral = 0;
+
+		errorIntegral = LIMIT(errorIntegral, -60,60); 
+
+    uwbSpeedOut[i] = error*kp + errorIntegral*ki;
+
+    if(abs(error) < 10)
+			isGetAround++; 
+  }   
+	
+	if(isGetAround != 2){
+		startTime = xTaskGetTickCount(); //获取当前Tick次数,以赋给延时函数初值
+		return 0;
+	}
+	
+	if( (xTaskGetTickCount() - startTime) > pdMS_TO_TICKS(checkTime))
+		return 1;
+	else
+		return 0;
+} 
+
+static void uwb_test_task(uint8_t direction)
+{ 
+	static	uint8_t	tarPosBufIndex = 0;
+	static	uint16_t	tarPosBuf[] = {210,230,250,270,290,310,330};
+	
+	uint8_t isArrive = position_control(tarPosBuf[tarPosBufIndex] , 250 , 500); 
+	
+	if(!isArrive)
+		return;
+	
+	if(direction == 0 && tarPosBufIndex>0)
+		tarPosBufIndex--;
+	else if(direction == 1 && tarPosBufIndex<((sizeof(tarPosBuf)/sizeof(tarPosBuf[0]))-1))
+		tarPosBufIndex++;
+		
 	
 }
