@@ -28,11 +28,10 @@ typedef struct {
 	uint32_t pos ;
 	uint32_t res ;
 }openmv_t ;
-
-
-
+ 
+extern uint8_t useOpenmv;
+extern openmv_t mvValue;
 extern float openmvSpeedOut[];
-extern openmv_t mvValue; 
 
 void openmv_update_task(void *pvParameters);
  

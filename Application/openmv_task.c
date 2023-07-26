@@ -1,13 +1,16 @@
 #include "openmv_task.h"
 
-float openmvSpeedOut[2]; 
+//只控制X,Y和YAW的速度
+float openmvSpeedOut[3]; 
 
+uint8_t useOpenmv = 0;
 openmv_t mvValue; 
 static uint32_t value;
 
 static uint8_t unpack_data(void);
 static void assign_value(uint8_t mId) ;
-static void position_control(uint32_t measureValue);
+static float position_control(uint32_t exp ,uint32_t measureValue);
+static float area_control(uint32_t exp ,uint32_t measureValue);
 
 /* openmv数据更新 */
 void openmv_update_task(void *pvParameters)
@@ -18,11 +21,20 @@ void openmv_update_task(void *pvParameters)
   Drv_Uart5Init(921600);
   debugOutput("openmv use uart5，rate:921600");
 
+	static TickType_t waitTime = 0;
   while (1) {
     uint8_t recId = unpack_data(); 
-		assign_value(recId);
 		
-    vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 100);
+		if(recId){ 
+			assign_value(recId);
+			waitTime = xTaskGetTickCount();
+		}
+		
+		//一定时间内无有效数据或者不使用openmv则控制速度清零
+		if((xTaskGetTickCount() - waitTime) > pdMS_TO_TICKS(500) || useOpenmv == 0) 
+			memset(openmvSpeedOut,0,sizeof(openmvSpeedOut)/sizeof(openmvSpeedOut[0]));
+		
+    vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 40);
   }
 }
 
@@ -85,7 +97,7 @@ static uint8_t unpack_data(void)
   return id;
 }
 
-//根据id赋值
+//根据id赋值,使用数据
 static void assign_value(uint8_t mId)
 {
 	switch (mId) {
@@ -100,6 +112,7 @@ static void assign_value(uint8_t mId)
 		break;
 	case POS_ID :
 		mvValue.pos = value;
+		openmvSpeedOut[YAW] = position_control(160 ,mvValue.pos);
 		break;
 	case RES_ID :
 		mvValue.res = value;
@@ -109,32 +122,46 @@ static void assign_value(uint8_t mId)
 	} 
 }
 
-//位置控制(单位:cm)
-static void position_control(uint32_t measureValue)
+//控制目标在图像中的位置（返回的速度控制yaw可以绕杆）
+static float position_control(uint32_t exp ,uint32_t measureValue)
 {
   const float kp = 0.08f;
-  const float ki = 0.0f;
-
-  float out  =  0 ;
-  uint32_t exp  = 160;
+  const float ki = 0.0f; 
 
   //P
   int error = exp - measureValue  ;
 
   static int errorIntegral = 0;
 		//I
-    if(abs(error) < 10)
+    if(abs(error) < 5)
       errorIntegral += error;
     else
       errorIntegral = 0;
-
-    if(errorIntegral > 100)
-      errorIntegral = 100;
-    if(errorIntegral < -100)
-      errorIntegral = -100;
-
-
-  out = error*kp + errorIntegral*ki;
-
+ 
+	errorIntegral = LIMIT(errorIntegral, -50,50); 
+ 
+  float out = error*kp + errorIntegral*ki;
+	return out ;
 }
 
+//控制目标在图像中像素的大小(近似控制openmv与目标的相对距离)
+static float area_control(uint32_t exp ,uint32_t measureValue)
+{
+  const float kp = 0.08f;
+  const float ki = 0.0f; 
+
+  //P
+  int error = exp - measureValue  ;
+
+  static int errorIntegral = 0;
+		//I
+    if(abs(error) < 5)
+      errorIntegral += error;
+    else
+      errorIntegral = 0;
+ 
+	errorIntegral = LIMIT(errorIntegral, -50,50); 
+ 
+  float out = error*kp + errorIntegral*ki;
+	return out ;
+}
