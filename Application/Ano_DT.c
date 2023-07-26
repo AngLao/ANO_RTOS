@@ -82,11 +82,11 @@ _dt_st dt;
 
 #define ACC_RAW_X      (posFus[X].out)
 #define ACC_RAW_Y      (posFus[Y].out)
-#define ACC_RAW_Z      (g_nlt_tagframe0.result.pos_3d[X])
-#define GYR_RAW_X      (g_nlt_tagframe0.result.pos_3d[Y])
-#define GYR_RAW_Y      (resValue)
-#define GYR_RAW_Z      (sensor.Gyro[Z])
-#define SHOCK_STA      (flag.unlock_err)
+#define ACC_RAW_Z      (uwb_acc_use[X])
+#define GYR_RAW_X      (g_nlt_tagframe0.result.pos_3d[X])
+#define GYR_RAW_Y      (g_nlt_tagframe0.result.pos_3d[Y])
+#define GYR_RAW_Z      (uwb_acc_use[Y])
+#define SHOCK_STA      (0)
 
 #include "openmv_task.h" 
 //0x02
@@ -157,31 +157,31 @@ _dt_st dt;
 void ANO_DT_Init(void)
 {
   //ACC-GRO
-  dt.txSet_u2[CSID_X01].fre_ms = 5;
-  //ECP-TEM-BARO
-  dt.txSet_u2[CSID_X02].fre_ms = 5;
-  //ATT_ANG
-  dt.txSet_u2[CSID_X03].fre_ms = 5;
+  dt.txSet_u2[CSID_X01].fre_ms = 1;
+//  //ECP-TEM-BARO
+//  dt.txSet_u2[CSID_X02].fre_ms = 5;
+//  //ATT_ANG
+//  dt.txSet_u2[CSID_X03].fre_ms = 5;
   //height
   dt.txSet_u2[CSID_X05].fre_ms = 5;
-  //fc_mode
-  dt.txSet_u2[CSID_X06].fre_ms = 15;
+//  //fc_mode
+//  dt.txSet_u2[CSID_X06].fre_ms = 15;
 //  //反馈速度
 //  dt.txSet_u2[CSID_X07].fre_ms = 5;
 //  //期望速度
 //  dt.txSet_u2[CSID_X0B].fre_ms = 5;
   //电压
   dt.txSet_u2[CSID_X0D].fre_ms = 5;
-  //传感器状态
-  dt.txSet_u2[CSID_X0E].fre_ms = 10;
-  //PWM
-  dt.txSet_u2[CSID_X20].fre_ms = 10;
-  //UWB数据
-  dt.txSet_u2[CSID_X32].fre_ms = 5;
+//  //传感器状态
+//  dt.txSet_u2[CSID_X0E].fre_ms = 10;
+//  //PWM
+//  dt.txSet_u2[CSID_X20].fre_ms = 10;
+//  //UWB数据
+//  dt.txSet_u2[CSID_X32].fre_ms = 5;
 //  //遥控数据
 //  dt.txSet_u2[CSID_X40].fre_ms = 5;
-  //光流数据
-  dt.txSet_u2[CSID_X51].fre_ms = 5;
+//  //光流数据
+//  dt.txSet_u2[CSID_X51].fre_ms = 5;
  
 #if(DEBUG_CONFIG == UART)
 
