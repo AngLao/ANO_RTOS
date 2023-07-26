@@ -100,6 +100,9 @@ void position_loop(void *pvParameters)
   TickType_t xLastWakeTime = xTaskGetTickCount(); //获取当前Tick次数,以赋给延时函数初值
 
   while (1) {  
+    /*用户设置速度*/
+		user_speed_set();
+			
     /*高度环控制*/
     Alt_2level_Ctrl(0.010f);  
 		

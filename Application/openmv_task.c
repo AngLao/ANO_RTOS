@@ -1,22 +1,12 @@
 #include "openmv_task.h"
 
-static uint8_t unpack_data(void);
+float openmvSpeedOut[2]; 
 
-//修正偏航
-#define ANGLE_ID (0x01)
-//面积
-#define AREA_ID (0x02)
-//宽度
-#define WIDTH_ID (0x03)
-//图像位置
-#define POS_ID (0x04)
-//二维码识别结果
-#define RES_ID (0x05)
-
-uint32_t angleValue, areaValue, widthValue, posValue, resValue;
+openmv_t mvValue; 
 static uint32_t value;
 
 static uint8_t unpack_data(void);
+static void assign_value(uint8_t mId) ;
 static void position_control(uint32_t measureValue);
 
 /* openmv数据更新 */
@@ -29,38 +19,12 @@ void openmv_update_task(void *pvParameters)
   debugOutput("openmv use uart5，rate:921600");
 
   while (1) {
-    uint8_t recId = unpack_data();
-    switch (recId) {
-    case 0:
-      break;
-    case ANGLE_ID :
-      angleValue = value;
-      break;
-    case AREA_ID :
-      areaValue = value;
-      break;
-    case WIDTH_ID :
-      widthValue = value;
-      break;
-    case POS_ID :
-      posValue = value;
-      static uint32_t lastPos = 0; 
-			//位置数据在变化且未识别到二维码
-      if(posValue!=lastPos && resValue == 0)
-				//控制杆的位置在图像中心保持低速前进
-        position_control(posValue);
-      else
-        Program_Ctrl_User_Set_HXYcmps(0, 0);
-      break;
-    case RES_ID :
-      resValue = value;
-      break;
-    }
-
+    uint8_t recId = unpack_data(); 
+		assign_value(recId);
+		
     vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 100);
   }
 }
-
 
 //解析缓冲区中的数据,返回id则解析成功
 static uint8_t unpack_data(void)
@@ -121,14 +85,35 @@ static uint8_t unpack_data(void)
   return id;
 }
 
+//根据id赋值
+static void assign_value(uint8_t mId)
+{
+	switch (mId) {
+	case ANGLE_ID :
+		mvValue.angle = value;
+		break;
+	case AREA_ID :
+		mvValue.area = value;
+		break;
+	case WIDTH_ID :
+		mvValue.width = value;
+		break;
+	case POS_ID :
+		mvValue.pos = value;
+		break;
+	case RES_ID :
+		mvValue.res = value;
+		break;
+	default:
+		break;
+	} 
+}
 
 //位置控制(单位:cm)
 static void position_control(uint32_t measureValue)
 {
   const float kp = 0.08f;
   const float ki = 0.0f;
-  const float kd = 0.0f;
-
 
   float out  =  0 ;
   uint32_t exp  = 160;
@@ -137,25 +122,19 @@ static void position_control(uint32_t measureValue)
   int error = exp - measureValue  ;
 
   static int errorIntegral = 0;
-//		//I
-//    if(abs(error) < 10)
-//      errorIntegral += error;
-//    else
-//      errorIntegral = 0;
+		//I
+    if(abs(error) < 10)
+      errorIntegral += error;
+    else
+      errorIntegral = 0;
 
-//    if(errorIntegral > 100)
-//      errorIntegral = 100;
-//    if(errorIntegral < -100)
-//      errorIntegral = -100;
-
-  //D
-  static int lastError = 0;
-  int differential = lastError - error;
-  lastError = error;
-
-  out = error*kp + errorIntegral*ki + differential*kd;
+    if(errorIntegral > 100)
+      errorIntegral = 100;
+    if(errorIntegral < -100)
+      errorIntegral = -100;
 
 
-  Program_Ctrl_User_Set_HXYcmps(0, out);
+  out = error*kp + errorIntegral*ki;
+
 }
 

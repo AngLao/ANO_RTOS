@@ -40,8 +40,6 @@ void uwb_update_task(void *pvParameters)
         break;
       }
 			
-		Program_Ctrl_User_Set_HXYcmps(uwbSpeedOut[X], uwbSpeedOut[Y]); 
-			
     vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 100);
   }
 }
@@ -217,7 +215,7 @@ static void uwb_test_task(uint8_t direction)
 	static	uint8_t	tarPosBufIndex = 0;
 	static	uint16_t	tarPosBuf[] = {210,230,250,270,290,310,330};
 	
-	uint8_t isArrive = position_control(tarPosBuf[tarPosBufIndex] , 250 , 500); 
+	uint8_t isArrive = position_control(tarPosBuf[tarPosBufIndex] , 200 , 500); 
 	
 	if(!isArrive)
 		return;

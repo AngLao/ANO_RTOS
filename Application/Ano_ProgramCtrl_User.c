@@ -52,7 +52,15 @@ void Program_Ctrl_User_Set_YAWdps(float yaw_pal_dps)
   pc_user.pal_dps_set = LIMIT(pc_user.pal_dps_set, -MAX_PC_PAL_DPS, MAX_PC_PAL_DPS);
 }
 
-
-
+ 
+void user_speed_set(void)
+{
+	float sumVelocity[3] = {0};
+	
+	sumVelocity[X] = uwbSpeedOut[X]+openmvSpeedOut[X];
+	sumVelocity[Y] = uwbSpeedOut[Y]+openmvSpeedOut[Y];
+	
+	Program_Ctrl_User_Set_HXYcmps(sumVelocity[X], sumVelocity[Y]);
+}
 
 

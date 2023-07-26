@@ -25,6 +25,7 @@
 extern  uint32_t totalFrameCount , errorFrameCount  ;
 
 extern uint8_t useUwb ; 
+extern float uwbSpeedOut[2];
 
 
 extern _fix_inte_filter_st posFus[2], speedFus[2];
