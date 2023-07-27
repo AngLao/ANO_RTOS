@@ -28,7 +28,7 @@ void uwb_update_task(void *pvParameters)
     uint8_t dataValidity = unpack_data(); 
 		 
     if(useUwb == 0)
-			memset(uwbSpeedOut,0,sizeof(uwbSpeedOut)/sizeof(uwbSpeedOut[0]));
+			memset(uwbSpeedOut,0,sizeof(uwbSpeedOut));
 			
 		if(flag.taking_off)
       switch(useUwb) {
