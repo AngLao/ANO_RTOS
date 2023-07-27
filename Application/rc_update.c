@@ -100,6 +100,7 @@ static void vSlowDetection( void *pvParameters )
   if(CH_N[AUX3]<-100){ 
 			channelThreeState = 0;  
 			useUwb = 0;
+			useOpenmv = 0;
 	}
 	
   if(channelThreeState == 0) {
@@ -107,8 +108,9 @@ static void vSlowDetection( void *pvParameters )
     if(CH_N[AUX3] > 300) {
       channelThreeState = 2;
 //      debugOutput("CH_N[AUX3]  = 2");
-			debugOutput("useUwb = 1");
+			debugOutput("useOpenmv = 1");
 			useUwb = 1;
+			useOpenmv = 1;
     }
     //开关打到中值
     else if(CH_N[AUX3] > -100) {

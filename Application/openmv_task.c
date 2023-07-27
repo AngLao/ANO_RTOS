@@ -32,9 +32,9 @@ void openmv_update_task(void *pvParameters)
 		
 		//一定时间内无有效数据或者不使用openmv则控制速度清零
 		if((xTaskGetTickCount() - waitTime) > pdMS_TO_TICKS(500) || useOpenmv == 0) 
-			memset(openmvSpeedOut,0,sizeof(openmvSpeedOut)/sizeof(openmvSpeedOut[0]));
+			memset(openmvSpeedOut,0,sizeof(openmvSpeedOut));
 		
-    vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 40);
+    vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 50);
   }
 }
 
@@ -113,6 +113,7 @@ static void assign_value(uint8_t mId)
 	case POS_ID :
 		mvValue.pos = value;
 		openmvSpeedOut[YAW] = position_control(160 ,mvValue.pos);
+		openmvSpeedOut[Y] = 20;
 		break;
 	case RES_ID :
 		mvValue.res = value;
@@ -125,7 +126,7 @@ static void assign_value(uint8_t mId)
 //控制目标在图像中的位置（返回的速度控制yaw可以绕杆）
 static float position_control(uint32_t exp ,uint32_t measureValue)
 {
-  const float kp = 0.08f;
+  const float kp = -0.38f;
   const float ki = 0.0f; 
 
   //P
@@ -147,7 +148,7 @@ static float position_control(uint32_t exp ,uint32_t measureValue)
 //控制目标在图像中像素的大小(近似控制openmv与目标的相对距离)
 static float area_control(uint32_t exp ,uint32_t measureValue)
 {
-  const float kp = 0.08f;
+  const float kp = 0.2f;
   const float ki = 0.0f; 
 
   //P
