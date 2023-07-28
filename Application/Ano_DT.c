@@ -26,14 +26,14 @@
 #include "Ano_FlightCtrl.h"
 #include "Ano_FlightDataCal.h"
 #include "Ano_OF_DecoFusion.h"
-#include "Ano_LocCtrl.h" 
+#include "Ano_LocCtrl.h"
 #include "Ano_OF.h"
 #include "Ano_OF_DecoFusion.h"
 #include "power_management.h"
 #include "nlink_linktrack_tagframe0.h"
 #include "uwb_task.h"
 
- 
+
 #define BYTE0(dwTemp)       ( *( (char *)(&dwTemp)		) )
 #define BYTE1(dwTemp)       ( *( (char *)(&dwTemp) + 1) )
 #define BYTE2(dwTemp)       ( *( (char *)(&dwTemp) + 2) )
@@ -44,7 +44,7 @@
 
 //越往前发送优先级越高，如果需要修改，这里和h文件里的枚举需要同时改
 const u8  _cs_idlist[CSID_NUM]	 	= {0x01, 0x02, 0x03, 0x05, 0x06, 0x07, 0x0B, 0x0D, 0x0E, 0x20, 0x32,0x40,0x51};
-  
+
 //循环发送数据结构体
 typedef struct {
   u8 WTS;		 //wait to send等待发送标记
@@ -53,7 +53,7 @@ typedef struct {
 } _dt_frame_st;
 
 //循环发送数据临时缓冲
-u8 CycleSendData[100];		
+u8 CycleSendData[100];
 
 //非循环发送数据结构体
 typedef struct {
@@ -65,13 +65,13 @@ typedef struct {
 _dt_otherdata_st OtherSendData[DT_ODNUM];
 
 u8 otherDataTmp[64];	//非循环发送数据临时缓冲
-  
+
 typedef struct {
   _dt_frame_st txSet_u2[CSID_NUM];
 } _dt_st;
 _dt_st dt;
 
-//0x01 
+//0x01
 //#define ACC_RAW_X      (sensor.Acc[X])
 //#define ACC_RAW_Y      (sensor.Acc[Y])
 //#define ACC_RAW_Z      (sensor.Acc[Z])
@@ -80,18 +80,18 @@ _dt_st dt;
 //#define GYR_RAW_Z      (sensor.Gyro[Z])
 //#define SHOCK_STA      (flag.unlock_err)
 
-#include "openmv_task.h" 
+#include "openmv_task.h"
 #define ACC_RAW_X      (0)
 #define ACC_RAW_Y      (0)
-#define ACC_RAW_Z      (0) 
+#define ACC_RAW_Z      (0)
 #define GYR_RAW_X      (0)
 #define GYR_RAW_Y      (mvValue.pos)
 #define GYR_RAW_Z      (openmvSpeedOut[YAW]*100)
 #define SHOCK_STA      (0)
 
 //0x02
-#define ECP_RAW_X      (g_nlt_tagframe0.result.vel_3d[X]) 
-#define ECP_RAW_Y      (g_nlt_tagframe0.result.vel_3d[Y]) 
+#define ECP_RAW_X      (g_nlt_tagframe0.result.vel_3d[X])
+#define ECP_RAW_Y      (g_nlt_tagframe0.result.vel_3d[Y])
 #define ECP_RAW_Z      (g_nlt_tagframe0.result.eop_3d[X])
 #define BARO_ALT       (g_nlt_tagframe0.result.eop_3d[Y]*100)
 #define TEMPERATURE    (sensor.Tempreature_C)
@@ -182,7 +182,7 @@ void ANO_DT_Init(void)
 //  dt.txSet_u2[CSID_X40].fre_ms = 5;
 //  //光流数据
 //  dt.txSet_u2[CSID_X51].fre_ms = 5;
- 
+
 #if(DEBUG_CONFIG == UART)
 
   //数传串口初始化
@@ -193,7 +193,7 @@ void ANO_DT_Init(void)
   //板载USB虚拟串口初始化
   AnoUsbCdcInit();
 
-#endif 
+#endif
 
 }
 
@@ -385,9 +385,9 @@ static void DTFrameAddData(u8 frame_num, u8 *_cnt)
     CycleSendData[(*_cnt)++] = BYTE1(temp_data);
   }
   break;
-	
-	//UWB数据
-  case 0x32: { 
+
+  //UWB数据
+  case 0x32: {
     for(uint8_t i = 0; i < 3; i++) {
       s32 temp = (int32_t)g_nlt_tagframe0.result.pos_3d[i];
       CycleSendData[(*_cnt)++] = BYTE0(temp) ;
@@ -399,7 +399,7 @@ static void DTFrameAddData(u8 frame_num, u8 *_cnt)
   break;
 
   //遥控器数据
-  case 0x40: {   
+  case 0x40: {
     for(char i = 0; i < CH_NUM; i++) {
       u16 temp = CH_N[i] + 1500;
       CycleSendData[(*_cnt)++] = BYTE0(temp) ;
@@ -547,7 +547,7 @@ static void CheckDotMs( u8 id_addr)
 //===========================================================
 u8 CheckDotWts(u8 id_addr)
 {
-  u8 _addr = 0xaf; 
+  u8 _addr = 0xaf;
   u8  * _dot_WTS  = & dt.txSet_u2[id_addr].WTS;
 
 
@@ -720,7 +720,7 @@ u8 ano_dt_rec_data = 0;
 void AnoDTRxOneByte(u8 data)
 {
   static _dt_rx_anl_st rx_anl;
- 
+
   switch (rx_anl.rxstate) {
   case 0: {
     if(data == 0xAA) {
@@ -850,33 +850,28 @@ static void AnoDTDataAnl(u8 *data, u8 len)
 
         }
       } else if(*(data + 5) == 0x30) { //校准exe
-//						//校准命令
-//						if(*(data+6)==0x01 ) //
-//						{
-//							if(flag.unlock_sta==0)
-//							{
-//								test_cali_cnt++;
-//								//开始6面校准
-//								st_imu_cali.acc_cali_on = 1;
-//								Ano_Parame.set.acc_calibrated = 0;
-//							}
-//						}
-//					else if(*(data+6) == 0x02)
-//					{
-//						if(flag.unlock_sta==0)
-//						{
-//							//开始mag校准
-//							mag.mag_CALIBRATE = 2;
-//							Ano_Parame.set.mag_calibrated = 0;
-//						}
-//					}
+        //校准命令
+        if(*(data+6)==0x01 ) { //
+//          if(flag.unlock_sta==0) {
+//            test_cali_cnt++;
+//            //开始6面校准
+//						st_imu_cali.acc_cali_on = 1;
+//            Ano_Parame.set.acc_calibrated = 0;
+//          }
+        } else if(*(data+6) == 0x02) {
+          if(flag.unlock_sta==0) {
+            //开始mag校准
+            mag.mag_CALIBRATE = 2;
+            Ano_Parame.set.mag_calibrated = 0;
+          }
+        }
       }
     }
     break;
- 
+
     default:
       break;
-    } 
+    }
     //需返回CHECK帧
     SendCheck(SWJ_ADDR, *(data + 2), check_sum1, check_sum2);
   } else if(*(data + 2) == 0XE1) {
@@ -888,7 +883,7 @@ static void AnoDTDataAnl(u8 *data, u8 len)
     AnoParWrite(*(u16*)(data + 4), *(s32*)(data + 6));
     //写入参数后需返回CHECK帧，告诉上位机参数写入成功
     SendCheck( SWJ_ADDR, *(data + 2), check_sum1, check_sum2);
-  }  
+  }
 }
 
 
