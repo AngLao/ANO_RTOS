@@ -5,6 +5,7 @@
 #include "Drv_Uart.h"
 #include "Drv_laser.h"
 #include "Drv_Timer.h"
+#include "drv_spl06.h"
 #include "Drv_UP_flow.h"
 #include "Drv_heating.h"
 
@@ -56,7 +57,10 @@ void basic_data_read(void *pvParameters)
 		
     //灯光驱动
     LED_1ms_DRV();
-
+		
+    /*数传数据交换调度*/
+    dt_scheduler(); 
+		
     vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 1000);
   }
 }
@@ -128,16 +132,13 @@ void auxiliary_loop(void *pvParameters)
 
     /*延时存储任务*/
     Ano_Parame_Write_task(20); //耗时较长 注意看门狗复位
-   
-    /*数传数据交换调度*/
-    dt_scheduler(); 
 		 
     /*灯光控制*/
     LED_Task2(20);
 		
 		/*着陆检测*/
 		land_discriminat(20); 
-	 
+		
     vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 50);
   }
 }
