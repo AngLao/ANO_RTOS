@@ -17,7 +17,7 @@ static s16 mag_val[3];
 
 void Mag_Update_Task(u8 dT_ms)
 {
-
+	Drv_AK8975_Read();
   Mag_Get(mag_val);
 
   Mag_Data_Deal_Task(dT_ms,mag_val,imu_data.z_vec[Z],sensor.Gyro_deg[X],sensor.Gyro_deg[Z]);
