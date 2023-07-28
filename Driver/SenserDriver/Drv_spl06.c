@@ -388,11 +388,11 @@ u8 Drv_Spl0601Init ( void )
   p_spl0601->i32rawTemperature = 0;
   p_spl0601->chip_id = spl0601_read ( 0x0D );// 0x34  0x10
 
-  spl0601_get_calib_param();
+	spl0601_get_calib_param();
 
-  spl0601_rateset ( PRESSURE_SENSOR, 32, 50 );
+	spl0601_rateset ( PRESSURE_SENSOR, 128, 16 );
 
-  spl0601_rateset ( TEMPERATURE_SENSOR, 8, 8 );
+	spl0601_rateset ( TEMPERATURE_SENSOR, 8, 8 );
 
   spl0601_start_continuous ( CONTINUOUS_P_AND_T );
 
@@ -459,20 +459,19 @@ float spl0601_get_pressure ( void )
 }
 
 
- 
+int32_t baroPressure =0 ;
  
 
 float barometer_update( void )
-{ 
-
+{
   spl0601_get_raw_temp();
   spl0601_get_raw_pressure();
 	
-//  float temperature = spl0601_get_temperature();
+  float temperature = spl0601_get_temperature();
   float baro_pressure = spl0601_get_pressure();
  
-//  float alt_3 = ( 101400 - baro_pressure ) / 1000.0f;
-//  float height = 0.82f * alt_3 * alt_3 * alt_3 + 0.09f * ( 101400 - baro_pressure ) * 100.0f ;
+  float alt_3 = ( 101400 - baro_pressure ) / 1000.0f;
+  float height = 0.82f * alt_3 * alt_3 * alt_3 + 0.09f * ( 101400 - baro_pressure ) * 100.0f ;
  
   return baro_pressure;
 }

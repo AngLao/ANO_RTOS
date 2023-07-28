@@ -29,6 +29,9 @@ struct spl0601_t {
   int32_t 	i32kT;
 };
 
+
+extern int32_t baroPressure;
+
 void Drv_SPL06CSPinInit(void);
 u8 Drv_Spl0601Init(void);
 
