@@ -62,26 +62,40 @@ float uwb_acc_use[2];
 
 void wcz_acc_update(void)//最小周期
 {
-  wcz_acc_use += 0.03f *(imu_data.w_acc[Z] - wcz_acc_use);
+  wcz_acc_use += 0.02f *(imu_data.w_acc[Z] - wcz_acc_use);
   uwb_acc_use[X] += 0.03f *(imu_data.w_acc[X] - uwb_acc_use[X]);
   uwb_acc_use[Y] += 0.03f *(imu_data.w_acc[Y] - uwb_acc_use[Y]);
 }
-
-
+ 
+static int32_t wcz_acc;
 static _inte_fix_filter_st wcz_acc_fus;
 _fix_inte_filter_st wcz_spe_fus,wcz_hei_fus;
 
-#define N_TIMES 5
+#define N_TIMES 6
 
 void wcz_fus_update(u8 dT_ms)
 {
-  s32 ref_height = jsdata.of_alt;
-
+	static int32_t baro_h_offset=0,ref_height=0;
+	
+  wcz_acc = (int32_t)wcz_acc_use;
+	
+	if(!flag.taking_off){
+		wcz_fus_reset();
+		baro_h_offset = baroHeight;
+		return;
+	}
+	
+	if(switchs.of_tof_on){ 
+		ref_height = jsdata.of_alt;
+		baro_h_offset = baroHeight;		//气压计切换点
+	}
+	else
+		ref_height = baroHeight - baro_h_offset;//气压计相对高度
+	
+	
 	//高度数据无效则只融合加速度计
 	if(ref_height<0 || ref_height>400)
 		ref_height = wcz_hei_fus.out;
-  static s32 ref_height_old,ref_speed_old;
-  static s32 wcz_ref_speed,wcz_ref_acc;
 	
   static u8 cyc_xn;
   float hz,ntimes_hz;
@@ -90,6 +104,9 @@ void wcz_fus_update(u8 dT_ms)
 	
   cyc_xn ++;
   cyc_xn %= N_TIMES;
+	
+  static s32 ref_height_old,ref_speed_old;
+  static s32 wcz_ref_speed,wcz_ref_acc;
 
   if(cyc_xn == 0) {
     wcz_ref_speed = (ref_height - ref_height_old) *ntimes_hz;
@@ -101,7 +118,7 @@ void wcz_fus_update(u8 dT_ms)
   }
 
   wcz_acc_fus.fix_ki = 0.1f;
-  wcz_acc_fus.in_est = wcz_acc_use;
+  wcz_acc_fus.in_est = wcz_acc;
   wcz_acc_fus.in_obs = wcz_ref_acc;
   wcz_acc_fus.ei_limit = 100;
   inte_fix_filter(dT_ms*1e-3f,&wcz_acc_fus);
@@ -117,17 +134,16 @@ void wcz_fus_update(u8 dT_ms)
   wcz_hei_fus.fix_kp = 0.3f;
   wcz_hei_fus.in_est_d = wcz_spe_fus.out;
   wcz_hei_fus.in_obs = ref_height;
-  //wcz_hei_fus.e_limit = 200;
+//  wcz_hei_fus.e_limit = 100;
   fix_inte_filter(dT_ms*1e-3f,&wcz_hei_fus);
-	 
-
+	  
 }
 
 
 void wcz_fus_reset()
 {
   wcz_acc_fus.out = 0;
-  wcz_acc_fus.ei = -wcz_acc_use;
+  wcz_acc_fus.ei = -wcz_acc;
 
   wcz_spe_fus.out = 0;
   wcz_spe_fus.e = 0;
