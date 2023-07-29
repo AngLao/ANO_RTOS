@@ -459,7 +459,7 @@ float spl0601_get_pressure ( void )
 }
 
 
-int32_t baroPressure =0 ;
+int32_t baroHeight =0 ;
  
 
 float barometer_update( void )
@@ -471,7 +471,7 @@ float barometer_update( void )
   float baro_pressure = spl0601_get_pressure();
  
   float alt_3 = ( 101400 - baro_pressure ) / 1000.0f;
-  float height = 0.82f * alt_3 * alt_3 * alt_3 + 0.09f * ( 101400 - baro_pressure ) * 100.0f ;
+  float height = 0.82f * alt_3 * alt_3 * alt_3 + 9.0f * ( 101400 - baro_pressure ) ;
  
-  return baro_pressure;
+  return height;
 }

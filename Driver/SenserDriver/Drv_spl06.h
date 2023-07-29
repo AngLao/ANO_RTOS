@@ -30,7 +30,7 @@ struct spl0601_t {
 };
 
 
-extern int32_t baroPressure;
+extern int32_t baroHeight;
 
 void Drv_SPL06CSPinInit(void);
 u8 Drv_Spl0601Init(void);
