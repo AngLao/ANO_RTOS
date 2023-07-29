@@ -14,6 +14,7 @@
 ===========================================================================*/
 
 #include "Ano_DT.h"
+#include "drv_spl06.h"
 #include "Drv_Uart.h"
 #include "ano_usb.h"
 #include "rc_update.h"
@@ -72,28 +73,28 @@ typedef struct {
 _dt_st dt;
 
 //0x01
-//#define ACC_RAW_X      (sensor.Acc[X])
-//#define ACC_RAW_Y      (sensor.Acc[Y])
-//#define ACC_RAW_Z      (sensor.Acc[Z])
-//#define GYR_RAW_X      (sensor.Gyro[X])
-//#define GYR_RAW_Y      (sensor.Gyro[Y])
-//#define GYR_RAW_Z      (sensor.Gyro[Z])
-//#define SHOCK_STA      (flag.unlock_err)
+#define ACC_RAW_X      (sensor.Acc[X])
+#define ACC_RAW_Y      (sensor.Acc[Y])
+#define ACC_RAW_Z      (sensor.Acc[Z])
+#define GYR_RAW_X      (sensor.Gyro[X])
+#define GYR_RAW_Y      (sensor.Gyro[Y])
+#define GYR_RAW_Z      (sensor.Gyro[Z])
+#define SHOCK_STA      (flag.unlock_err)
 
-#include "openmv_task.h"
-#define ACC_RAW_X      (0)
-#define ACC_RAW_Y      (0)
-#define ACC_RAW_Z      (0)
-#define GYR_RAW_X      (0)
-#define GYR_RAW_Y      (mvValue.pos)
-#define GYR_RAW_Z      (openmvSpeedOut[YAW]*100)
-#define SHOCK_STA      (0)
+//#include "openmv_task.h"
+//#define ACC_RAW_X      (0)
+//#define ACC_RAW_Y      (0)
+//#define ACC_RAW_Z      (0)
+//#define GYR_RAW_X      (0)
+//#define GYR_RAW_Y      (mvValue.pos)
+//#define GYR_RAW_Z      (openmvSpeedOut[YAW]*100)
+//#define SHOCK_STA      (0)
 
 //0x02
-#define ECP_RAW_X      (g_nlt_tagframe0.result.vel_3d[X])
-#define ECP_RAW_Y      (g_nlt_tagframe0.result.vel_3d[Y])
-#define ECP_RAW_Z      (g_nlt_tagframe0.result.eop_3d[X])
-#define BARO_ALT       (g_nlt_tagframe0.result.eop_3d[Y]*100)
+#define ECP_RAW_X      (mag.val[X])
+#define ECP_RAW_Y      (mag.val[Y])
+#define ECP_RAW_Z      (mag.val[Z])
+#define BARO_ALT       (baroHeight*100)
 #define TEMPERATURE    (sensor.Tempreature_C)
 #define BARO_STA       (sens_hd_check.baro_ok)
 #define ECP_STA        (sens_hd_check.mag_ok)
@@ -156,32 +157,32 @@ _dt_st dt;
 
 void ANO_DT_Init(void)
 {
-  //ACC-GRO
-  dt.txSet_u2[CSID_X01].fre_ms = 5;
-//  //ECP-TEM-BARO
-//  dt.txSet_u2[CSID_X02].fre_ms = 5;
-//  //ATT_ANG
-//  dt.txSet_u2[CSID_X03].fre_ms = 5;
+//  //ACC-GRO
+//  dt.txSet_u2[CSID_X01].fre_ms = 100;
+  //ECP-TEM-BARO
+  dt.txSet_u2[CSID_X02].fre_ms = 50;
+  //ATT_ANG
+  dt.txSet_u2[CSID_X03].fre_ms = 100;
   //height
-  dt.txSet_u2[CSID_X05].fre_ms = 1;
+  dt.txSet_u2[CSID_X05].fre_ms = 50;
 //  //fc_mode
-//  dt.txSet_u2[CSID_X06].fre_ms = 15;
+//  dt.txSet_u2[CSID_X06].fre_ms = 200;
 //  //反馈速度
-//  dt.txSet_u2[CSID_X07].fre_ms = 5;
+//  dt.txSet_u2[CSID_X07].fre_ms = 100;
 //  //期望速度
-//  dt.txSet_u2[CSID_X0B].fre_ms = 5;
-  //电压
-  dt.txSet_u2[CSID_X0D].fre_ms = 10;
+//  dt.txSet_u2[CSID_X0B].fre_ms = 100;
+//  //电压
+//  dt.txSet_u2[CSID_X0D].fre_ms = 100;
 //  //传感器状态
-//  dt.txSet_u2[CSID_X0E].fre_ms = 10;
+//  dt.txSet_u2[CSID_X0E].fre_ms = 100;
 //  //PWM
-//  dt.txSet_u2[CSID_X20].fre_ms = 10;
+//  dt.txSet_u2[CSID_X20].fre_ms = 100;
 //  //UWB数据
-//  dt.txSet_u2[CSID_X32].fre_ms = 5;
+//  dt.txSet_u2[CSID_X32].fre_ms = 100;
 //  //遥控数据
-//  dt.txSet_u2[CSID_X40].fre_ms = 5;
+//  dt.txSet_u2[CSID_X40].fre_ms = 100;
 //  //光流数据
-//  dt.txSet_u2[CSID_X51].fre_ms = 5;
+//  dt.txSet_u2[CSID_X51].fre_ms = 100;
 
 #if(DEBUG_CONFIG == UART)
 
