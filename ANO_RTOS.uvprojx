@@ -339,7 +339,7 @@
               <MiscControls></MiscControls>
               <Define>TARGET_IS_TM4C123_RB1 PART_TM4C123GH6PM</Define>
               <Undefine></Undefine>
-              <IncludePath>.\TiDriver\inc;.\TiDriver\inc\driver_inc;.\TiDriver\inc\driver_hw;.\TiDriver\inc\driver_usb;.\TiDriver\inc\driver_usb\device;.\Application;.\Driver;.\Driver\SenserDriver;.\SRC\fc_general;.\SRC\fc_specific;.\Driver\SenserDriver\UWB;.\FreeRTOS;.\FreeRTOS\portable\RVDS\ARM_CM4F;.\FreeRTOS\include</IncludePath>
+              <IncludePath>.\TiDriver\inc;.\TiDriver\inc\driver_inc;.\TiDriver\inc\driver_hw;.\TiDriver\inc\driver_usb;.\TiDriver\inc\driver_usb\device;.\Application;.\Driver;.\Driver\SenserDriver;.\SRC\fc_general;.\SRC\fc_specific;.\Driver\SenserDriver\UWB;.\FreeRTOS;.\FreeRTOS\portable\RVDS\ARM_CM4F;.\FreeRTOS\include;.\SRC\AnoPTv8</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -732,6 +732,31 @@
               <FileName>README.md</FileName>
               <FileType>5</FileType>
               <FilePath>.\README.md</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>AnoV8</GroupName>
+          <Files>
+            <File>
+              <FileName>AnoPTv8DataDef.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SRC\AnoPTv8\AnoPTv8DataDef.c</FilePath>
+            </File>
+            <File>
+              <FileName>AnoPTv8FrameFactory.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SRC\AnoPTv8\AnoPTv8FrameFactory.c</FilePath>
+            </File>
+            <File>
+              <FileName>AnoPTv8Run.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SRC\AnoPTv8\AnoPTv8Run.c</FilePath>
+            </File>
+            <File>
+              <FileName>hardwareInterface.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SRC\AnoPTv8\hardwareInterface.c</FilePath>
             </File>
           </Files>
         </Group>
