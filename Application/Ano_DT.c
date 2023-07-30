@@ -81,15 +81,6 @@ _dt_st dt;
 #define GYR_RAW_Z      (sensor.Gyro[Z])
 #define SHOCK_STA      (flag.unlock_err)
 
-//#include "openmv_task.h"
-//#define ACC_RAW_X      (0)
-//#define ACC_RAW_Y      (0)
-//#define ACC_RAW_Z      (0)
-//#define GYR_RAW_X      (0)
-//#define GYR_RAW_Y      (mvValue.pos)
-//#define GYR_RAW_Z      (openmvSpeedOut[YAW]*100)
-//#define SHOCK_STA      (0)
-
 //0x02
 #define ECP_RAW_X      (mag.val[X])
 #define ECP_RAW_Y      (mag.val[Y])
@@ -98,6 +89,7 @@ _dt_st dt;
 #define TEMPERATURE    (sensor.Tempreature_C)
 #define BARO_STA       (sens_hd_check.baro_ok)
 #define ECP_STA        (sens_hd_check.mag_ok)
+
 //0x03
 #define ANGLE_ROL      (imu_data.rol)
 #define ANGLE_PIT      (imu_data.pit)
@@ -157,8 +149,8 @@ _dt_st dt;
 
 void ANO_DT_Init(void)
 {
-//  //ACC-GRO
-//  dt.txSet_u2[CSID_X01].fre_ms = 100;
+  //ACC-GRO
+  dt.txSet_u2[CSID_X01].fre_ms = 100;
   //ECP-TEM-BARO
   dt.txSet_u2[CSID_X02].fre_ms = 50;
   //ATT_ANG
@@ -194,6 +186,13 @@ void ANO_DT_Init(void)
   //板载USB虚拟串口初始化
   AnoUsbCdcInit();
 
+#endif
+#if(DEBUG_CONFIG == CLOSE && ANO_HELPER)
+
+#include "hardwareInterface.h"
+
+  AnoUsbCdcInit();
+  xTaskCreate(ano_helper_task, "ano_helper_task", 158, NULL, 2, NULL);
 #endif
 
 }
@@ -819,25 +818,9 @@ static void AnoDTDataAnl(u8 *data, u8 len)
     switch(*(data + 4)) {	//CID
     case 0x01: {
       if(*(data + 5) == 0x00) {
-        if(*(data + 6) == 0x01) { //acc
-
-        } else if(*(data + 6) == 0x02) { //gyro
-        } else if(*(data + 6) == 0x03) { //horizontal
-
-        } else if(*(data + 6) == 0x04) { //ecp
-
-        } else if(*(data + 6) == 0x05) { //6 side
-
-        } else if(*(data + 6) == 0x10) { //imu_reset
-
-        } else if(*(data + 6) == 0x61) {	//存储航点
-
-        } else if(*(data + 6) == 0x62) {	//清空航点
-
-        } else if(*(data + 6) == 0xAA) {	//恢复默认PID
+				if(*(data + 6) == 0xAA) {	//恢复默认PID
           PID_Rest();
           data_save();
-
         } else if(*(data + 6) == 0xAB) {	//恢复默认参数
           Parame_Reset(1);
           data_save();
@@ -845,26 +828,6 @@ static void AnoDTDataAnl(u8 *data, u8 len)
           PID_Rest();
           Parame_Reset(2);
           data_save();
-        }
-      } else if(*(data + 5) == 0x01) {
-        if(*(data + 6) == 0x01 ) { //飞控模式
-
-        }
-      } else if(*(data + 5) == 0x30) { //校准exe
-        //校准命令
-        if(*(data+6)==0x01 ) { //
-//          if(flag.unlock_sta==0) {
-//            test_cali_cnt++;
-//            //开始6面校准
-//						st_imu_cali.acc_cali_on = 1;
-//            Ano_Parame.set.acc_calibrated = 0;
-//          }
-        } else if(*(data+6) == 0x02) {
-          if(flag.unlock_sta==0) {
-            //开始mag校准
-            mag.mag_CALIBRATE = 2;
-            Ano_Parame.set.mag_calibrated = 0;
-          }
         }
       }
     }

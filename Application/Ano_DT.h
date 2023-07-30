@@ -15,6 +15,7 @@
 
 //数传输出硬件选择
 #define DEBUG_CONFIG UART
+#define ANO_HELPER 1
 
 typedef enum {
   CSID_X01,
@@ -41,8 +42,6 @@ void AnoDTRxOneByteUsb( u8 data );
 void AnoDTSendStr(u8 dest_addr, u8 string_color, char *str);
 void ANO_DT_Init(void);
 void dt_scheduler(void);
-
-
 
 #define		 debugOutput(str) 	AnoDTSendStr(0xFF, LOG_COLOR_RED , str )
 
