@@ -171,8 +171,8 @@ void ANO_DT_Init(void)
 //  dt.txSet_u2[CSID_X07].fre_ms = 100;
 //  //期望速度
 //  dt.txSet_u2[CSID_X0B].fre_ms = 100;
-//  //电压
-//  dt.txSet_u2[CSID_X0D].fre_ms = 100;
+  //电压
+  dt.txSet_u2[CSID_X0D].fre_ms = 100;
 //  //传感器状态
 //  dt.txSet_u2[CSID_X0E].fre_ms = 100;
 //  //PWM
