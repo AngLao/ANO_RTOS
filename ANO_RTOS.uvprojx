@@ -136,8 +136,8 @@
             <Capability>1</Capability>
             <DriverSelection>4099</DriverSelection>
           </Flash1>
-          <bUseTDR>0</bUseTDR>
-          <Flash2>BIN\CMSIS_AGDI.dll</Flash2>
+          <bUseTDR>1</bUseTDR>
+          <Flash2>BIN\UL2CM3.DLL</Flash2>
           <Flash3>"" ()</Flash3>
           <Flash4></Flash4>
           <pFcarmOut></pFcarmOut>
@@ -687,6 +687,16 @@
               <FileName>power_management.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\SRC\fc_specific\power_management.c</FilePath>
+            </File>
+            <File>
+              <FileName>Ano_OPMV_CBTracking_Ctrl.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Application\Ano_OPMV_CBTracking_Ctrl.c</FilePath>
+            </File>
+            <File>
+              <FileName>Ano_OPMV_Ctrl.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Application\Ano_OPMV_Ctrl.c</FilePath>
             </File>
           </Files>
         </Group>

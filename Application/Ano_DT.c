@@ -33,7 +33,7 @@
 #include "power_management.h"
 #include "nlink_linktrack_tagframe0.h"
 #include "uwb_task.h"
-
+#include "Ano_OPMV_CBTracking_Ctrl.h"
 
 #define BYTE0(dwTemp)       ( *( (char *)(&dwTemp)		) )
 #define BYTE1(dwTemp)       ( *( (char *)(&dwTemp) + 1) )
@@ -73,13 +73,21 @@ typedef struct {
 _dt_st dt;
 
 //0x01
-#define ACC_RAW_X      (sensor.Acc[X])
-#define ACC_RAW_Y      (sensor.Acc[Y])
-#define ACC_RAW_Z      (sensor.Acc[Z])
-#define GYR_RAW_X      (sensor.Gyro[X])
-#define GYR_RAW_Y      (sensor.Gyro[Y])
-#define GYR_RAW_Z      (sensor.Gyro[Z])
-#define SHOCK_STA      (flag.unlock_err)
+//#define ACC_RAW_X      (sensor.Acc[X])
+//#define ACC_RAW_Y      (sensor.Acc[Y])
+//#define ACC_RAW_Z      (sensor.Acc[Z])
+//#define GYR_RAW_X      (sensor.Gyro[X])
+//#define GYR_RAW_Y      (sensor.Gyro[Y])
+//#define GYR_RAW_Z      (sensor.Gyro[Z])
+//#define SHOCK_STA      (flag.unlock_err)
+
+#define ACC_RAW_X      (opmv.cb.pos_x)
+#define ACC_RAW_Y      (opmv.cb.pos_y)
+#define ACC_RAW_Z      (ano_opmv_cbt_ctrl.exp_velocity_h_cmps[0])
+#define GYR_RAW_X      (ano_opmv_cbt_ctrl.exp_velocity_h_cmps[1])
+#define GYR_RAW_Y      (g_nlt_tagframe0.result.pos_3d[Y])
+#define GYR_RAW_Z      (uwb_acc_use[Y])
+#define SHOCK_STA      (0)
 
 //0x02
 #define ECP_RAW_X      (mag.val[X])

@@ -1,7 +1,13 @@
 #include "openmv_task.h"
+#include "Ano_OPMV_Ctrl.h"
+#include "Ano_OPMV_CBTracking_Ctrl.h"
+
+#define OPENMV_CBTRACK_CTR (1)
 
 //只控制X,Y和YAW的速度
 float openmvSpeedOut[3]; 
+
+_openmv_data_st opmv;
 
 uint8_t useOpenmv = 0;
 openmv_t mvValue; 
@@ -11,6 +17,7 @@ static uint8_t unpack_data(void);
 static void assign_value(uint8_t mId) ;
 static float position_control(uint32_t exp ,uint32_t measureValue);
 static float area_control(uint32_t exp ,uint32_t measureValue);
+
 
 /* openmv数据更新 */
 void openmv_update_task(void *pvParameters)
@@ -23,8 +30,41 @@ void openmv_update_task(void *pvParameters)
 
 	static TickType_t waitTime = 0;
   while (1) {
-    uint8_t recId = unpack_data(); 
+    
 		
+#if (OPENMV_CBTRACK_CTR == 1)
+    uint8_t recId = unpack_data(); /* 解帧 */
+		assign_value(recId);					 /* 解值 */
+		
+		if((recId == POS_X_ERROR) || (recId == POS_Y_ERROR))
+		{
+			if(recId == POS_X_ERROR)
+			{
+				opmv.cb.pos_x = value;/* 原始数据 */
+				opmv.cb.pos_x = opmv.cb.pos_x - 160;/* 左边偏移至图像中心 */
+				opmv.cb.pos_x = -opmv.cb.pos_x;
+			}
+			else if(recId == POS_Y_ERROR)
+			{
+				opmv.cb.pos_y = value;/* 原始数据 */
+				opmv.cb.pos_y = opmv.cb.pos_y - 120;/* 左边偏移至图像中心 */
+				opmv.cb.pos_y = -opmv.cb.pos_y;
+			}
+			
+			opmv.cb.sta = 1;					/* 识别有效 */
+			opmv.mode_sta = 1;				/* openmv追寻色块模式 */
+			
+			OpenMV_Check_Reset();	
+		}
+
+		/*OPMV检测是否掉线*/
+		OpenMV_Offline_Check(20);
+		/*OPMV色块追踪数据处理任务*/
+		ANO_CBTracking_Task(20);
+		/*OPMV控制任务*/
+		ANO_OPMV_Ctrl_Task(20);
+#else
+		uint8_t recId = unpack_data(); 
 		if(recId){ 
 			assign_value(recId);
 			waitTime = xTaskGetTickCount();
@@ -32,7 +72,8 @@ void openmv_update_task(void *pvParameters)
 		
 		//一定时间内无有效数据或者不使用openmv则控制速度清零
 		if((xTaskGetTickCount() - waitTime) > pdMS_TO_TICKS(500) || useOpenmv == 0) 
-			memset(openmvSpeedOut,0,sizeof(openmvSpeedOut));
+		memset(openmvSpeedOut,0,sizeof(openmvSpeedOut));
+#endif
 		
     vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 50);
   }
@@ -166,3 +207,4 @@ static float area_control(uint32_t exp ,uint32_t measureValue)
   float out = error*kp + errorIntegral*ki;
 	return out ;
 }
+
