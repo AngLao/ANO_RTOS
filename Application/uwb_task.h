@@ -20,9 +20,17 @@
 #include "Ano_Math.h"
 #include "Ano_FlightDataCal.h"
 
+typedef struct {
+	uint16_t x;
+	uint16_t y;
+}dot_t;
+
  
+extern	uint8_t	dotfIndex;
+extern	dot_t		dotPath[];
  
-extern  uint32_t totalFrameCount , errorFrameCount  ;
+extern	uint8_t		dotfIndex;
+extern  uint32_t	totalFrameCount , errorFrameCount  ;
 
 extern uint8_t useUwb ; 
 extern float uwbSpeedOut[2];

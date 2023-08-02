@@ -73,13 +73,21 @@ typedef struct {
 _dt_st dt;
 
 //0x01
-#define ACC_RAW_X      (sensor.Acc[X])
-#define ACC_RAW_Y      (sensor.Acc[Y])
-#define ACC_RAW_Z      (sensor.Acc[Z])
-#define GYR_RAW_X      (sensor.Gyro[X])
-#define GYR_RAW_Y      (sensor.Gyro[Y])
-#define GYR_RAW_Z      (sensor.Gyro[Z])
-#define SHOCK_STA      (flag.unlock_err)
+//#define ACC_RAW_X      (sensor.Acc[X])
+//#define ACC_RAW_Y      (sensor.Acc[Y])
+//#define ACC_RAW_Z      (sensor.Acc[Z])
+//#define GYR_RAW_X      (sensor.Gyro[X])
+//#define GYR_RAW_Y      (sensor.Gyro[Y])
+//#define GYR_RAW_Z      (sensor.Gyro[Z])
+//#define SHOCK_STA      (flag.unlock_err)
+
+#define ACC_RAW_X      (dotPath[dotfIndex].x)
+#define ACC_RAW_Y      (dotPath[dotfIndex].y)
+#define ACC_RAW_Z      (40 + dotPath[dotfIndex].x * 80)
+#define GYR_RAW_X      (40 + dotPath[dotfIndex].y * 80)
+#define GYR_RAW_Y      (0)
+#define GYR_RAW_Z      (0)
+#define SHOCK_STA      (dotfIndex)
 
 //0x02
 #define ECP_RAW_X      (mag.val[X])
@@ -151,8 +159,8 @@ void ANO_DT_Init(void)
 {
   //ACC-GRO
   dt.txSet_u2[CSID_X01].fre_ms = 100;
-  //ECP-TEM-BARO
-  dt.txSet_u2[CSID_X02].fre_ms = 50;
+//  //ECP-TEM-BARO
+//  dt.txSet_u2[CSID_X02].fre_ms = 50;
   //ATT_ANG
   dt.txSet_u2[CSID_X03].fre_ms = 100;
   //height
@@ -169,8 +177,8 @@ void ANO_DT_Init(void)
 //  dt.txSet_u2[CSID_X0E].fre_ms = 100;
 //  //PWM
 //  dt.txSet_u2[CSID_X20].fre_ms = 100;
-//  //UWB数据
-//  dt.txSet_u2[CSID_X32].fre_ms = 100;
+  //UWB数据
+  dt.txSet_u2[CSID_X32].fre_ms = 100;
 //  //遥控数据
 //  dt.txSet_u2[CSID_X40].fre_ms = 100;
 //  //光流数据
