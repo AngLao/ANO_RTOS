@@ -85,8 +85,8 @@ _dt_st dt;
 #define ACC_RAW_Y      (dotPath[dotfIndex].y)
 #define ACC_RAW_Z      (40 + dotPath[dotfIndex].x * 80)
 #define GYR_RAW_X      (40 + dotPath[dotfIndex].y * 80)
-#define GYR_RAW_Y      (0)
-#define GYR_RAW_Z      (0)
+#define GYR_RAW_Y      (mvValue.posX)
+#define GYR_RAW_Z      (mvValue.posY)
 #define SHOCK_STA      (dotfIndex)
 
 //0x02
