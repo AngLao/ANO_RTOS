@@ -12,6 +12,7 @@ static uint8_t position_control(const int16_t tarX,const int16_t tarY,uint16_t c
 static void fusion_parameter_init(void);
 static void imu_fus_update(u8 dT_ms);
 static void uwb_test_task(uint8_t direction);
+static void send_message_to_car(uint16_t waitTIme);
 
 static void uwb_task_2023(void);
 
@@ -23,18 +24,23 @@ void uwb_update_task(void *pvParameters)
   Drv_Uart2Init(921600);
   debugOutput("uwb use uart2，rate:921600");
 
+  //数传串口初始化
+  Drv_Uart3Init(115200);
+	
 	//融合参数初始化
 	fusion_parameter_init();
 	
   while (1) {
-
     //解析成功,校验成功可以使用数据
     uint8_t dataValidity = unpack_data(); 
 		 
     if(useUwb == 0)
 			memset(uwbSpeedOut,0,sizeof(uwbSpeedOut));
 			
-		if(flag.taking_off)
+		if(flag.auto_take_off_land == AUTO_TAKE_OFF_FINISH)
+			//车机通信
+			send_message_to_car(800);
+		
       switch(useUwb) {
       case 1:
         break;
@@ -83,7 +89,6 @@ static uint8_t unpack_data(void)
         //数据检验
         analyticResult = validate_data();
       }
-
     }
   }
   return analyticResult;
@@ -175,8 +180,8 @@ static void fusion_parameter_init(void)
 //位置控制(单位:cm)
 static uint8_t position_control(const int16_t tarX,const int16_t tarY,uint16_t checkTime)
 {
-  const float kp = 0.55f;
-  const float ki = -0.00f; 
+  const float kp = 1.0f;
+  const float ki = -0.02f; 
  
 	uint8_t isGetAround = 0;
 	static TickType_t startTime = 0;
@@ -215,7 +220,7 @@ static uint8_t position_control(const int16_t tarX,const int16_t tarY,uint16_t c
 
 static void uwb_test_task(uint8_t direction)
 { 
-	static	uint8_t	tarPosBufIndex = 0;
+	static	uint8_t		tarPosBufIndex = 0;
 	static	uint16_t	tarPosBuf[] = {210,230,250,270,290,310,330};
 	
 	uint8_t isArrive = position_control(tarPosBuf[tarPosBufIndex] , 200 , 500); 
@@ -239,19 +244,19 @@ uint8_t	dotfIndex = 0;
 dot_t	dotPath[] = {
 {0,0} ,{0,1} ,{0,2} ,{0,3} ,{0,4} ,
 {1,4} ,{2,4} ,{3,4} ,{4,4} ,{5,4} ,
-{5,3} ,
-{4,3} ,{3,3} ,{2,3} ,{1,3} ,
-{1,2} ,{2,2} ,{3,2} ,{4,2} ,{5,2} ,
-{5,1} ,{5,0} ,
-{4,0} ,
-{4,1} ,
-{3,1} ,
-{3,0} ,
-{2,0} ,
-{2,1} ,
-{1,1} ,
-{1,0} ,
+{5,3} ,{5,2} ,{5,1} ,{5,0} ,
+{4,0} ,{4,1} ,{4,2} ,{4,3} ,
+{3,3} ,{3,2} ,{3,1} ,{3,0} ,
+{2,0} ,{2,1} ,{2,2} ,{2,3} ,
+{1,3} ,{1,2} ,{1,1} ,{1,0} ,
 {0,0} ,
+
+//{0,0} ,{0,4} ,{5,4} ,{5,0} ,
+//{4,0} ,{4,3} ,
+//{3,3} ,{3,0} ,
+//{2,0} ,{2,3} ,
+//{1,3} ,{1,0} ,
+//{0,0} ,
 };
 //基础巡航任务(巡遍整个区域)
 static void uwb_task_2023(void)
@@ -268,13 +273,32 @@ static void uwb_task_2023(void)
 	uint16_t tarPosX = areaCenter + tarCoordinateX * areaLength;
 	uint16_t tarPosY = areaCenter + tarCoordinateY * areaLength;
 	
-	uint8_t isArrive = position_control(tarPosX , tarPosY , 500); 
+	uint8_t isArrive = position_control(tarPosX , tarPosY , 300); 
 	
 	if(!isArrive)
 		return;
 	
 	if(dotfIndex < ((sizeof(dotPath)/sizeof(dotPath[0]))-1))
 		dotfIndex++;
-		
 	
+}
+
+//发送当前位置信息到小车端
+static void send_message_to_car(uint16_t setTime)
+{  	
+	static TickType_t lastTime = 0;
+	TickType_t thisTime = xTaskGetTickCount();
+	if(lastTime == 0)
+		lastTime = thisTime;
+	
+	if( (thisTime - lastTime) > pdMS_TO_TICKS(setTime)){
+		lastTime = thisTime;
+		
+		char coordinateStr[50];
+		
+		memset(coordinateStr,0,sizeof(coordinateStr));
+		sprintf((char*)coordinateStr,"coordinate,%d,%d\r\n",pos[X],pos[Y]);
+		
+	  Drv_Uart3SendBuf((uint8_t*)coordinateStr, sizeof(coordinateStr));
+	}
 }
