@@ -71,7 +71,7 @@ static int32_t wcz_acc;
 static _inte_fix_filter_st wcz_acc_fus;
 _fix_inte_filter_st wcz_spe_fus,wcz_hei_fus;
 
-#define N_TIMES 6
+#define N_TIMES 15
 
 void wcz_fus_update(u8 dT_ms)
 {
@@ -98,9 +98,8 @@ void wcz_fus_update(u8 dT_ms)
 		ref_height = wcz_hei_fus.out;
 	
   static u8 cyc_xn;
-  float hz,ntimes_hz;
-  hz = safe_div(1000,dT_ms,0);
-  ntimes_hz = hz/N_TIMES;
+  float hz = safe_div(1000,dT_ms,0);
+  float ntimes_hz = hz/N_TIMES;
 	
   cyc_xn ++;
   cyc_xn %= N_TIMES;
