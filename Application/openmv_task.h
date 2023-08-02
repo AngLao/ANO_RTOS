@@ -10,23 +10,12 @@
  
 #include "Drv_Uart.h"  
 
-//修正偏航
-#define ANGLE_ID (0x01)
-//面积
-#define AREA_ID (0x02)
-//宽度
-#define WIDTH_ID (0x03)
-//图像位置
-#define POS_ID (0x04)
-//二维码识别结果
-#define RES_ID (0x05)
+#define X_ID (0x01)
+#define Y_ID (0x02)
 
 typedef struct {
-	uint32_t angle ;
-	uint32_t area ;
-	uint32_t width ;
-	uint32_t pos ;
-	uint32_t res ;
+	uint32_t posX ;
+	uint32_t posY ;
 }openmv_t ;
  
 extern uint8_t useOpenmv;
