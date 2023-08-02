@@ -5,6 +5,8 @@
 #include "hw_gpio.h"
 #include "Ano_DT.h"
 #include "Drv_laser.h"
+#include "Ano_FcData.h"
+#include "rc_update.h"
 
 //TM4C的串口0对应底板串口1
 //TM4C的串口2对应底板串口5
@@ -150,7 +152,6 @@ void Drv_Uart2TxCheck(void)
 u8 U3TxDataTemp[256];
 u8 U3TxInCnt = 0;
 u8 U3TxOutCnt = 0;
-
 //串口收发环形缓冲区定义
 RINGBUFF_T U3rxring;
 volatile unsigned char UART3Buffer[128];
@@ -166,6 +167,21 @@ void UART3_IRQHandler(void)
   while(ROM_UARTCharsAvail(UART5_BASE)) {
     com_data = ROM_UARTCharGet(UART5_BASE);
 
+		uint8_t carState = 0;
+		switch(carState){
+			case 0:
+				if(com_data == 0xAA)
+					carState++;
+			case 1:
+				if(com_data == 0x0A)
+					carState++;
+				else
+					carState = 0;
+			case 2:
+				if(com_data == 0xFF)
+					one_key_take_off();
+				carState=0;
+		}
     if(RingBuffer_GetFree(&U3rxring) > 1) {
       RingBuffer_Insert(&U3rxring, &com_data);
     }

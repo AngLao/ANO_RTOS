@@ -18,7 +18,7 @@ static void offLineProtection()
 }
 
 //一键起飞
-static void one_key_take_off()
+void one_key_take_off()
 {
   if(flag.unlock_err == 0 && flag.auto_take_off_land == AUTO_TAKE_OFF_NULL) { 
       flag.unlock_cmd = 1;
@@ -109,7 +109,6 @@ static void vSlowDetection( void *pvParameters )
       channelThreeState = 2;
 //      debugOutput("CH_N[AUX3]  = 2");
 			debugOutput("useOpenmv = 1");
-			useUwb = 1;
 			useOpenmv = 1;
     }
     //开关打到中值

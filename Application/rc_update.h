@@ -17,7 +17,6 @@
 
 #include "uwb_task.h"
 
-
 //摇杆触发值，摇杆值范围为+-500，超过300属于触发范围
 #define UN_YAW_VALUE  300
 #define UN_THR_VALUE  300
@@ -42,6 +41,7 @@ enum {
 extern int16_t CH_N[] ;
 
 
+void one_key_take_off(void);
 void receivingModeInit(void);
 
 void receiving_task(void *pvParameters);
