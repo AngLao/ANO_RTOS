@@ -185,8 +185,8 @@ int main(void)
   /* uwb数据更新 */
   xTaskCreate(uwb_update_task, "uwb_update_task", 136, NULL, 3, NULL);
 	
-//  /* openmv数据更新 */
-//  xTaskCreate(openmv_update_task, "openmv_update_task", 156, NULL, 3, NULL); 
+  /* openmv数据更新 */
+  xTaskCreate(openmv_update_task, "openmv_update_task", 156, NULL, 3, NULL); 
 
   /*--------------------------------------------------------
   									上层扩展任务

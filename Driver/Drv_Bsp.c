@@ -104,6 +104,13 @@ void Drv_BspInit(void)
 	
   //滴答时钟初始化
   SysTick_Init(); 
+	
+			
+  //发现火源指示灯引脚初始化
+  ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
+  ROM_GPIOPinTypeGPIOOutput(GPIOF_BASE, GPIO_PIN_0);
+  ROM_GPIOPinWrite(GPIOF_BASE, GPIO_PIN_0, 0);
+	
 }
 
 

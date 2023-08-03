@@ -1,7 +1,9 @@
 #include "uwb_task.h"
 
+
+uint8_t	taskStatus_2023 = 0;
+
 float uwbSpeedOut[2];
-uint8_t useUwb = 0;
 uint32_t totalFrameCount = 0, errorFrameCount = 0;
 
 static int16_t pos[2];
@@ -30,25 +32,50 @@ void uwb_update_task(void *pvParameters)
 	//融合参数初始化
 	fusion_parameter_init();
 	
+	taskStatus_2023 = cruise;
   while (1) {
     //解析成功,校验成功可以使用数据
     uint8_t dataValidity = unpack_data(); 
-		 
-    if(useUwb == 0)
-			memset(uwbSpeedOut,0,sizeof(uwbSpeedOut));
-			
-		if(flag.auto_take_off_land == AUTO_TAKE_OFF_FINISH)
-			//车机通信
-			send_message_to_car(800);
 		
-      switch(useUwb) {
-      case 1:
-        break;
-      case 2:
-				uwb_task_2023();
-        break;
-      }
+		//解析小车发来的数据(是否开始一键起飞)
+		uint8_t RingBufferDataLen = RingBuffer_GetCount(&U3rxring) ;
+	 
+		for(uint8_t cnt = 0; cnt <RingBufferDataLen ; cnt++) {
+			uint8_t data = 0;
+			RingBuffer_Pop(&U3rxring, &data); 
+		
+			static uint8_t carState = 0;
+			switch(carState){
+				case 0:
+					if(data == 0xAA)
+						carState++;
+				case 1:
+					if(data == 0x0A)
+						carState++;
+					else
+						carState = 0;
+				case 2:
+					if(data == 0xFF)
+						one_key_take_off();
+					carState=0;
+			}
+		}
+		
+		if(flag.auto_take_off_land == AUTO_TAKE_OFF_FINISH){
+			//车机通信
+			send_message_to_car(1000);
 			
+			//等待坐标稳定
+			
+			//UWB自动巡航
+			if(taskStatus_2023 == cruise) 
+				uwb_task_2023(); 
+		}
+			
+		//不启用UWB巡航时
+    if(taskStatus_2023 != cruise)
+			memset(uwbSpeedOut,0,sizeof(uwbSpeedOut));
+		
     vTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ / 100);
   }
 }
@@ -180,7 +207,7 @@ static void fusion_parameter_init(void)
 //位置控制(单位:cm)
 static uint8_t position_control(const int16_t tarX,const int16_t tarY,uint16_t checkTime)
 {
-  const float kp = 1.0f;
+  const float kp = 1.4f;
   const float ki = -0.02f; 
  
 	uint8_t isGetAround = 0;
@@ -194,12 +221,12 @@ static uint8_t position_control(const int16_t tarX,const int16_t tarY,uint16_t c
 
     static int16_t errorIntegral = 0;
 		//I
-    if(abs(error) < 3)
+    if(abs(error) < 10)
       errorIntegral += error;
     else
       errorIntegral = 0;
 
-		errorIntegral = LIMIT(errorIntegral, -60,60); 
+		errorIntegral = LIMIT(errorIntegral, -200,200); 
 
     uwbSpeedOut[i] = error*kp + errorIntegral*ki;
 
@@ -232,32 +259,33 @@ static void uwb_test_task(uint8_t direction)
 		tarPosBufIndex--;
 	else if(direction == 1 && tarPosBufIndex<((sizeof(tarPosBuf)/sizeof(tarPosBuf[0]))-1))
 		tarPosBufIndex++;
-		
-	
 }
 
 const uint8_t xNum=6 , yNum = 5;
-
+const uint16_t offsetX = 10, offsetY=11;
 //走过的区域计数
 uint8_t	dotfIndex = 0;
 //路径设置(坐标系映射)
 dot_t	dotPath[] = {
-{0,0} ,{0,1} ,{0,2} ,{0,3} ,{0,4} ,
-{1,4} ,{2,4} ,{3,4} ,{4,4} ,{5,4} ,
-{5,3} ,{5,2} ,{5,1} ,{5,0} ,
-{4,0} ,{4,1} ,{4,2} ,{4,3} ,
-{3,3} ,{3,2} ,{3,1} ,{3,0} ,
-{2,0} ,{2,1} ,{2,2} ,{2,3} ,
-{1,3} ,{1,2} ,{1,1} ,{1,0} ,
-{0,0} ,
+//										{0,0} ,{0,1} ,{0,2} ,{0,3} ,{0,4} ,
+//										{1,4} ,{2,4} ,{3,4} ,{4,4} ,{5,4} ,
+//										{5,3} ,{5,2} ,{5,1} ,{5,0} ,
+//										{4,0} ,{4,1} ,{4,2} ,{4,3} ,
+//										{3,3} ,{3,2} ,{3,1} ,{3,0} ,
+//										{2,0} ,{2,1} ,{2,2} ,{2,3} ,
+//										{1,3} ,{1,2} ,{1,1} ,{1,0} ,
+//										{0,0}
 
-//{0,0} ,{0,4} ,{5,4} ,{5,0} ,
-//{4,0} ,{4,3} ,
-//{3,3} ,{3,0} ,
-//{2,0} ,{2,3} ,
-//{1,3} ,{1,0} ,
-//{0,0} ,
-};
+										{0,0} ,{0,4} ,{5,4} ,{5,0} ,
+										{4,0} ,{4,3} ,
+										{3,3} ,{3,0} ,
+										{2,0} ,{2,3} ,
+										{1,3} ,{1,0} ,
+										{0,0}
+											
+//										//test
+//										{2,1},{2,2} ,{3,2} ,{3,1} 
+									};
 //基础巡航任务(巡遍整个区域)
 static void uwb_task_2023(void)
 {  	
@@ -269,17 +297,28 @@ static void uwb_task_2023(void)
 	uint16_t tarCoordinateX = dotPath[dotfIndex].x;
 	uint16_t tarCoordinateY = dotPath[dotfIndex].y;
 	
+	uint16_t tarPosX=0 , tarPosY=0;
 	//根据地图以及坐标点取出实际坐标
-	uint16_t tarPosX = areaCenter + tarCoordinateX * areaLength;
-	uint16_t tarPosY = areaCenter + tarCoordinateY * areaLength;
-	
-	uint8_t isArrive = position_control(tarPosX , tarPosY , 300); 
+	if(tarCoordinateX == 0 && tarCoordinateY == 0){
+		tarPosX = offsetX + 32;
+		tarPosY = offsetY + 32;
+	}else{
+		tarPosX = offsetX + areaCenter + tarCoordinateX * areaLength;
+		tarPosY = offsetY + areaCenter + tarCoordinateY * areaLength;
+	}
+
+	uint8_t isArrive = position_control(tarPosX , tarPosY , 100); 
 	
 	if(!isArrive)
 		return;
 	
 	if(dotfIndex < ((sizeof(dotPath)/sizeof(dotPath[0]))-1))
 		dotfIndex++;
+	else{
+		taskStatus_2023 = complete;
+		one_key_land();
+		dotfIndex=0;
+	}
 	
 }
 
@@ -301,4 +340,14 @@ static void send_message_to_car(uint16_t setTime)
 		
 	  Drv_Uart3SendBuf((uint8_t*)coordinateStr, sizeof(coordinateStr));
 	}
+}
+
+int16_t getPosX(void)
+{
+	return pos[X];
+}
+
+int16_t getPosY(void)
+{
+	return pos[Y];
 }

@@ -9,6 +9,7 @@
 #include "Ano_ProgramCtrl_User.h"
  
 #include "Drv_Uart.h"  
+#include "Drv_PwmOut.h"
 
 #define X_ID (0x01)
 #define Y_ID (0x02)

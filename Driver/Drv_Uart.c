@@ -166,25 +166,8 @@ void UART3_IRQHandler(void)
   /*判断FIFO是否还有数据*/
   while(ROM_UARTCharsAvail(UART5_BASE)) {
     com_data = ROM_UARTCharGet(UART5_BASE);
-
-		uint8_t carState = 0;
-		switch(carState){
-			case 0:
-				if(com_data == 0xAA)
-					carState++;
-			case 1:
-				if(com_data == 0x0A)
-					carState++;
-				else
-					carState = 0;
-			case 2:
-				if(com_data == 0xFF)
-					one_key_take_off();
-				carState=0;
-		}
-    if(RingBuffer_GetFree(&U3rxring) > 1) {
-      RingBuffer_Insert(&U3rxring, &com_data);
-    }
+		
+		RingBuffer_Insert(&U3rxring, &com_data);
   }
 
   if(flag & UART_INT_TX) {
