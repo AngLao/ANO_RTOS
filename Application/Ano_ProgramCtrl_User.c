@@ -59,11 +59,10 @@ void user_speed_set(void)
 	
 	sumVelocity[X] = uwbSpeedOut[X]+openmvSpeedOut[X];
 	sumVelocity[Y] = uwbSpeedOut[Y]+openmvSpeedOut[Y];
-	
-	sumVelocity[YAW] = openmvSpeedOut[YAW];
-	
-	Program_Ctrl_User_Set_YAWdps(sumVelocity[YAW]);
 	Program_Ctrl_User_Set_HXYcmps(sumVelocity[X], sumVelocity[Y]);
+	
+//	sumVelocity[YAW] = openmvSpeedOut[YAW];
+//	Program_Ctrl_User_Set_YAWdps(sumVelocity[YAW]);
 }
 
 
