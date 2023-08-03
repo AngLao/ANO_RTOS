@@ -69,6 +69,10 @@ void Drv_PwmOutInit(void)
   for ( u8 i = 0; i < 8; i++) {
     Drv_MotorPWMSet(i, 0);
   }
+	
+	//¶æ»ú¹éÁã
+	gear_protocol_set(6 ,2000);
+	gear_protocol_set(7 ,2000);
 }
 /**********************************************************************************************************
 *º¯ Êý Ãû: Drv_MotorPWMSet
@@ -134,10 +138,9 @@ void Drv_HeatSet(u16 val)
 void gear_protocol_set(u16 num ,u16 val)
 {
 	
-  if(val > 1000) 
-		val = 1000;
-	
-	val += 500;
+	val = 625 + val/0.8f ;
+  if(val > 3125) 
+		val = 3125;
 	
   if(num == 6)
     ROM_PWMPulseWidthSet(PWM1_BASE, PWM_OUT_6, val); 
