@@ -48,13 +48,15 @@ void Drv_PwmOutInit(void)
   ROM_PWMGenPeriodSet(PWM0_BASE, PWM_GEN_1, PWM_PERIOD_MAX);
   ROM_PWMGenPeriodSet(PWM1_BASE, PWM_GEN_1, PWM_PERIOD_MAX);
   ROM_PWMGenPeriodSet(PWM1_BASE, PWM_GEN_2, PWM_PERIOD_MAX);
-  ROM_PWMGenPeriodSet(PWM1_BASE, PWM_GEN_3, PWM_PERIOD_MAX);
+	//PWM6,7的周期改为50Hz 20000/0.8 = 25000
+  ROM_PWMGenPeriodSet(PWM1_BASE, PWM_GEN_3, 25000);
   /*使能定时器*/
   ROM_PWMGenEnable(PWM0_BASE, PWM_GEN_0);
   ROM_PWMGenEnable(PWM0_BASE, PWM_GEN_1);
   ROM_PWMGenEnable(PWM1_BASE, PWM_GEN_1);
   ROM_PWMGenEnable(PWM1_BASE, PWM_GEN_2);
   ROM_PWMGenEnable(PWM1_BASE, PWM_GEN_3);
+	
   /* 使能输出 */
   ROM_PWMOutputState(PWM0_BASE, PWM_OUT_0_BIT | PWM_OUT_1_BIT | PWM_OUT_2_BIT | PWM_OUT_3_BIT, true);
   ROM_PWMOutputState(PWM1_BASE, PWM_OUT_4_BIT | PWM_OUT_5_BIT | PWM_OUT_6_BIT | PWM_OUT_7_BIT, true);
@@ -126,4 +128,20 @@ void Drv_HeatSet(u16 val)
     tmpval = (PWM_PERIOD_MAX - 1);
 
   ROM_PWMPulseWidthSet(PWM1_BASE, PWM_OUT_3, tmpval);
+}
+
+//舵机控制 0-2000us -> 0.5-2.5ms 
+void gear_protocol_set(u16 num ,u16 val)
+{
+	
+  if(val > 1000) 
+		val = 1000;
+	
+	val += 500;
+	
+  if(num == 6)
+    ROM_PWMPulseWidthSet(PWM1_BASE, PWM_OUT_6, val); 
+  else if(num == 7)
+    ROM_PWMPulseWidthSet(PWM1_BASE, PWM_OUT_7, val);
+	
 }
