@@ -87,7 +87,7 @@ _dt_st dt;
 #define GYR_RAW_X      (40 + dotPath[dotfIndex].y * 80)
 #define GYR_RAW_Y      (mvValue.posX)
 #define GYR_RAW_Z      (mvValue.posY)
-#define SHOCK_STA      (dotfIndex)
+#define SHOCK_STA      (taskStatus_2023)
 
 //0x02
 #define ECP_RAW_X      (mag.val[X])
@@ -149,10 +149,10 @@ _dt_st dt;
 #define STATE         (OF_STATE)
 #define DX_2          (OF_DX2)
 #define DY_2          (OF_DY2)
-#define DX_FIX  	   	(OF_DX2FIX)
-#define DY_FIX      	(OF_DY2FIX)
-#define INTEG_X      	(OF_INTEG_X)
-#define INTEG_Y				(OF_INTEG_Y)
+#define DX_FIX  	   	(loc_ctrl_1.exp[X])
+#define DY_FIX      	(loc_ctrl_1.exp[Y])
+#define INTEG_X      	(loc_ctrl_1.fb[X])
+#define INTEG_Y				(loc_ctrl_1.fb[Y])
 #define QUALITY      	(OF_QUALITY)
 
 void ANO_DT_Init(void)
@@ -179,10 +179,10 @@ void ANO_DT_Init(void)
 //  dt.txSet_u2[CSID_X20].fre_ms = 100;
   //UWB数据
   dt.txSet_u2[CSID_X32].fre_ms = 100;
-//  //遥控数据
-//  dt.txSet_u2[CSID_X40].fre_ms = 100;
-//  //光流数据
-//  dt.txSet_u2[CSID_X51].fre_ms = 100;
+  //遥控数据
+  dt.txSet_u2[CSID_X40].fre_ms = 100;
+  //光流数据
+  dt.txSet_u2[CSID_X51].fre_ms = 100;
 
 #if(DEBUG_CONFIG == UART)
 

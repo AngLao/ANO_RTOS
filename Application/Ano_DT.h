@@ -14,8 +14,8 @@
 #define UART 3
 
 //数传输出硬件选择
-#define DEBUG_CONFIG CLOSE
-#define ANO_HELPER 1
+#define DEBUG_CONFIG UART
+#define ANO_HELPER 0
 
 typedef enum {
   CSID_X01,

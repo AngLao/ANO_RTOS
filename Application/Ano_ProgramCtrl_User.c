@@ -2,8 +2,8 @@
 #include "Ano_Math.h"
 
 
-#define MAX_PC_XYVEL_CMPS  30
-#define MAX_PC_ZVEL_CMPS   30
+#define MAX_PC_XYVEL_CMPS  50
+#define MAX_PC_ZVEL_CMPS   50
 #define MAX_PC_PAL_DPS     100
 
 _pc_user_st pc_user;

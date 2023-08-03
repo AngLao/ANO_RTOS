@@ -25,7 +25,7 @@
 
 
 
-#define MAX_ANGLE     15.0f
+#define MAX_ANGLE     10.0f
 
 #define MAX_ROLLING_SPEED 600  //Ω«∂»√ø√Î
 
