@@ -42,6 +42,7 @@ extern int16_t CH_N[] ;
 
 
 void one_key_take_off(void);
+void one_key_land(void);
 void receivingModeInit(void);
 
 void receiving_task(void *pvParameters);

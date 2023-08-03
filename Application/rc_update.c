@@ -18,7 +18,7 @@ static void offLineProtection()
 }
 
 //一键起飞
-void one_key_take_off()
+void one_key_take_off(void)
 {
   if(flag.unlock_err == 0 && flag.auto_take_off_land == AUTO_TAKE_OFF_NULL) { 
       flag.unlock_cmd = 1;
@@ -28,14 +28,13 @@ void one_key_take_off()
 	 debugOutput("auto take off fail");
 }
 //一键降落
-static void one_key_land()
+void one_key_land(void)
 { 
 	if(flag.taking_off) 
 		flag.auto_take_off_land = AUTO_LAND;
 	else
 	 debugOutput("take off before land"); 
 }
-
 //电调校准模式
 uint8_t escCalibrationMode = 0;
 //低速状态变化检测回调函数
@@ -98,25 +97,26 @@ static void vSlowDetection( void *pvParameters )
   static uint8_t channelThreeState = 0;
   //开关回到零点
   if(CH_N[AUX3]<-100){ 
-			channelThreeState = 0;  
-			useUwb = 0;
-			useOpenmv = 0;
+			channelThreeState = 0;
 	}
+	
+static uint8_t blackCode = 0x01;
+static uint8_t redCode = 0x02;
+#define FindBlack() ( Drv_Uart5SendBuf(&blackCode,1) ) // (ROM_UARTCharPutNonBlocking(UART2_BASE, 0x01))
+#define FindRed() 	( Drv_Uart5SendBuf(&redCode,1) )// (ROM_UARTCharPutNonBlocking(UART2_BASE, 0x02))
 	
   if(channelThreeState == 0) {
     //开关打到高值
     if(CH_N[AUX3] > 300) {
       channelThreeState = 2;
-//      debugOutput("CH_N[AUX3]  = 2");
 			debugOutput("useOpenmv = 1");
-			useOpenmv = 1;
+			FindBlack();
     }
     //开关打到中值
     else if(CH_N[AUX3] > -100) {
       channelThreeState = 1;
-//      debugOutput("CH_N[AUX3]  = 1");
 			debugOutput("useUwb = 2");
-			useUwb = 2;
+			FindRed();
     }
   }
 
@@ -301,6 +301,13 @@ static void dataStandardization(void)
       CH_N[i] = LIMIT(CH_N[i], -500, 500); //限制到+—500
     }
   }
+	
+	//除去姿态控制信号误差
+	for(u8 i = 0; i < 4; i++) { 
+		if(ABS(CH_N[i])<30)
+			CH_N[i] = 0;
+	}
+	
 }
 
 
