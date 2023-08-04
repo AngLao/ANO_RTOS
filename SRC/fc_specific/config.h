@@ -25,9 +25,9 @@
 
 
 
-#define MAX_ANGLE     10.0f
+#define MAX_ANGLE     6.0f
 
-#define MAX_ROLLING_SPEED 600  //角度每秒
+#define MAX_ROLLING_SPEED 350  //角度每秒
 
 #define MAX_SPEED 200 //最大水平速度，厘米每秒 cm/s
 
