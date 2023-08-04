@@ -16,6 +16,8 @@ static uint8_t position_stability_judgment(uint16_t setTime);
 static uint8_t throw_task(void);
 static void send_fire_pos(void);
 
+static uint8_t in_roi(void);
+
 #define led_on() (ROM_GPIOPinWrite(GPIOF_BASE, GPIO_PIN_0, 0))
 #define led_off() (ROM_GPIOPinWrite(GPIOF_BASE, GPIO_PIN_0, 1))
 
@@ -45,7 +47,8 @@ void openmv_update_task(void *pvParameters)
 				//巡航中找到色块
 				case cruise:
 					//中止巡航,开始定位火源
-						taskStatus_2023 = fixPoint;
+						if( in_roi() )
+							taskStatus_2023 = fixPoint;
 					break;
 				case fixPoint:
 					//位置稳定,记录火源位置,打开指示灯
@@ -159,8 +162,8 @@ static void assign_value(uint8_t mId)
 //控制目标在图像中的位置（返回的速度控制yaw可以绕杆）
 static float position_control_x(uint32_t exp ,uint32_t measureValue)
 {
-  const float kp = -0.11f;
-  const float ki = 0.2f; 
+  const float kp = 0.12f;
+  const float ki = -0.06f; 
 
   //P
   int error = exp - measureValue  ;
@@ -171,8 +174,8 @@ static float position_control_x(uint32_t exp ,uint32_t measureValue)
 		errorIntegral += error;
 	else
 		errorIntegral = 0;
- 
-	errorIntegral = LIMIT(errorIntegral, -50,50); 
+  
+	errorIntegral = LIMIT(errorIntegral, -300,300); 
  
   float out = error*kp + errorIntegral*ki;
 	return out ;
@@ -180,8 +183,8 @@ static float position_control_x(uint32_t exp ,uint32_t measureValue)
 
 static float position_control_y(uint32_t exp ,uint32_t measureValue)
 {
-  const float kp = -0.11f;
-  const float ki = 0.2f; 
+  const float kp = 0.12f;
+  const float ki = -0.06f; 
 
   //P
   int error = exp - measureValue  ;
@@ -193,7 +196,7 @@ static float position_control_y(uint32_t exp ,uint32_t measureValue)
 	else
 		errorIntegral = 0;
  
-	errorIntegral = LIMIT(errorIntegral, -50,50); 
+	errorIntegral = LIMIT(errorIntegral, -300,300); 
  
   float out = error*kp + errorIntegral*ki;
 	return out ;
@@ -273,4 +276,16 @@ static void send_fire_pos(void)
 	  Drv_Uart3SendBuf((uint8_t*)coordinateStr, sizeof(coordinateStr));
 	  Drv_Uart3SendBuf((uint8_t*)coordinateStr, sizeof(coordinateStr));
 	  Drv_Uart3SendBuf((uint8_t*)coordinateStr, sizeof(coordinateStr));
+}
+
+//是否在火源可能出现的区域
+static uint8_t in_roi(void)
+{  	
+	uint8_t res ;
+	uint8_t x = dotPath[dotfIndex].x , y = dotPath[dotfIndex].y;
+	if( x > 3 || y > 0)
+		return 1;
+	else
+		return 0;
+
 }
