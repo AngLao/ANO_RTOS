@@ -207,7 +207,7 @@ static void fusion_parameter_init(void)
 //位置控制(单位:cm)
 static uint8_t position_control(const int16_t tarX,const int16_t tarY,uint16_t checkTime)
 {
-  const float kp = 1.4f;
+  const float kp = 1.5f;
   const float ki = -0.02f; 
  
 	uint8_t isGetAround = 0;
@@ -221,7 +221,7 @@ static uint8_t position_control(const int16_t tarX,const int16_t tarY,uint16_t c
 
     static int16_t errorIntegral = 0;
 		//I
-    if(abs(error) < 10)
+    if(abs(error) < 15)
       errorIntegral += error;
     else
       errorIntegral = 0;
@@ -267,21 +267,21 @@ const uint16_t offsetX = 10, offsetY=11;
 uint8_t	dotfIndex = 0;
 //路径设置(坐标系映射)
 dot_t	dotPath[] = {
-//										{0,0} ,{0,1} ,{0,2} ,{0,3} ,{0,4} ,
-//										{1,4} ,{2,4} ,{3,4} ,{4,4} ,{5,4} ,
-//										{5,3} ,{5,2} ,{5,1} ,{5,0} ,
-//										{4,0} ,{4,1} ,{4,2} ,{4,3} ,
-//										{3,3} ,{3,2} ,{3,1} ,{3,0} ,
-//										{2,0} ,{2,1} ,{2,2} ,{2,3} ,
-//										{1,3} ,{1,2} ,{1,1} ,{1,0} ,
-//										{0,0}
-
-										{0,0} ,{0,4} ,{5,4} ,{5,0} ,
-										{4,0} ,{4,3} ,
-										{3,3} ,{3,0} ,
-										{2,0} ,{2,3} ,
-										{1,3} ,{1,0} ,
+										{0,0} ,{0,1} ,{0,2} ,{0,3} ,{0,4} ,
+										{1,4} ,{2,4} ,{3,4} ,{4,4} ,{5,4} ,
+										{5,3} ,{5,2} ,{5,1} ,{5,0} ,
+										{4,0} ,{4,1} ,{4,2} ,{4,3} ,
+										{3,3} ,{3,2} ,{3,1} ,{3,0} ,
+										{2,0} ,{2,1} ,{2,2} ,{2,3} ,
+										{1,3} ,{1,2} ,{1,1} ,{1,0} ,
 										{0,0}
+
+//										{0,0} ,{0,4} ,{5,4} ,{5,0} ,
+//										{4,0} ,{4,3} ,
+//										{3,3} ,{3,0} ,
+//										{2,0} ,{2,3} ,
+//										{1,3} ,{1,0} ,
+//										{0,0}
 											
 //										//test
 //										{2,1},{2,2} ,{3,2} ,{3,1} 
@@ -290,7 +290,7 @@ dot_t	dotPath[] = {
 static void uwb_task_2023(void)
 {  	
 	//地图分三十块正方形区域,x轴长6块,y轴长5块
-	static const uint8_t areaLength = 80;
+	static const uint8_t areaLength = 84;
 	static const uint8_t areaCenter = areaLength/2;
 	
 	//求出区域坐标系中的位置
@@ -307,7 +307,7 @@ static void uwb_task_2023(void)
 		tarPosY = offsetY + areaCenter + tarCoordinateY * areaLength;
 	}
 
-	uint8_t isArrive = position_control(tarPosX , tarPosY , 100); 
+	uint8_t isArrive = position_control(tarPosX , tarPosY , 50); 
 	
 	if(!isArrive)
 		return;
@@ -319,7 +319,6 @@ static void uwb_task_2023(void)
 		one_key_land();
 		dotfIndex=0;
 	}
-	
 }
 
 //发送当前位置信息到小车端
