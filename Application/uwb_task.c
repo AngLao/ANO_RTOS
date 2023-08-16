@@ -61,7 +61,16 @@ void uwb_update_task(void *pvParameters)
 			}
 		}
 		
+		static uint8_t isWaitSomeTime = 0;
+		
 		if(flag.auto_take_off_land == AUTO_TAKE_OFF_FINISH){
+			
+			//等待坐标稳定
+			if(!isWaitSomeTime){
+				isWaitSomeTime = 1;
+				vTaskDelay( pdMS_TO_TICKS(2000));
+			}
+			
 			//车机通信
 			send_message_to_car(1000);
 			
@@ -70,6 +79,13 @@ void uwb_update_task(void *pvParameters)
 			//UWB自动巡航
 			if(taskStatus_2023 == cruise) 
 				uwb_task_2023(); 
+		}else{
+			isWaitSomeTime=0;
+		}
+		
+		if(flag.auto_take_off_land == AUTO_LAND){
+			uwbSpeedOut[X] = -1.1;
+			uwbSpeedOut[Y] = -1.1;
 		}
 			
 		//不启用UWB巡航时
@@ -207,7 +223,7 @@ static void fusion_parameter_init(void)
 //位置控制(单位:cm)
 static uint8_t position_control(const int16_t tarX,const int16_t tarY,uint16_t checkTime)
 {
-  const float kp = 1.5f;
+  const float kp = 1.4f;
   const float ki = -0.02f; 
  
 	uint8_t isGetAround = 0;

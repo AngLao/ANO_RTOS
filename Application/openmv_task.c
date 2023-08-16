@@ -18,8 +18,8 @@ static void send_fire_pos(void);
 
 static uint8_t in_roi(void);
 
-#define led_on() (ROM_GPIOPinWrite(GPIOF_BASE, GPIO_PIN_0, 0))
-#define led_off() (ROM_GPIOPinWrite(GPIOF_BASE, GPIO_PIN_0, 1))
+#define led_on() (ROM_GPIOPinWrite(GPIOF_BASE, GPIO_PIN_0, 1))
+#define led_off() (ROM_GPIOPinWrite(GPIOF_BASE, GPIO_PIN_0, 0))
 
 const uint16_t expPosX = 120 , expPosY = 160;
 /* openmv数据更新 */
@@ -159,12 +159,12 @@ static void assign_value(uint8_t mId)
 	} 
 }
 
+
+const float kp = 0.16f;
+const float ki = -0.03f; 
 //控制目标在图像中的位置（返回的速度控制yaw可以绕杆）
 static float position_control_x(uint32_t exp ,uint32_t measureValue)
 {
-  const float kp = 0.12f;
-  const float ki = -0.06f; 
-
   //P
   int error = exp - measureValue  ;
 
@@ -183,9 +183,6 @@ static float position_control_x(uint32_t exp ,uint32_t measureValue)
 
 static float position_control_y(uint32_t exp ,uint32_t measureValue)
 {
-  const float kp = 0.12f;
-  const float ki = -0.06f; 
-
   //P
   int error = exp - measureValue  ;
 
@@ -210,8 +207,8 @@ static uint8_t position_stability_judgment(uint16_t setTime)
 	TickType_t thisTime = xTaskGetTickCount();
 	
 	uint8_t res = 0;
-	res += (ABS(mvValue.posX-expPosX) < 40) ? 1 : 0 ;
-	res += (ABS(mvValue.posY-expPosY) < 40) ? 1 : 0 ;
+	res += (ABS(mvValue.posX-expPosX) < 50) ? 1 : 0 ;
+	res += (ABS(mvValue.posY-expPosY) < 50) ? 1 : 0 ;
 	
 	if(lastTime == 0 || res != 2)
 		lastTime = thisTime;
@@ -257,8 +254,10 @@ static uint8_t throw_task(void)
 			send_fire_pos();
 		}
 		//上升完成结束任务继续巡航
-		else
+		else{
+			Program_Ctrl_User_Set_Zcmps(0);
 			return 1;
+		}
 	}
 	
 	return 0;
