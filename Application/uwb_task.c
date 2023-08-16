@@ -32,6 +32,7 @@ void uwb_update_task(void *pvParameters)
 	//融合参数初始化
 	fusion_parameter_init();
 	
+	//任务默认启用uwb巡航
 	taskStatus_2023 = cruise;
   while (1) {
     //解析成功,校验成功可以使用数据
@@ -65,7 +66,7 @@ void uwb_update_task(void *pvParameters)
 		
 		if(flag.auto_take_off_land == AUTO_TAKE_OFF_FINISH){
 			
-			//等待坐标稳定
+			//起飞完成后延时等待坐标稳定
 			if(!isWaitSomeTime){
 				isWaitSomeTime = 1;
 				vTaskDelay( pdMS_TO_TICKS(2000));
@@ -74,8 +75,6 @@ void uwb_update_task(void *pvParameters)
 			//车机通信
 			send_message_to_car(1000);
 			
-			//等待坐标稳定
-			
 			//UWB自动巡航
 			if(taskStatus_2023 == cruise) 
 				uwb_task_2023(); 
@@ -83,12 +82,13 @@ void uwb_update_task(void *pvParameters)
 			isWaitSomeTime=0;
 		}
 		
+		//给固定的便宜速度,纠正降落时黑块导致的位置偏移
 		if(flag.auto_take_off_land == AUTO_LAND){
 			uwbSpeedOut[X] = -1.1;
 			uwbSpeedOut[Y] = -1.1;
 		}
 			
-		//不启用UWB巡航时
+		//不启用UWB巡航时,uwb控制速度清零
     if(taskStatus_2023 != cruise)
 			memset(uwbSpeedOut,0,sizeof(uwbSpeedOut));
 		
