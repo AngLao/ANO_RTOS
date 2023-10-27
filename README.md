@@ -1,4 +1,4 @@
-#飞控硬件参数
+## 飞控硬件参数
 
 | 控制芯片        | 型号   |
 | :--------   | :-----  |
@@ -16,7 +16,7 @@
 
 输入电压:2S~6S
 
-#task list
+## task list
 
 - [x] 加入uwb数据解析（nooploop LinkTrack P-B ）
 - [x] 加入freertos
